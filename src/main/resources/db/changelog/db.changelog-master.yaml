@@ -1,0 +1,104 @@
+databaseChangeLog:
+  -  preConditions:
+  -  runningAs:
+       username:  Infercidium
+
+  -  changeSet:
+       id:  1
+       author: Infercidium
+       changes:
+         -  createTable:
+              tableName:  persons
+              columns:
+                -  column:
+                     name:  firstName
+                     type:  varchar(50)
+                     constraints:
+                       primaryKey:  true
+                       nullable: false
+                -  column:
+                     name:  lastName
+                     type:  varchar(50)
+                     constraints:
+                       primaryKey:  true
+                       nullable:  false
+                - column:
+                    name: address
+                    type: varchar(50)
+                    constraints:
+                      primaryKey:  true
+                      nullable: false
+                - column:
+                    name: city
+                    type: varchar(50)
+                    constraints:
+                      nullable: false
+                - column:
+                    name: zip
+                    type: int
+                    constraints:
+                      nullable: false
+                - column:
+                    name: phone
+                    type: varchar(50)
+                    constraints:
+                      nullable: true
+                - column:
+                    name: email
+                    type: varchar(50)
+                    constraints:
+                      nullable: true
+
+  -  changeSet:
+       id:  2
+       author:  Infercidium
+       changes:
+         -  createTable:
+              tableName:  firestations
+              columns:
+                -  column:
+                     name:  address
+                     type:  varchar(50)
+                     constraints:
+                       primaryKey:  true
+                       nullable: false
+                -  column:
+                     name:  station
+                     type:  int
+                     constraints:
+                       nullable:  false
+
+  -  changeSet:
+       id:  3
+       author:  Infercidium
+       changes:
+         -  createTable:
+              tableName:  medicalrecords
+              columns:
+                - column:
+                    name: firstName
+                    type: varchar(50)
+                    constraints:
+                      primaryKey:  true
+                      nullable: false
+                - column:
+                    name: lastName
+                    type: varchar(50)
+                    constraints:
+                      primaryKey:  true
+                      nullable: false
+                - column:
+                    name: birthdate
+                    type: varchar(50)
+                    constraints:
+                      nullable: false
+                - column:
+                    name: medications
+                    type: varchar(50)
+                    constraints:
+                      nullable: true
+                - column:
+                    name: allergies
+                    type: varchar(50)
+                    constraints:
+                      nullable: true
