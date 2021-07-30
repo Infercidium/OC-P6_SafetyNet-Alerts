@@ -1,6 +1,16 @@
 package com.infercidium.safetynet.model;
 
-public class Person {
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+@Entity
+public class Persons {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private String firstName;
     private String lastName;
@@ -9,6 +19,22 @@ public class Person {
     private int zip;
     private String phone;
     private String email;
+
+    public Persons() { }
+
+    public Persons(String firstName, String lastName, String address, String city, int zip, String phone, String email) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.address = address;
+        this.city = city;
+        this.zip = zip;
+        this.phone = phone;
+        this.email = email;
+    }
+
+    public Long getId() { return id; }
+
+    public void setId(Long id) { this.id = id; }
 
     public String getFirstName() {
         return firstName;
@@ -68,14 +94,15 @@ public class Person {
 
     @Override
     public String toString() {
-        return "Person{" +
-                "firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", address='" + address + '\'' +
-                ", city='" + city + '\'' +
-                ", zip=" + zip + '\'' +
-                ", phone='" + phone + '\'' +
-                ", email='" + email + '\'' +
-                '}';
+        return "Persons{"
+                + "id='" + id + '\''
+                + "firstName='" + firstName + '\''
+                + ", lastName='" + lastName + '\''
+                + ", address='" + address + '\''
+                + ", city='" + city + '\''
+                + ", zip=" + zip + '\''
+                + ", phone='" + phone + '\''
+                + ", email='" + email + '\''
+                + '}';
     }
 }
