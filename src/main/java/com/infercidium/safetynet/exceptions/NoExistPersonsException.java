@@ -7,5 +7,5 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class NoExistPersonsException extends RuntimeException {
     public NoExistPersonsException(String s) {
         super(s);
+        }
     }
-}

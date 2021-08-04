@@ -1,19 +1,16 @@
 package com.infercidium.safetynet.rest;
 
+import com.infercidium.safetynet.exceptions.MultiplePersonsIdentiteException;
 import com.infercidium.safetynet.exceptions.NoExistPersonsException;
 import com.infercidium.safetynet.model.Persons;
 import com.infercidium.safetynet.repository.PersonsRepository;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class PersonsRest {
@@ -26,12 +23,41 @@ public class PersonsRest {
 
         Persons verify = this.personR.save(persons);
 
-        if(verify == null) return ResponseEntity.noContent().build();
+        if(verify == null) return ResponseEntity.noContent().build(); //TODO : Utilité ?
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{firstName}/{lastName}")
                 .buildAndExpand(verify.getFirstName(), verify.getLastName()).toUri();
 
         return ResponseEntity.created(location).build();
+    }
+
+    @PutMapping(value = "/person/{firstName}/{lastName}")
+    public void putPerson(@PathVariable String firstName, @PathVariable String lastName, @RequestBody Persons persons) {
+        //TODO : Trouver un raccourci pour faire un put
+    }
+
+    @DeleteMapping(value = "/person/{firstName}/{lastName}")
+    public ResponseEntity<Object> dellPerson(@PathVariable String firstName, @PathVariable String lastName){
+        List<Persons> verify = getPerson(firstName, lastName);
+        if(verify.size() > 1) {
+            throw new MultiplePersonsIdentiteException("More than one person has this identity : " + verify + " Added the ID of the person referred to below: /<ID>");
+        } else {
+            this.personR.delete(verify.get(0));
+            return ResponseEntity.ok().build();
+        }
+    }
+
+    @DeleteMapping(value = "/person/{firstName}/{lastName}/{id}")
+    public ResponseEntity<Object> dellPerson(@PathVariable String firstName, @PathVariable String lastName, @PathVariable Long id){
+        Optional<Persons> verify = this.personR.findById(id);
+        if(!verify.isPresent()) {
+            throw new NoExistPersonsException("The id : " + id + " is not assigned.");
+        } else if(!verify.get().getFirstName().equals(firstName) || !verify.get().getLastName().equals(lastName)) {
+            throw new NoExistPersonsException("The id : " + id + " does not correspond with the first name : " + firstName + " and the last name : " + lastName + ".");
+        } else {
+            this.personR.delete(verify.get());
+            return ResponseEntity.ok().build();
+        }
     }
 
     @GetMapping(value = "/person/{firstName}/{lastName}")
@@ -50,7 +76,7 @@ public class PersonsRest {
         return verify;
         }
 
-    //7. http://localhost:8080/communityEmail?city=<city>
+    //7. http://localhost:8080/communityEmail?city=<city> //TODO : Filtrer pour ne voir que les EMail
     @GetMapping(value = "/communityEmail")
     public List<Persons> getEmailCity(@RequestParam String city) throws NoExistPersonsException {
 
