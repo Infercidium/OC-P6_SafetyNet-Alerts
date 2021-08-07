@@ -1,10 +1,6 @@
 package com.infercidium.safetynet.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-
+import javax.persistence.*;
 
 @Entity
 public class Medications {
@@ -23,13 +19,9 @@ public class Medications {
 
     public void setId(Long id) { this.id = id;}
 
-    public String getMedication() {
-            return medication;
-        }
+    public String getMedication() { return medication; }
 
-    public void setMedication(String medication) {
-            this.medication = medication;
-        }
+    public void setMedication(String medication) { this.medication = medication; }
 
     @Override
     public String toString() {

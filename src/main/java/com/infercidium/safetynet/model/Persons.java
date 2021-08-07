@@ -1,12 +1,19 @@
 package com.infercidium.safetynet.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreType;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 
 @Entity
 public class Persons {
+
 
     public Persons() { }
 
@@ -20,16 +27,30 @@ public class Persons {
         this.email = email;
     }
 
+
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Message ici")
     private String firstName;
+
+    @NotBlank(message = "Message ici")
     private String lastName;
+
+    @NotBlank(message = "Message ici")
     private String address;
+
+    @NotBlank(message = "Message ici")
     private String city;
+
+    @Min(value = 1, message = "Message ici")
     private int zip;
+
     private String phone;
+
+    @Email(message = "Message ici")
     private String email;
 
     public Long getId() { return id; }
@@ -105,4 +126,5 @@ public class Persons {
                 + ", email='" + email + '\''
                 + '}';
     }
+
 }

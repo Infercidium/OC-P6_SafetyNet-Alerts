@@ -1,13 +1,6 @@
 package com.infercidium.safetynet.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
+import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
@@ -35,15 +28,13 @@ public class MedicalRecords {
     private String lastName;
     private LocalDate birthdate;
 
-    @Column
     @ManyToMany
-    @JoinTable(name = "Medicalrecords_Medications", joinColumns = {@JoinColumn(name="MedicalRecords_id")},
+    @JoinTable(name = "Medicalrecords_Medications", joinColumns = {@JoinColumn(name = "MedicalRecords_id")},
             inverseJoinColumns = @JoinColumn(name = "Medications_id"))
     private Set<Medications> medications = new HashSet<>();
 
-    @Column
     @ManyToMany
-    @JoinTable(name = "Medicalrecords_Allergies", joinColumns = {@JoinColumn(name="MedicalRecords_id")},
+    @JoinTable(name = "Medicalrecords_Allergies", joinColumns = {@JoinColumn(name = "MedicalRecords_id")},
     inverseJoinColumns = @JoinColumn(name = "Allergies_id"))
     private Set<Allergies> allergies = new HashSet<>();
 
