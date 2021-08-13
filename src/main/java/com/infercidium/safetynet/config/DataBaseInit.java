@@ -25,12 +25,16 @@ public class DataBaseInit {
     private final MedicationsRepository medicationsR;
     private final AllergiesRepository allergiesR;
 
-    public DataBaseInit(PersonsRepository personR, FirestationsRepository firestationsR, MedicalrecordsRepository medicalrecordsR, MedicationsRepository medicationsR, AllergiesRepository allergiesR) {
-        this.personR = personR;
-        this.firestationsR = firestationsR;
-        this.medicalrecordsR = medicalrecordsR;
-        this.medicationsR = medicationsR;
-        this.allergiesR = allergiesR;
+    public DataBaseInit(final PersonsRepository personRe,
+                        final FirestationsRepository firestationsRe,
+                        final MedicalrecordsRepository medicalrecordsRe,
+                        final MedicationsRepository medicationsRe,
+                        final AllergiesRepository allergiesRe) {
+        this.personR = personRe;
+        this.firestationsR = firestationsRe;
+        this.medicalrecordsR = medicalrecordsRe;
+        this.medicationsR = medicationsRe;
+        this.allergiesR = allergiesRe;
     }
 
     @Bean
@@ -38,23 +42,31 @@ public class DataBaseInit {
         return args -> {
 
             //Initialisation
-            DataBaseInitService dbis = new DataBaseInitService(personR, firestationsR, medicalrecordsR, medicationsR, allergiesR);
+            DataBaseInitService dbis
+                    = new DataBaseInitService(personR, firestationsR,
+                    medicalrecordsR, medicationsR, allergiesR);
 
             // Ouverture et mise en String du fichier
-            String data = dbis.convertFileToString("src/main/resources/data.json");
+            String data
+                    = dbis.convertFileToString("src/main/resources/data.json");
 
             // Deserialize du string en MAP
             Map<String, Object> passageList = dbis.deserializeStringToMap(data);
 
-            // Mise en liste des Objets
-            List<Map<String, String>> persons = dbis.convertMaptoList(passageList, "persons");
-            List<Map<String, String>> firestations = dbis.convertMaptoList(passageList, "firestations");
-            List<Map<String, Object>> medicalRecords = dbis.convertMedicalRecordsMaptoList(passageList);
+            // Mise en liste instanciée des Objets
+            List<Map<String, String>> persons
+                    = dbis.convertMaptoList(passageList, "persons");
+            List<Map<String, String>> firestations
+                    = dbis.convertMaptoList(passageList, "firestations");
+            List<Map<String, Object>> medicalRecords
+                    = dbis.convertMedicalRecordsMaptoList(passageList);
 
             //Instantiation des Lists
             List<Persons> personsList = dbis.instantiateListPersons(persons);
-            List<Firestations> firestationsList = dbis.instantiateListFirestations(firestations);
-            List<MedicalRecords> medicalRecordsList = dbis.instantiateListMedicalRecords(medicalRecords);
+            List<Firestations> firestationsList
+                    = dbis.instantiateListFirestations(firestations);
+            List<MedicalRecords> medicalRecordsList
+                    = dbis.instantiateListMedicalRecords(medicalRecords);
 
             // Envoie dans H2
             dbis.saveAllList(personsList, firestationsList, medicalRecordsList);

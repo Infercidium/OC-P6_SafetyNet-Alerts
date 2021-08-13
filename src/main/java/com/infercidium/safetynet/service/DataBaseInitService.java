@@ -1,7 +1,15 @@
 package com.infercidium.safetynet.service;
 
-import com.infercidium.safetynet.model.*;
-import com.infercidium.safetynet.repository.*;
+import com.infercidium.safetynet.model.Allergies;
+import com.infercidium.safetynet.model.Firestations;
+import com.infercidium.safetynet.model.MedicalRecords;
+import com.infercidium.safetynet.model.Medications;
+import com.infercidium.safetynet.model.Persons;
+import com.infercidium.safetynet.repository.AllergiesRepository;
+import com.infercidium.safetynet.repository.FirestationsRepository;
+import com.infercidium.safetynet.repository.MedicalrecordsRepository;
+import com.infercidium.safetynet.repository.MedicationsRepository;
+import com.infercidium.safetynet.repository.PersonsRepository;
 import com.jsoniter.JsonIterator;
 
 import java.io.BufferedReader;
@@ -22,27 +30,35 @@ public class DataBaseInitService implements DataBaseInitI {
     private final MedicationsRepository medicationsR;
     private final AllergiesRepository allergiesR;
 
-    public DataBaseInitService(PersonsRepository personR, FirestationsRepository firestationsR, MedicalrecordsRepository medicalrecordsR, MedicationsRepository medicationsR, AllergiesRepository allergiesR) {
-        this.personR = personR;
-        this.firestationsR = firestationsR;
-        this.medicalrecordsR = medicalrecordsR;
-        this.medicationsR = medicationsR;
-        this.allergiesR = allergiesR;
+    public DataBaseInitService(final PersonsRepository personRe,
+                               final FirestationsRepository firestationsRe,
+                               final MedicalrecordsRepository medicalrecordsRe,
+                               final MedicationsRepository medicationsRe,
+                               final AllergiesRepository allergiesRe) {
+        this.personR = personRe;
+        this.firestationsR = firestationsRe;
+        this.medicalrecordsR = medicalrecordsRe;
+        this.medicationsR = medicationsRe;
+        this.allergiesR = allergiesRe;
     }
 
     @Override
-    public String convertFileToString(String path) {
+    public String convertFileToString(final String path) {
         StringBuilder data = new StringBuilder();
         String datatemp;
         BufferedReader readBuffer = null;
         try {
             readBuffer = new BufferedReader(new FileReader(path));
-            while ((datatemp = readBuffer.readLine()) != null){ data.append(datatemp); }
+            while ((datatemp = readBuffer.readLine()) != null) {
+                data.append(datatemp);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
             try {
-                if (readBuffer != null) { readBuffer.close(); }
+                if (readBuffer != null) {
+                    readBuffer.close();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -51,25 +67,31 @@ public class DataBaseInitService implements DataBaseInitI {
     }
 
     @Override
-    public Map<String, Object> deserializeStringToMap(String data) {
-        Map<String, Object> passageList = JsonIterator.deserialize(data, Map.class);
+    public Map<String, Object> deserializeStringToMap(final String data) {
+        Map<String, Object> passageList
+                = JsonIterator.deserialize(data, Map.class);
         return passageList;
     }
 
     @Override
-    public List<Map<String, String>> convertMaptoList(Map<String, Object> passageList, String name) {
-        List<Map<String, String>> list = (List<Map<String, String>>) passageList.get(name);
+    public List<Map<String, String>> convertMaptoList(
+            final Map<String, Object> passageList, final String name) {
+        List<Map<String, String>> list
+                = (List<Map<String, String>>) passageList.get(name);
         return list;
     }
 
     @Override
-    public List<Map<String, Object>> convertMedicalRecordsMaptoList(Map<String, Object> passageList) {
-        List<Map<String, Object>> list = (List<Map<String, Object>>) passageList.get("medicalrecords");
+    public List<Map<String, Object>> convertMedicalRecordsMaptoList(
+            final Map<String, Object> passageList) {
+        List<Map<String, Object>> list
+                = (List<Map<String, Object>>) passageList.get("medicalrecords");
         return list;
     }
 
     @Override
-    public List<Persons> instantiateListPersons(List<Map<String, String>> persons) {
+    public List<Persons> instantiateListPersons(
+            final List<Map<String, String>> persons) {
         List<Persons> personsList = new ArrayList<>();
         for (Map<String, String> person : persons) {
             Persons person1 = new Persons();
@@ -86,31 +108,43 @@ public class DataBaseInitService implements DataBaseInitI {
     }
 
     @Override
-    public List<Firestations> instantiateListFirestations(List<Map<String, String>> firestations) {
+    public List<Firestations> instantiateListFirestations(
+            final List<Map<String, String>> firestations) {
         List<Firestations> firestationsList = new ArrayList<>();
         for (Map<String, String> firestation : firestations) {
             Firestations firestation1 = new Firestations();
             firestation1.setAddress(firestation.get("address"));
-            firestation1.setStation(Integer.parseInt(firestation.get("station")));
+            firestation1.setStation(
+                    Integer.parseInt(firestation.get("station")));
             firestationsList.add(firestation1);
         }
         return firestationsList;
     }
 
     @Override
-    public List<MedicalRecords> instantiateListMedicalRecords(List<Map<String, Object>> medicalRecords) {
+    public List<MedicalRecords> instantiateListMedicalRecords(
+            final List<Map<String, Object>> medicalRecords) {
         List<MedicalRecords> medicalRecordsList = new ArrayList<>();
-        SecondaryTableService sts = new SecondaryTableService(medicationsR, allergiesR);
+        SecondaryTableService sts
+                = new SecondaryTableService(medicationsR, allergiesR);
         for (Map<String, Object> medicalRecord : medicalRecords) {
             MedicalRecords medicalRecords1 = new MedicalRecords();
-            medicalRecords1.setFirstName((String) medicalRecord.get("firstName"));
+            medicalRecords1.setFirstName(
+                    (String) medicalRecord.get("firstName"));
             medicalRecords1.setLastName((String) medicalRecord.get("lastName"));
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
-            LocalDate localDate = LocalDate.parse((CharSequence) medicalRecord.get("birthdate"), formatter);
+            DateTimeFormatter formatter
+                    = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+            LocalDate localDate
+                    = LocalDate.parse((CharSequence) medicalRecord
+                    .get("birthdate"), formatter);
             medicalRecords1.setBirthdate(localDate);
-            HashSet<Medications> medicationRecord = new HashSet<>(sts.checkMedicationMedicalRecords((List<String>) medicalRecord.get("medications")));
+            HashSet<Medications> medicationRecord
+                    = new HashSet<>(sts.checkMedicationMedicalRecords(
+                            (List<String>) medicalRecord.get("medications")));
             medicalRecords1.setMedications(medicationRecord);
-            HashSet<Allergies> allergiesRecord = new HashSet<>(sts.checkAllergieMedicalRecords((List<String>) medicalRecord.get("allergies")));
+            HashSet<Allergies> allergiesRecord
+                    = new HashSet<>(sts.checkAllergieMedicalRecords(
+                            (List<String>) medicalRecord.get("allergies")));
             medicalRecords1.setAllergies(allergiesRecord);
             medicalRecordsList.add(medicalRecords1);
         }
@@ -118,7 +152,9 @@ public class DataBaseInitService implements DataBaseInitI {
     }
 
     @Override
-    public void saveAllList(List<Persons> persons, List<Firestations> firestations, List<MedicalRecords> medicalRecords) {
+    public void saveAllList(final List<Persons> persons,
+                            final List<Firestations> firestations,
+                            final List<MedicalRecords> medicalRecords) {
         personR.saveAll(persons);
         firestationsR.saveAll(firestations);
         medicalrecordsR.saveAll(medicalRecords);

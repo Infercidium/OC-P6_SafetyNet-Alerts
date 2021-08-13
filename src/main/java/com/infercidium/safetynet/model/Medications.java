@@ -1,27 +1,43 @@
 package com.infercidium.safetynet.model;
 
-import javax.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 @Entity
 public class Medications {
 
     public Medications() { }
 
-    public Medications(String medication) { this.medication = medication; }
+    public Medications(final String medicationC) {
+        this.medication = medicationC;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonIgnore
     private Long id;
 
     private String medication;
 
-    public Long getId() { return id;}
+    public Long getId() {
+        return id;
+    }
 
-    public void setId(Long id) { this.id = id;}
+    public void setId(final Long idC) {
+        this.id = idC;
+    }
 
-    public String getMedication() { return medication; }
+    public String getMedication() {
+        return medication;
+    }
 
-    public void setMedication(String medication) { this.medication = medication; }
+    public void setMedication(final String medicationC) {
+        this.medication = medicationC;
+    }
 
     @Override
     public String toString() {

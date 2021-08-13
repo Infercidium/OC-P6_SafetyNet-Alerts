@@ -1,124 +1,124 @@
 package com.infercidium.safetynet.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreType;
+import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
+import com.jsoniter.annotation.JsonIgnore;
 
+import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 
+
 @Entity
+@JsonIgnoreProperties(value = "name")
 public class Persons {
 
 
-    public Persons() { }
+    public Persons() { this.name = new Name();}
 
-    public Persons(String firstName, String lastName, String address, String city, int zip, String phone, String email) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.address = address;
-        this.city = city;
-        this.zip = zip;
-        this.phone = phone;
-        this.email = email;
+    public Persons(final String firstname, final String lastname,
+                   final String addressC, final String cityC,
+                   final int zipC, final String phoneC, final String emailC) {
+        this.name = new Name(firstname, lastname);
+        this.address = addressC;
+        this.city = cityC;
+        this.zip = zipC;
+        this.phone = phoneC;
+        this.email = emailC;
     }
 
+    @EmbeddedId
+    @Column(unique = true)
+    private Name name;
 
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @NotBlank(message = "Message ici")
-    private String firstName;
-
-    @NotBlank(message = "Message ici")
-    private String lastName;
-
-    @NotBlank(message = "Message ici")
+    @NotBlank(message = "The address cannot be null or empty.")
     private String address;
 
-    @NotBlank(message = "Message ici")
+    @NotBlank(message = "The city cannot be null or empty.")
     private String city;
 
-    @Min(value = 1, message = "Message ici")
+    @Min(value = 1, message = "The zip must be a positive number.")
     private int zip;
 
     private String phone;
 
-    @Email(message = "Message ici")
+    @Email(message = "A standard email address format is expected.")
     private String email;
 
-    public Long getId() { return id; }
-
-    public void setId(Long id) { this.id = id; }
-
-    public String getFirstName() {
-        return firstName;
+    public Name getName() {
+        return name;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public void setName(Name name) {
+        this.name = name;
+    }
+
+    public String getFirstName() {
+        return name.getFirstName();
+    }
+
+    public void setFirstName(final String firstname) {
+        this.name.setFirstName(firstname);
     }
 
     public String getLastName() {
-        return lastName;
+        return name.getLastName();
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setLastName(final String lastname) {
+        this.name.setLastName(lastname);
     }
 
     public String getAddress() {
         return address;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setAddress(final String addressC) {
+        this.address = addressC;
     }
 
     public String getCity() {
         return city;
     }
 
-    public void setCity(String city) {
-        this.city = city;
+    public void setCity(final String cityC) {
+        this.city = cityC;
     }
 
     public int getZip() {
         return zip;
     }
 
-    public void setZip(int zip) {
-        this.zip = zip;
+    public void setZip(final int zipC) {
+        this.zip = zipC;
     }
 
     public String getPhone() {
         return phone;
     }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
+    public void setPhone(final String phoneC) {
+        this.phone = phoneC;
     }
 
     public String getEmail() {
         return email;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setEmail(final String emailC) {
+        this.email = emailC;
     }
 
     @Override
     public String toString() {
         return "Persons{"
-                + "id='" + id + '\''
-                + "firstName='" + firstName + '\''
-                + ", lastName='" + lastName + '\''
+                + "firstName='" + name.getFirstName() + '\''
+                + ", lastName='" + name.getLastName() + '\''
                 + ", address='" + address + '\''
                 + ", city='" + city + '\''
                 + ", zip=" + zip + '\''
