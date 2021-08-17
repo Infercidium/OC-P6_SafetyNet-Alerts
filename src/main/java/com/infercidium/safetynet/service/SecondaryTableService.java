@@ -4,6 +4,8 @@ import com.infercidium.safetynet.model.Allergies;
 import com.infercidium.safetynet.model.Medications;
 import com.infercidium.safetynet.repository.AllergiesRepository;
 import com.infercidium.safetynet.repository.MedicationsRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -11,6 +13,9 @@ import java.util.List;
 import java.util.Set;
 
 public class SecondaryTableService implements SecondaryTableI {
+
+    private static final Logger LOGGER
+            = LoggerFactory.getLogger(SecondaryTableService.class);
 
     private final MedicationsRepository medicationsR;
     private final AllergiesRepository allergiesR;
@@ -29,27 +34,35 @@ public class SecondaryTableService implements SecondaryTableI {
         for (String allergie1 : allergies) {
             Allergies allergie = new Allergies();
             allergie.setAllergie(allergie1);
-            if (allergiesR.findByAllergie(allergie.getAllergie()) != null) {
-                allergie.setId(allergiesR
+            if (this.allergiesR
+                    .findByAllergie(allergie.getAllergie()) != null) {
+                allergie.setId(this.allergiesR
                         .findByAllergie(allergie.getAllergie()).getId());
             } else {
-                allergiesR.save(allergie);
+                this.allergiesR.save(allergie);
+                LOGGER.debug("Save " + allergie + " in the Allergies table");
             }
             allergies1.add(allergie);
         }
+        LOGGER.debug("Allergie check completed");
         return allergies1;
     }
     @Override
-    public Set<Allergies> checkAllergieMedicalRecords(Set<Allergies> allergiesSet) {
+    public Set<Allergies> checkAllergieMedicalRecords(
+            final Set<Allergies> allergiesSet) {
         Set<Allergies> allergies = new HashSet<>();
-        for(Allergies allergie : allergiesSet) {
-            if(allergiesR.findByAllergie(allergie.getAllergie()) != null) {
-                allergie.setId(allergiesR.findByAllergie(allergie.getAllergie()).getId());
+        for (Allergies allergie : allergiesSet) {
+            if (this.allergiesR
+                    .findByAllergie(allergie.getAllergie()) != null) {
+                allergie.setId(this.allergiesR
+                        .findByAllergie(allergie.getAllergie()).getId());
             } else {
-                allergiesR.save(allergie);
+                this.allergiesR.save(allergie);
+                LOGGER.debug("Save " + allergie + " in the Allergies table");
             }
             allergies.add(allergie);
         }
+        LOGGER.debug("Allergie check completed");
         return allergies;
     }
 
@@ -60,31 +73,40 @@ public class SecondaryTableService implements SecondaryTableI {
         for (String medication1 : medications) {
             Medications medication = new Medications();
             medication.setMedication(medication1);
-            if (medicationsR
+            if (this.medicationsR
                     .findByMedication(medication.getMedication()) != null) {
-                medication.setId(medicationsR
+                medication.setId(this.medicationsR
                         .findByMedication(medication.getMedication()).getId());
             } else {
-                medicationsR.save(medication);
+                this.medicationsR.save(medication);
+                LOGGER.debug("Save " + medication
+                        + " in the Medications table");
             }
             medications1.add(medication);
         }
+        LOGGER.debug("Medication check completed");
         return medications1;
     }
 
 
 
     @Override
-    public Set<Medications> checkMedicationMedicalRecords(Set<Medications> medicationsSet) {
+    public Set<Medications> checkMedicationMedicalRecords(
+            final Set<Medications> medicationsSet) {
         Set<Medications> medications = new HashSet<>();
-        for(Medications medication : medicationsSet) {
-            if(medicationsR.findByMedication(medication.getMedication()) != null) {
-                medication.setId(medicationsR.findByMedication(medication.getMedication()).getId());
+        for (Medications medication : medicationsSet) {
+            if (this.medicationsR
+                    .findByMedication(medication.getMedication()) != null) {
+                medication.setId(this.medicationsR
+                        .findByMedication(medication.getMedication()).getId());
             } else {
-                medicationsR.save(medication);
+                this.medicationsR.save(medication);
+                LOGGER.debug("Save " + medication
+                        + " in the Medications table");
             }
             medications.add(medication);
         }
+        LOGGER.debug("Medication check completed");
         return medications;
     }
 }

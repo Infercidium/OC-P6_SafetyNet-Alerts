@@ -30,4 +30,6 @@ public interface DataBaseInitI {
     void saveAllList(List<Persons> persons,
                      List<Firestations> firestations,
                      List<MedicalRecords> medicalRecords);
+
+    List<MedicalRecords> connectMedicalRecordsToPersons(List<MedicalRecords> medicalRecords);
 }

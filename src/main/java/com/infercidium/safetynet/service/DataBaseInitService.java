@@ -17,10 +17,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class DataBaseInitService implements DataBaseInitI {
 
@@ -155,8 +152,20 @@ public class DataBaseInitService implements DataBaseInitI {
     public void saveAllList(final List<Persons> persons,
                             final List<Firestations> firestations,
                             final List<MedicalRecords> medicalRecords) {
-        personR.saveAll(persons);
-        firestationsR.saveAll(firestations);
-        medicalrecordsR.saveAll(medicalRecords);
+        this.personR.saveAll(persons);
+        this.firestationsR.saveAll(firestations);
+        List<MedicalRecords> medicalRecordsConnect = connectMedicalRecordsToPersons(medicalRecords);
+        this.medicalrecordsR.saveAll(medicalRecordsConnect);
+    }
+
+    @Override
+    public List<MedicalRecords> connectMedicalRecordsToPersons(final List<MedicalRecords> medicalRecords) {
+        List<MedicalRecords> medicalRecordsList = new ArrayList<>();
+        for(MedicalRecords medicalRecord : medicalRecords) {
+           Optional<Persons> person = personR.findByFirstNameIgnoreCaseAndLastNameIgnoreCase(medicalRecord.getFirstName(), medicalRecord.getLastName());
+           medicalRecord.setPersons(person.get());
+           medicalRecordsList.add(medicalRecord);
+        }
+        return medicalRecordsList;
     }
 }

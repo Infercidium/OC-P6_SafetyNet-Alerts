@@ -10,5 +10,6 @@ public interface SecondaryTableI {
     List<Allergies> checkAllergieMedicalRecords(List<String> allergies);
     List<Medications> checkMedicationMedicalRecords(List<String> medications);
     Set<Allergies> checkAllergieMedicalRecords(Set<Allergies> allergiesSet);
-    Set<Medications> checkMedicationMedicalRecords(Set<Medications> medicationsSet);
+    Set<Medications> checkMedicationMedicalRecords(
+            Set<Medications> medicationsSet);
 }

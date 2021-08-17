@@ -1,20 +1,28 @@
 package com.infercidium.safetynet.service;
 
 import com.infercidium.safetynet.model.MedicalRecords;
-import com.infercidium.safetynet.model.Name;
+import org.apache.commons.lang.NullArgumentException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.json.MappingJacksonValue;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface MedicalRecordsI {
-    //Post, Put, Delete, Get
-    ResponseEntity<Void> createMedicalRecords(MedicalRecords medicalRecords);
-    ResponseEntity<Void> editMedicalRecords(Name name, MedicalRecords medicalRecords);
-    ResponseEntity<Void> removeMedicalRecords(Name name);
-    Optional<MedicalRecords> getMedicalRecord(Name name);
+
+    //Post, Put, Delete
+    ResponseEntity<Void> createMedicalRecords(
+            MedicalRecords medicalRecords) throws NullArgumentException;
+    ResponseEntity<Void> editMedicalRecords(String firstName,
+                                            String lastName,
+                                            MedicalRecords medicalRecords);
+    ResponseEntity<Void> removeMedicalRecords(String firstName,
+                                              String lastName);
+
+    //Get
+    List<MedicalRecords> getMedicalRecord(String firstName,
+                                          String lastName);
     List<MedicalRecords> getMedicalRecords();
+    MappingJacksonValue getChildAlert(String address);
 
     //URL lié MedicalRecords
-    String addressChildrenInfo(String address);
 }

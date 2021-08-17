@@ -1,23 +1,23 @@
 package com.infercidium.safetynet.service;
 
-import com.infercidium.safetynet.model.Name;
 import com.infercidium.safetynet.model.Persons;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.json.MappingJacksonValue;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface PersonsI {
-    //Post, Put, Delete, Get
+    //Post, Put, Delete
     ResponseEntity<Void> createPerson(Persons persons);
-    ResponseEntity<Void> editPerson(Name name, Persons persons);
-    ResponseEntity<Void> removePerson(Name name);
-    Optional<Persons> getPerson(Name name);
+    ResponseEntity<Void> editPerson(String firstName,
+                                    String lastName,
+                                    Persons persons);
+    ResponseEntity<Void> removePerson(String firstName,
+                                      String lastName);
+    //Get
+    List<Persons> getPerson(String firstName, String lastName);
     List<Persons> getPersons();
 
     //URL lié à Persons
-    List<Persons> getPersonsAddress(String address);
-    String fireAlert(String address);
-    String personInfo(Name name);
-    List<Persons> getEmailCity(String city);
+    MappingJacksonValue getEmailCommnunity(String city);
 }

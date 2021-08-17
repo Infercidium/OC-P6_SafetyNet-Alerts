@@ -1,9 +1,11 @@
 package com.infercidium.safetynet.model;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.HashSet;
@@ -11,100 +13,126 @@ import java.util.Set;
 
 
 @Entity
-@JsonIgnoreProperties(value = "name")
+@JsonFilter("MedicalRecordFilter")
+@Table(uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"firstName", "lastName"})})
 public class MedicalRecords {
 
-    public MedicalRecords() { this.name = new Name(); }
+    public MedicalRecords() { }
 
-    public MedicalRecords(final String firstname, final String lastname,
+    public MedicalRecords(final String firstNameC, final String lastNameC,
                           final LocalDate birthdateC,
-                          final Set<Medications> medicationsSet,
-                          final Set<Allergies> allergiesSet) {
-        this.name = new Name(firstname, lastname);
+                          final Set<Medications> medicationsC,
+                          final Set<Allergies> allergiesC) {
+        this.firstName = firstNameC;
+        this.lastName = lastNameC;
         this.birthdate = birthdateC;
-        this.medications = medicationsSet;
-        this.allergies = allergiesSet;
+        this.medications = medicationsC;
+        this.allergies = allergiesC;
     }
 
-    @EmbeddedId
-    @Column(unique = true)
-    private Name name;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonIgnore
+    private Long id;
+
+    @Column(name = "firstName")
+    @NotBlank(message = "The first name cannot be null or empty.")
+    private String firstName;
+
+    @Column(name = "lastName")
+    @NotBlank(message = "The last name cannot be null or empty.")
+    private String lastName;
 
     @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate birthdate;
 
     @ManyToMany
     @JoinTable(name = "Medicalrecords_Medications",
-            joinColumns = {@JoinColumn(name = "MedicalRecords_firstName"),
-                            @JoinColumn(name = "MedicalRecords_lastName")},
+            joinColumns = @JoinColumn(name = "MedicalRecords_id"),
             inverseJoinColumns = @JoinColumn(name = "Medications_id"))
     private Set<Medications> medications = new HashSet<>();
 
     @ManyToMany
     @JoinTable(name = "Medicalrecords_Allergies",
-            joinColumns = {@JoinColumn(name = "MedicalRecords_firstName"),
-                            @JoinColumn(name = "MedicalRecords_lastName")},
+            joinColumns = @JoinColumn(name = "MedicalRecords_id"),
             inverseJoinColumns = @JoinColumn(name = "Allergies_id"))
     private Set<Allergies> allergies = new HashSet<>();
 
-    public Name getName() {
-        return name;
+    @OneToOne
+    @JoinColumn(nullable = false)
+    private Persons persons;
+
+    public Long getId() {
+        return id;
     }
 
-    public void setName(Name name) {
-        this.name = name;
+    public void setId(final Long idS) {
+        this.id = idS;
     }
 
     public String getFirstName() {
-        return name.getFirstName();
+        return firstName;
     }
 
-    public void setFirstName(final String firstname) {
-        this.name.setFirstName(firstname);
+    public void setFirstName(final String firstNameS) {
+        this.firstName = firstNameS;
     }
 
     public String getLastName() {
-        return name.getLastName();
+        return lastName;
     }
 
-    public void setLastName(final String lastname) {
-        this.name.setLastName(lastname);
+    public void setLastName(final String lastNameS) {
+        this.lastName = lastNameS;
     }
 
     public LocalDate getBirthdate() {
         return birthdate;
     }
 
-    public void setBirthdate(final LocalDate birthdateC) {
-        this.birthdate = birthdateC;
+    public void setBirthdate(final LocalDate birthdateS) {
+        this.birthdate = birthdateS;
     }
 
-    public int getAge() {return Period.between(birthdate, LocalDate.now()).getYears();}
+    public int getAge() {
+        return Period.between(birthdate, LocalDate.now()).getYears();
+    }
 
     public Set<Medications> getMedications() {
         return medications;
     }
 
-    public void setMedications(final Set<Medications> medicationsSet) {
-        this.medications = medicationsSet;
+    public void setMedications(final Set<Medications> medicationsS) {
+        this.medications = medicationsS;
     }
 
     public Set<Allergies> getAllergies() {
         return allergies;
     }
 
-    public void setAllergies(final Set<Allergies> allergiesSet) {
-        this.allergies = allergiesSet;
+    public void setAllergies(final Set<Allergies> allergiesS) {
+        this.allergies = allergiesS;
+    }
+
+    public Persons getPersons() {
+        return persons;
+    }
+
+    public void setPersons(final Persons personsS) {
+        this.persons = personsS;
     }
 
     @Override
     public String toString() {
         return "MedicalRecords{"
-                + "firstName='" + name.getFirstName() + '\''
-                + ", lastName='" + name.getLastName() + '\''
-                + ", birthdate=" + birthdate + '\''
-                + ", medications=" + medications + '\''
-                + ", allergies=" + allergies + '\''
+                + "id =" + id + '\''
+                + ", firstName ='" + firstName + '\''
+                + ", lastName ='" + lastName + '\''
+                + ", birthdate =" + birthdate + '\''
+                + ", medications =" + medications + '\''
+                + ", allergies =" + allergies + '\''
+                + ", person =" + persons.getId() + '\''
                 + '}';
     }
 }

@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.NotBlank;
 
 
 @Entity
@@ -22,28 +23,29 @@ public class Allergies {
     @JsonIgnore
     private Long id;
 
+    @NotBlank(message = "The allergie cannot be null or empty.")
     private String allergie;
 
     public Long getId() {
         return id;
     }
 
-    public void setId(final Long idC) {
-        this.id = idC;
+    public void setId(final Long idS) {
+        this.id = idS;
     }
 
     public String getAllergie() {
         return allergie;
     }
 
-    public void setAllergie(final String allergieC) {
-        this.allergie = allergieC;
+    public void setAllergie(final String allergieS) {
+        this.allergie = allergieS;
     }
 
     @Override
     public String toString() {
-        return "Allergies{"
-                + "id='" + id + '\''
+        return "Allergies{" + '\''
+                + "id ='" + id + '\''
                 + "allergie ='" + allergie + '\''
                 + '}';
     }
