@@ -13,7 +13,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class FirestationsService implements FirestationsI {
@@ -46,6 +50,7 @@ public class FirestationsService implements FirestationsI {
         List<Firestations> basicFirestation = getAddress(address);
         Firestations firestationChanged = firestations;
         firestationChanged.setId(basicFirestation.get(0).getId());
+        firestationChanged.setAddress(basicFirestation.get(0).getAddress());
         this.firestationsR.save(firestationChanged);
         return ResponseEntity.ok().build();
     }
@@ -95,20 +100,29 @@ public class FirestationsService implements FirestationsI {
     //URL lié à Persons
 
     //Méthode tiers
-    private MappingJacksonValue FirestationFilterAdd(final List<Firestations> firestations, final Set<String> attribute) {
-        SimpleBeanPropertyFilter firestationFilter = SimpleBeanPropertyFilter.filterOutAllExcept(attribute);
-        FilterProvider listFilter = new SimpleFilterProvider().addFilter("FirestationFilter", firestationFilter);
-        MappingJacksonValue filterMedicalRecords = new MappingJacksonValue(firestations);
+    private MappingJacksonValue firestationFilterAdd(
+            final List<Firestations> firestations,
+            final Set<String> attribute) {
+        SimpleBeanPropertyFilter firestationFilter
+                = SimpleBeanPropertyFilter.filterOutAllExcept(attribute);
+        FilterProvider listFilter = new SimpleFilterProvider()
+                .addFilter("FirestationFilter", firestationFilter);
+        MappingJacksonValue filterMedicalRecords
+                = new MappingJacksonValue(firestations);
         filterMedicalRecords.setFilters(listFilter);
         LOGGER.debug("Applying filters " + attribute);
         return filterMedicalRecords;
     }
 
-    public MappingJacksonValue firestationsFilterNull(final List<Firestations> firestations) {
+    public MappingJacksonValue firestationsFilterNull(
+            final List<Firestations> firestations) {
         Set<String> nul = new HashSet<>();
-        SimpleBeanPropertyFilter firestationsFilter = SimpleBeanPropertyFilter.serializeAllExcept(nul);
-        FilterProvider listFilter = new SimpleFilterProvider().addFilter("FirestationFilter", firestationsFilter);
-        MappingJacksonValue filterFirestations = new MappingJacksonValue(firestations);
+        SimpleBeanPropertyFilter firestationsFilter
+                = SimpleBeanPropertyFilter.serializeAllExcept(nul);
+        FilterProvider listFilter = new SimpleFilterProvider()
+                .addFilter("FirestationFilter", firestationsFilter);
+        MappingJacksonValue filterFirestations
+                = new MappingJacksonValue(firestations);
         filterFirestations.setFilters(listFilter);
         return filterFirestations;
     }

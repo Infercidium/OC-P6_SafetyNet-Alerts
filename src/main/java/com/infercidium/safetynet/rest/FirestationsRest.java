@@ -70,7 +70,8 @@ public class FirestationsRest {
     public MappingJacksonValue getAddress(
             @PathVariable final String address) {
         List<Firestations> firestations = firestationsS.getAddress(address);
-        MappingJacksonValue firestationsFilter = firestationsS.firestationsFilterNull(firestations);
+        MappingJacksonValue firestationsFilter
+                = firestationsS.firestationsFilterNull(firestations);
         LOGGER.info("Firestation found");
         return firestationsFilter;
     }
@@ -79,7 +80,8 @@ public class FirestationsRest {
     public MappingJacksonValue getStation(@RequestParam(required = false,
             defaultValue = "0") final int station) {
         List<Firestations> firestations = firestationsS.getStation(station);
-        MappingJacksonValue firestationsFilter = firestationsS.firestationsFilterNull(firestations);
+        MappingJacksonValue firestationsFilter
+                = firestationsS.firestationsFilterNull(firestations);
         LOGGER.info("List of Firestations displayed");
         return firestationsFilter;
     }

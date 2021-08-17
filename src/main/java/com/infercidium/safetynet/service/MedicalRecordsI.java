@@ -22,7 +22,8 @@ public interface MedicalRecordsI {
     List<MedicalRecords> getMedicalRecord(String firstName,
                                           String lastName);
     List<MedicalRecords> getMedicalRecords();
-    MappingJacksonValue getChildAlert(String address);
 
     //URL lié MedicalRecords
+    MappingJacksonValue getChildAlert(String address);
+    MappingJacksonValue getPersonInfo(String firstName, String lastName);
 }

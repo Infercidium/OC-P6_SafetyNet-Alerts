@@ -13,7 +13,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class PersonsService implements PersonsI {
@@ -86,14 +90,15 @@ public class PersonsService implements PersonsI {
 
     //URL lié à Persons
     @Override
-    public MappingJacksonValue getEmailCommnunity(String city) {
+    public MappingJacksonValue getEmailCommnunity(final String city) {
         List<Persons> persons = this.personsR.findByCityIgnoreCase(city);
         if (persons.size() == 0) {
             throw new NullPointerException();
         } else {
             Set<String> attribute = new HashSet<>();
             attribute.add("email");
-            MappingJacksonValue filterPersons = personFilterAdd(persons, attribute);
+            MappingJacksonValue filterPersons
+                    = personFilterAdd(persons, attribute);
             return filterPersons;
         }
     }
@@ -110,7 +115,8 @@ public class PersonsService implements PersonsI {
         }
         if (personChanged.getAddress() == null) {
             personChanged.setAddress(basicPerson.getAddress());
-        } else if (!personChanged.getAddress().equals(basicPerson.getAddress())) {
+        } else if (!personChanged.getAddress()
+                .equals(basicPerson.getAddress())) {
             LOGGER.debug("Address modification");
         }
         if (personChanged.getZip() < 1) {
@@ -131,9 +137,12 @@ public class PersonsService implements PersonsI {
         return personChanged;
     }
 
-    private MappingJacksonValue personFilterAdd(final List<Persons> persons, final Set<String> attribute) {
-        SimpleBeanPropertyFilter personFilter = SimpleBeanPropertyFilter.filterOutAllExcept(attribute);
-        FilterProvider listFilter = new SimpleFilterProvider().addFilter("PersonFilter", personFilter);
+    public MappingJacksonValue personFilterAdd(final List<Persons> persons,
+                                               final Set<String> attribute) {
+        SimpleBeanPropertyFilter personFilter
+                = SimpleBeanPropertyFilter.filterOutAllExcept(attribute);
+        FilterProvider listFilter = new SimpleFilterProvider()
+                .addFilter("PersonFilter", personFilter);
         MappingJacksonValue filterPersons = new MappingJacksonValue(persons);
         filterPersons.setFilters(listFilter);
         LOGGER.debug("Applying filters " + attribute);
@@ -142,15 +151,18 @@ public class PersonsService implements PersonsI {
 
     public MappingJacksonValue personFilterNull(final List<Persons> persons) {
         Set<String> nul = new HashSet<>();
-        SimpleBeanPropertyFilter personFilter = SimpleBeanPropertyFilter.serializeAllExcept(nul);
-        FilterProvider listFilter = new SimpleFilterProvider().addFilter("PersonFilter", personFilter);
+        SimpleBeanPropertyFilter personFilter
+                = SimpleBeanPropertyFilter.serializeAllExcept(nul);
+        FilterProvider listFilter = new SimpleFilterProvider()
+                .addFilter("PersonFilter", personFilter);
         MappingJacksonValue filterPersons = new MappingJacksonValue(persons);
         filterPersons.setFilters(listFilter);
         return filterPersons;
     }
 
-    public boolean personCheck (final String firstName, final String lastName) {
-        return personsR.findByFirstNameIgnoreCaseAndLastNameIgnoreCase(firstName, lastName).isPresent();
+    public boolean personCheck(final String firstName, final String lastName) {
+        return personsR.findByFirstNameIgnoreCaseAndLastNameIgnoreCase(
+                firstName, lastName).isPresent();
     }
 }
 

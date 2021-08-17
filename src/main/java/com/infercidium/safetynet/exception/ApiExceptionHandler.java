@@ -43,7 +43,8 @@ public class ApiExceptionHandler {
     }
 
     @ExceptionHandler(value = {NullArgumentException.class})
-    public ResponseEntity<String> handleNullArgumentException(final NullArgumentException e) {
+    public ResponseEntity<String> handleNullArgumentException(
+            final NullArgumentException e) {
         String message = "Link between tables = null";
         LOGGER.error(message, e);
         return new ResponseEntity<>(message, HttpStatus.CONFLICT);

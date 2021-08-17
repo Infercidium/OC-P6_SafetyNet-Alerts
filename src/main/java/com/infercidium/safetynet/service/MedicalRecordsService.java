@@ -19,7 +19,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class MedicalRecordsService implements MedicalRecordsI {
@@ -31,7 +37,8 @@ public class MedicalRecordsService implements MedicalRecordsI {
     private final MedicationsRepository medicationsR;
     private final AllergiesRepository allergiesR;
     public MedicalRecordsService(
-            final PersonsService personsSe, final MedicalrecordsRepository medicalrecordsRe,
+            final PersonsService personsSe,
+            final MedicalrecordsRepository medicalrecordsRe,
             final MedicationsRepository medicationsRe,
             final AllergiesRepository allergiesRe) {
         this.personsS = personsSe;
@@ -45,8 +52,11 @@ public class MedicalRecordsService implements MedicalRecordsI {
     public ResponseEntity<Void> createMedicalRecords(
             final MedicalRecords medicalRecords) throws NullArgumentException {
         MedicalRecords verify = medicalRecords;
-        if (personsS.personCheck(medicalRecords.getFirstName(), medicalRecords.getLastName())) {
-            medicalRecords.setPersons((Persons) personsS.getPerson(medicalRecords.getFirstName(), medicalRecords.getLastName()).get(0));
+        if (personsS.personCheck(medicalRecords.getFirstName(),
+                medicalRecords.getLastName())) {
+            medicalRecords.setPersons((Persons) personsS
+                    .getPerson(medicalRecords.getFirstName(),
+                            medicalRecords.getLastName()).get(0));
         } else {
             throw new NullArgumentException("Null table binding");
         }
@@ -75,11 +85,12 @@ public class MedicalRecordsService implements MedicalRecordsI {
             final String firstName,
             final String lastName,
             final MedicalRecords medicalRecords) {
-        MedicalRecords basicMedicalRecords = getMedicalRecord(firstName, lastName).get(0);
+        MedicalRecords basicMedicalRecords
+                = getMedicalRecord(firstName, lastName).get(0);
         MedicalRecords medicalRecordsChanged = medicalRecords;
         medicalRecordsChanged.setId(basicMedicalRecords.getId());
-        MedicalRecords medicalRecord
-                = medicalRecordsVerification(basicMedicalRecords, medicalRecordsChanged);
+        MedicalRecords medicalRecord = medicalRecordsVerification(
+                basicMedicalRecords, medicalRecordsChanged);
         this.medicalrecordsR.save(medicalRecord);
         return ResponseEntity.ok().build();
     }
@@ -87,7 +98,8 @@ public class MedicalRecordsService implements MedicalRecordsI {
     @Override
     public ResponseEntity<Void> removeMedicalRecords(
             final String firstName, final String lastName) {
-        List<MedicalRecords> medicalRecord = getMedicalRecord(firstName, lastName);
+        List<MedicalRecords> medicalRecord
+                = getMedicalRecord(firstName, lastName);
         this.medicalrecordsR.delete(medicalRecord.get(0));
         return ResponseEntity.ok().build();
     }
@@ -121,18 +133,20 @@ public class MedicalRecordsService implements MedicalRecordsI {
 
     //URL lié à MedicalRecords
     @Override
-    public MappingJacksonValue getChildAlert(String address) {
-        List<MedicalRecords> child = this.medicalrecordsR.findByPersonsAddressIgnoreCase(address);
+    public MappingJacksonValue getChildAlert(final String address) {
+        List<MedicalRecords> child = this.medicalrecordsR
+                .findByPersonsAddressIgnoreCase(address);
         int childNumber = child.size();
         Collections.sort(child, new Comparator<MedicalRecords>() {
             @Override
-            public int compare(MedicalRecords o1, MedicalRecords o2) {
+            public int compare(
+                    final MedicalRecords o1, final MedicalRecords o2) {
                 return o2.getBirthdate().compareTo(o1.getBirthdate());
             }
         });
-        for(MedicalRecords medicalRecord : child) {
+        for (MedicalRecords medicalRecord : child) {
             if (medicalRecord.getAge() > 18) {
-                childNumber --;
+                childNumber--;
             }
         }
         if (childNumber == 0) {
@@ -147,9 +161,38 @@ public class MedicalRecordsService implements MedicalRecordsI {
         attribute.add("firstName");
         attribute.add("lastName");
         attribute.add("age");
-        MappingJacksonValue childResult = medicalRecordFilterAdd(child, attribute);
+        MappingJacksonValue childResult
+                = medicalRecordFilterAdd(child, attribute);
         return childResult;
     }
+
+    @Override
+    public MappingJacksonValue getPersonInfo(final String firstName,
+                                             final String lastName) {
+        Optional<MedicalRecords> medicalRecords = this.medicalrecordsR
+                .findByFirstNameIgnoreCaseAndLastNameIgnoreCase(
+                        firstName, lastName);
+        if (!medicalRecords.isPresent()) {
+            throw new NullPointerException();
+        }
+        Set<String> attribute = newHashSet("fisrtName", "lastName", "age",
+                "medications", "allergies", "persons");
+        SimpleBeanPropertyFilter medicalRecordFilter
+                = SimpleBeanPropertyFilter.filterOutAllExcept(attribute);
+        Set<String> attributeP = newHashSet("address", "email");
+        SimpleBeanPropertyFilter personFilter
+                = SimpleBeanPropertyFilter.filterOutAllExcept(attributeP);
+        FilterProvider listFilter = new SimpleFilterProvider()
+                .addFilter("MedicalRecordFilter", medicalRecordFilter)
+                .addFilter("PersonFilter", personFilter);
+        MappingJacksonValue personInfo
+                = new MappingJacksonValue(medicalRecords);
+        personInfo.setFilters(listFilter);
+        LOGGER.debug("Applying filters " + attribute);
+        LOGGER.debug("Applying person filters " + attributeP);
+        return personInfo;
+    }
+
     //Methode tiers
     private MedicalRecords medicalRecordsVerification(
             final MedicalRecords basicMedicalRecords,
@@ -173,22 +216,40 @@ public class MedicalRecordsService implements MedicalRecordsI {
         }
         return medicalRecordsChanged;
     }
-    private MappingJacksonValue medicalRecordFilterAdd(final List<MedicalRecords> medicalRecords, final Set<String> attribute) {
-        SimpleBeanPropertyFilter medicalRecordFilter = SimpleBeanPropertyFilter.filterOutAllExcept(attribute);
-        FilterProvider listFilter = new SimpleFilterProvider().addFilter("MedicalRecordFilter", medicalRecordFilter);
-        MappingJacksonValue filterMedicalRecords = new MappingJacksonValue(medicalRecords);
+    private MappingJacksonValue medicalRecordFilterAdd(
+            final List<MedicalRecords> medicalRecords,
+            final Set<String> attribute) {
+        SimpleBeanPropertyFilter medicalRecordFilter
+                = SimpleBeanPropertyFilter.filterOutAllExcept(attribute);
+        FilterProvider listFilter = new SimpleFilterProvider()
+                .addFilter("MedicalRecordFilter", medicalRecordFilter);
+        MappingJacksonValue filterMedicalRecords
+                = new MappingJacksonValue(medicalRecords);
         filterMedicalRecords.setFilters(listFilter);
         LOGGER.debug("Applying filters " + attribute);
         return filterMedicalRecords;
     }
 
-    public MappingJacksonValue medicalRecordFilterNull(final List<MedicalRecords> medicalRecords) {
+    public MappingJacksonValue medicalRecordFilterNull(
+            final List<MedicalRecords> medicalRecords) {
         Set<String> nul = new HashSet<>();
         nul.add("persons");
-        SimpleBeanPropertyFilter medicalRecordFilter = SimpleBeanPropertyFilter.serializeAllExcept(nul);
-        FilterProvider listFilter = new SimpleFilterProvider().addFilter("MedicalRecordFilter", medicalRecordFilter);
-        MappingJacksonValue filterMedicalRecords = new MappingJacksonValue(medicalRecords);
+        SimpleBeanPropertyFilter medicalRecordFilter
+                = SimpleBeanPropertyFilter.serializeAllExcept(nul);
+        FilterProvider listFilter = new SimpleFilterProvider()
+                .addFilter("MedicalRecordFilter", medicalRecordFilter);
+        MappingJacksonValue filterMedicalRecords
+                = new MappingJacksonValue(medicalRecords);
         filterMedicalRecords.setFilters(listFilter);
         return filterMedicalRecords;
+    }
+
+    private Set<String> newHashSet(final String... strings) {
+        HashSet<String> set = new HashSet<String>();
+
+        for (String s : strings) {
+            set.add(s);
+        }
+        return set;
     }
 }
