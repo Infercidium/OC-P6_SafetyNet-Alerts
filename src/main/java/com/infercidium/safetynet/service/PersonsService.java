@@ -34,6 +34,7 @@ public class PersonsService implements PersonsI {
     public ResponseEntity<Void> createPerson(final Persons persons) {
         Persons result = this.personsR.save(persons);
 
+        //Rest doit faire ça
         URI locate = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{firstName}/{lastName}")
@@ -151,10 +152,8 @@ public class PersonsService implements PersonsI {
 
     public MappingJacksonValue personFilterNull(final List<Persons> persons) {
         Set<String> nul = new HashSet<>();
-        SimpleBeanPropertyFilter personFilter
-                = SimpleBeanPropertyFilter.serializeAllExcept(nul);
-        FilterProvider listFilter = new SimpleFilterProvider()
-                .addFilter("PersonFilter", personFilter);
+        SimpleBeanPropertyFilter personFilter = SimpleBeanPropertyFilter.serializeAllExcept(nul);
+        FilterProvider listFilter = new SimpleFilterProvider().addFilter("PersonFilter", personFilter);
         MappingJacksonValue filterPersons = new MappingJacksonValue(persons);
         filterPersons.setFilters(listFilter);
         return filterPersons;

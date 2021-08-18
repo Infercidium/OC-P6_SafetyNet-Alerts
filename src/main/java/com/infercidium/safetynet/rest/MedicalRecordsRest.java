@@ -29,14 +29,15 @@ public class MedicalRecordsRest {
     }
 
     @PostMapping(value = "/medicalRecord")
-    public ResponseEntity<Void> createMedicalRecords(
+    public String createMedicalRecords(
             @Valid @RequestBody final MedicalRecords medicalRecords) {
-        ResponseEntity<Void> result
-                = medicalRecordsS.createMedicalRecords(medicalRecords);
-        LOGGER.info("Saving " + medicalRecords.getFirstName()
+       // ResponseEntity<Void> result
+              //  = medicalRecordsS.createMedicalRecords(medicalRecords);
+        /*LOGGER.info("Saving " + medicalRecords.getFirstName()
                 + " " + medicalRecords.getLastName()
-                + " in the Medicalrecords table");
-        return result;
+                + " in the Medicalrecords table");*/
+        System.out.println(medicalRecords);
+        return "medicalRecords.toString()";
     }
 
     @PutMapping(value = "/medicalRecord/{firstName}/{lastName}")

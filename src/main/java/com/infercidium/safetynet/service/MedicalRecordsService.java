@@ -175,7 +175,7 @@ public class MedicalRecordsService implements MedicalRecordsI {
         if (!medicalRecords.isPresent()) {
             throw new NullPointerException();
         }
-        Set<String> attribute = newHashSet("fisrtName", "lastName", "age",
+        Set<String> attribute = newHashSet("firstName", "lastName", "age",
                 "medications", "allergies", "persons");
         SimpleBeanPropertyFilter medicalRecordFilter
                 = SimpleBeanPropertyFilter.filterOutAllExcept(attribute);

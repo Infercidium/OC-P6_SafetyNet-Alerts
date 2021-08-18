@@ -3,18 +3,9 @@ package com.infercidium.safetynet.model;
 import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.Cascade;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
 import java.time.Period;
@@ -57,14 +48,14 @@ public class MedicalRecords {
     @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate birthdate;
 
-    @ManyToMany
-    @JoinTable(name = "Medicalrecords_Medications",
-            joinColumns = @JoinColumn(name = "MedicalRecords_id"),
-            inverseJoinColumns = @JoinColumn(name = "Medications_id"))
+    @ManyToMany(cascade = {CascadeType.PERSIST})
+    @JoinTable(name = "MedicalRecords_Medication",
+    joinColumns = @JoinColumn(name = "MedicalRecords_id"),
+    inverseJoinColumns = @JoinColumn(name = "Medications_id"))
     private Set<Medications> medications = new HashSet<>();
 
-    @ManyToMany
-    @JoinTable(name = "Medicalrecords_Allergies",
+    @ManyToMany(cascade = {CascadeType.PERSIST})
+    @JoinTable(name = "MedicalRecords_Allergies",
             joinColumns = @JoinColumn(name = "MedicalRecords_id"),
             inverseJoinColumns = @JoinColumn(name = "Allergies_id"))
     private Set<Allergies> allergies = new HashSet<>();
@@ -142,7 +133,7 @@ public class MedicalRecords {
                 + ", birthdate =" + birthdate + '\''
                 + ", medications =" + medications + '\''
                 + ", allergies =" + allergies + '\''
-                + ", person =" + persons.getId() + '\''
+               // + ", person =" + persons.getId() + '\''
                 + '}';
     }
 }

@@ -2,10 +2,7 @@ package com.infercidium.safetynet.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 
 @Entity
@@ -18,7 +15,7 @@ public class Medications {
     }
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+   @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonIgnore
     private Long id;
 
@@ -29,7 +26,7 @@ public class Medications {
         return id;
     }
 
-    public void setId(final Long idS) {
+   public void setId(final Long idS) {
         this.id = idS;
     }
 
