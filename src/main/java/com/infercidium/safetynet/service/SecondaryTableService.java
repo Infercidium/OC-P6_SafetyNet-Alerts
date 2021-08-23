@@ -36,8 +36,8 @@ public class SecondaryTableService implements SecondaryTableI {
             allergie.setAllergie(allergie1);
             if (this.allergiesR
                     .findByAllergie(allergie.getAllergie()) != null) {
-               /* allergie.setId(this.allergiesR
-                        .findByAllergie(allergie.getAllergie()).getId());*/
+                allergie.setId(this.allergiesR
+                        .findByAllergie(allergie.getAllergie()).getId());
             } else {
                 this.allergiesR.save(allergie);
                 LOGGER.debug("Save " + allergie + " in the Allergies table");
@@ -54,8 +54,8 @@ public class SecondaryTableService implements SecondaryTableI {
         for (Allergies allergie : allergiesSet) {
             if (this.allergiesR
                     .findByAllergie(allergie.getAllergie()) != null) {
-               /* allergie.setId(this.allergiesR
-                        .findByAllergie(allergie.getAllergie()).getId());*/
+                allergie.setId(this.allergiesR
+                        .findByAllergie(allergie.getAllergie()).getId());
             } else {
                 this.allergiesR.save(allergie);
                 LOGGER.debug("Save " + allergie + " in the Allergies table");
@@ -75,8 +75,8 @@ public class SecondaryTableService implements SecondaryTableI {
             medication.setMedication(medication1);
             if (this.medicationsR
                     .findByMedication(medication.getMedication()) != null) {
-               /* medication.setId(this.medicationsR
-                        .findByMedication(medication.getMedication()).getId());*/
+                medication.setId(this.medicationsR
+                        .findByMedication(medication.getMedication()).getId());
             } else {
                 this.medicationsR.save(medication);
                 LOGGER.debug("Save " + medication
@@ -97,8 +97,8 @@ public class SecondaryTableService implements SecondaryTableI {
         for (Medications medication : medicationsSet) {
             if (this.medicationsR
                     .findByMedication(medication.getMedication()) != null) {
-               /* medication.setId(this.medicationsR
-                        .findByMedication(medication.getMedication()).getId());*/
+                medication.setId(this.medicationsR
+                        .findByMedication(medication.getMedication()).getId());
             } else {
                 this.medicationsR.save(medication);
                 LOGGER.debug("Save " + medication

@@ -1,8 +1,5 @@
 package com.infercidium.safetynet.service;
 
-import com.fasterxml.jackson.databind.ser.FilterProvider;
-import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
-import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.infercidium.safetynet.model.Persons;
 import com.infercidium.safetynet.repository.PersonsRepository;
 import org.slf4j.Logger;
@@ -10,9 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -22,8 +17,7 @@ import java.util.Set;
 @Service
 public class PersonsService implements PersonsI {
 
-    private static final Logger LOGGER
-            = LoggerFactory.getLogger(PersonsService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PersonsService.class);
     private final PersonsRepository personsR;
     public PersonsService(final PersonsRepository personsRe) {
         this.personsR = personsRe;
@@ -31,45 +25,32 @@ public class PersonsService implements PersonsI {
 
     //Post, Put, Delete
     @Override
-    public ResponseEntity<Void> createPerson(final Persons persons) {
+    public Persons createPerson(final Persons persons) {
         Persons result = this.personsR.save(persons);
-
-        //Rest doit faire ça
-        URI locate = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{firstName}/{lastName}")
-                .buildAndExpand(result.getFirstName(), result.getLastName())
-                .toUri();
-        return ResponseEntity.created(locate).build();
+        return result;
     }
 
     @Override
-    public ResponseEntity<Void> editPerson(final String firstName,
-                                           final String lastName,
-                                           final Persons persons) {
+    public void editPerson(final String firstName, final String lastName, final Persons persons) {
         Persons basicPerson = getPerson(firstName, lastName).get(0);
+        System.out.println(basicPerson);
         Persons personChanged = persons;
         personChanged.setId(basicPerson.getId());
         Persons person = personVerification(basicPerson, personChanged);
         this.personsR.save(person);
-        return ResponseEntity.ok().build();
     }
 
     @Override
-    public ResponseEntity<Void> removePerson(final String firstName,
-                                             final String lastName) {
+    public void removePerson(final String firstName, final String lastName) {
         List<Persons> person = getPerson(firstName, lastName);
         this.personsR.delete(person.get(0));
-        return ResponseEntity.ok().build();
+
     }
 
     //Get
     @Override
-    public List<Persons> getPerson(final String firstName,
-                                   final String lastName) {
-        Optional<Persons> person
-                = this.personsR.findByFirstNameIgnoreCaseAndLastNameIgnoreCase(
-                        firstName, lastName);
+    public List<Persons> getPerson(final String firstName, final String lastName) {
+        Optional<Persons> person = this.personsR.findByFirstNameIgnoreCaseAndLastNameIgnoreCase(firstName, lastName);
         if (person.isPresent()) {
             List<Persons> personList = new ArrayList<>();
             personList.add(person.get());
@@ -91,22 +72,17 @@ public class PersonsService implements PersonsI {
 
     //URL lié à Persons
     @Override
-    public MappingJacksonValue getEmailCommnunity(final String city) {
+    public List<Persons> getEmailCommnunity(final String city) {
         List<Persons> persons = this.personsR.findByCityIgnoreCase(city);
-        if (persons.size() == 0) {
-            throw new NullPointerException();
+        if (persons.size() != 0) {
+            return persons;
         } else {
-            Set<String> attribute = new HashSet<>();
-            attribute.add("email");
-            MappingJacksonValue filterPersons
-                    = personFilterAdd(persons, attribute);
-            return filterPersons;
+            throw new NullPointerException();
         }
     }
 
     //Méthode tiers
-    private Persons personVerification(final Persons basicPerson,
-                                       final Persons personChanged) {
+    private Persons personVerification(final Persons basicPerson, final Persons personChanged) {
         personChanged.setFirstName(basicPerson.getFirstName());
         personChanged.setLastName(basicPerson.getLastName());
         if (personChanged.getCity() == null) {
@@ -138,30 +114,8 @@ public class PersonsService implements PersonsI {
         return personChanged;
     }
 
-    public MappingJacksonValue personFilterAdd(final List<Persons> persons,
-                                               final Set<String> attribute) {
-        SimpleBeanPropertyFilter personFilter
-                = SimpleBeanPropertyFilter.filterOutAllExcept(attribute);
-        FilterProvider listFilter = new SimpleFilterProvider()
-                .addFilter("PersonFilter", personFilter);
-        MappingJacksonValue filterPersons = new MappingJacksonValue(persons);
-        filterPersons.setFilters(listFilter);
-        LOGGER.debug("Applying filters " + attribute);
-        return filterPersons;
-    }
-
-    public MappingJacksonValue personFilterNull(final List<Persons> persons) {
-        Set<String> nul = new HashSet<>();
-        SimpleBeanPropertyFilter personFilter = SimpleBeanPropertyFilter.serializeAllExcept(nul);
-        FilterProvider listFilter = new SimpleFilterProvider().addFilter("PersonFilter", personFilter);
-        MappingJacksonValue filterPersons = new MappingJacksonValue(persons);
-        filterPersons.setFilters(listFilter);
-        return filterPersons;
-    }
-
     public boolean personCheck(final String firstName, final String lastName) {
         return personsR.findByFirstNameIgnoreCaseAndLastNameIgnoreCase(
                 firstName, lastName).isPresent();
     }
 }
-

@@ -9,6 +9,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import javax.validation.ConstraintViolationException;
 import java.sql.SQLIntegrityConstraintViolationException;
 
 
@@ -48,5 +49,12 @@ public class ApiExceptionHandler {
         String message = "Link between tables = null";
         LOGGER.error(message, e);
         return new ResponseEntity<>(message, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(value = {ConstraintViolationException.class})
+    public ResponseEntity<String> handleConstraintViolationException(final ConstraintViolationException e) {
+        String message = "Invalid resource field";
+        LOGGER.error(message, e);
+        return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
     }
 }

@@ -141,11 +141,11 @@ public class DataBaseInitService implements DataBaseInitI {
             medicalRecords1.setBirthdate(localDate);
             HashSet<Medications> medicationRecord
                     = new HashSet<>(sts.checkMedicationMedicalRecords(
-                            (List<String>) medicalRecord.get("medications")));
+                    (List<String>) medicalRecord.get("medications")));
             medicalRecords1.setMedications(medicationRecord);
             HashSet<Allergies> allergiesRecord
                     = new HashSet<>(sts.checkAllergieMedicalRecords(
-                            (List<String>) medicalRecord.get("allergies")));
+                    (List<String>) medicalRecord.get("allergies")));
             medicalRecords1.setAllergies(allergiesRecord);
             medicalRecordsList.add(medicalRecords1);
         }

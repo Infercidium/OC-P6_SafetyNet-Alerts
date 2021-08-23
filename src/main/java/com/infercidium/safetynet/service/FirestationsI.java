@@ -7,11 +7,10 @@ import java.util.List;
 
 public interface FirestationsI {
     //Post, Put, Delete
-    ResponseEntity<Void> createStationMap(Firestations firestations);
-    ResponseEntity<Void> editStationMap(String address,
-                                        Firestations firestations);
-    ResponseEntity<Void> removeAddress(String address);
-    ResponseEntity<Void> removeStation(int station);
+    Firestations createStationMap(Firestations firestations);
+    void editStationMap(String address, Firestations firestations);
+    void removeStation(int station);
+    void removeAddress(String address);
 
     //Get
     List<Firestations> getAddress(String address);
