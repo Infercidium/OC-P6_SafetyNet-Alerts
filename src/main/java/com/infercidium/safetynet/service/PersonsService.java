@@ -1,60 +1,52 @@
 package com.infercidium.safetynet.service;
 
+import com.infercidium.safetynet.dto.PersonsDTO;
 import com.infercidium.safetynet.model.Persons;
 import com.infercidium.safetynet.repository.PersonsRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 
 @Service
 public class PersonsService implements PersonsI {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PersonsService.class);
     private final PersonsRepository personsR;
-    public PersonsService(final PersonsRepository personsRe) {
+    private final SecondaryTableService secondaryTableS;
+
+    public PersonsService(final PersonsRepository personsRe, final SecondaryTableService secondaryTableSe) {
         this.personsR = personsRe;
+        this.secondaryTableS = secondaryTableSe;
     }
 
     //Post, Put, Delete
     @Override
-    public Persons createPerson(final Persons persons) {
-        Persons result = this.personsR.save(persons);
-        return result;
+    public Persons postPerson(final Persons persons) {
+        persons.setAddress(secondaryTableS.checkAddress(persons.getAddress()));
+        return this.personsR.save(persons);
     }
 
     @Override
     public void editPerson(final String firstName, final String lastName, final Persons persons) {
-        Persons basicPerson = getPerson(firstName, lastName).get(0);
-        System.out.println(basicPerson);
-        Persons personChanged = persons;
-        personChanged.setId(basicPerson.getId());
-        Persons person = personVerification(basicPerson, personChanged);
+        Persons basicPerson = getPersonName(firstName, lastName);
+        Persons person = personVerification(basicPerson, persons);
         this.personsR.save(person);
     }
 
     @Override
     public void removePerson(final String firstName, final String lastName) {
-        List<Persons> person = getPerson(firstName, lastName);
-        this.personsR.delete(person.get(0));
-
+        Persons person = getPersonName(firstName, lastName);
+        this.personsR.delete(person);
     }
-
     //Get
     @Override
-    public List<Persons> getPerson(final String firstName, final String lastName) {
-        Optional<Persons> person = this.personsR.findByFirstNameIgnoreCaseAndLastNameIgnoreCase(firstName, lastName);
-        if (person.isPresent()) {
-            List<Persons> personList = new ArrayList<>();
-            personList.add(person.get());
-            return personList;
+    public Persons getPersonName(final String firstName, final String lastName) {
+        Persons person = this.personsR.findByFirstNameIgnoreCaseAndLastNameIgnoreCase(firstName, lastName);
+        if (person != null) {
+            return person;
         } else {
             throw new NullPointerException();
         }
@@ -69,53 +61,61 @@ public class PersonsService implements PersonsI {
             throw new NullPointerException();
         }
     }
-
     //URL lié à Persons
     @Override
-    public List<Persons> getEmailCommnunity(final String city) {
-        List<Persons> persons = this.personsR.findByCityIgnoreCase(city);
-        if (persons.size() != 0) {
-            return persons;
-        } else {
-            throw new NullPointerException();
-        }
+    public List<Persons> getPersonsAddress(final String address) {
+        LOGGER.debug("List of Person Found");
+        return this.personsR.findByAddressAddressIgnoreCase(address);
     }
 
-    //Méthode tiers
+    @Override
+    public List<Persons> getPersonsCity(final String city) {
+        LOGGER.debug("List of Person Found");
+        return this.personsR.findByCityIgnoreCase(city);
+    }
+
+    @Override
+    public List<PersonsDTO> personsToPersonsdtoEmail(final List<Persons> persons) {
+        List<PersonsDTO> personsDTO = new ArrayList<>();
+        for (Persons person : persons) {
+            PersonsDTO personsDto = new PersonsDTO();
+            personsDto.setEmail(person.getEmail());
+            personsDTO.add(personsDto);
+        }
+        LOGGER.debug("Retrieving emails people");
+        return personsDTO;
+    }
+
+    //Methods Tiers
     private Persons personVerification(final Persons basicPerson, final Persons personChanged) {
+        personChanged.setId(basicPerson.getId());
         personChanged.setFirstName(basicPerson.getFirstName());
         personChanged.setLastName(basicPerson.getLastName());
-        if (personChanged.getCity() == null) {
-            personChanged.setCity(basicPerson.getCity());
-        } else if (!personChanged.getCity().equals(basicPerson.getCity())) {
-            LOGGER.debug("City modification");
-        }
         if (personChanged.getAddress() == null) {
             personChanged.setAddress(basicPerson.getAddress());
-        } else if (!personChanged.getAddress()
-                .equals(basicPerson.getAddress())) {
-            LOGGER.debug("Address modification");
+        } else {
+            personChanged.setAddress(secondaryTableS.checkAddress(personChanged.getAddress()));
+        }
+        if (personChanged.getCity() == null) {
+            personChanged.setCity(basicPerson.getCity());
         }
         if (personChanged.getZip() < 1) {
             personChanged.setZip(basicPerson.getZip());
-        } else if (personChanged.getZip() != basicPerson.getZip()) {
-            LOGGER.debug("Zip modification");
         }
         if (personChanged.getPhone() == null) {
             personChanged.setPhone(basicPerson.getPhone());
-        } else if (!personChanged.getPhone().equals(basicPerson.getPhone())) {
-            LOGGER.debug("Phone modification");
         }
         if (personChanged.getEmail() == null) {
             personChanged.setEmail(basicPerson.getEmail());
-        } else if (!personChanged.getEmail().equals(basicPerson.getEmail())) {
-            LOGGER.debug("Email modification");
         }
+        LOGGER.debug("Verification of Person fields");
         return personChanged;
     }
 
+    @Override
     public boolean personCheck(final String firstName, final String lastName) {
-        return personsR.findByFirstNameIgnoreCaseAndLastNameIgnoreCase(
-                firstName, lastName).isPresent();
+        Persons persons = personsR.findByFirstNameIgnoreCaseAndLastNameIgnoreCase(firstName, lastName);
+        LOGGER.debug("Verification of the person's existence");
+        return persons != null;
     }
 }

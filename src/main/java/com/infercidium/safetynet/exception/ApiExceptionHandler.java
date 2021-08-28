@@ -52,7 +52,8 @@ public class ApiExceptionHandler {
     }
 
     @ExceptionHandler(value = {ConstraintViolationException.class})
-    public ResponseEntity<String> handleConstraintViolationException(final ConstraintViolationException e) {
+    public ResponseEntity<String> handleConstraintViolationException(
+            final ConstraintViolationException e) {
         String message = "Invalid resource field";
         LOGGER.error(message, e);
         return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);

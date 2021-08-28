@@ -9,23 +9,22 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotBlank;
 
-
 @Entity
-public class Allergies {
+public class Address {
 
-   @Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonIgnore
     private Long id;
 
-    @NotBlank(message = "The allergie cannot be null or empty.")
+    @NotBlank(message = "Address cannot be null or empty.")
     @Column(unique = true)
-    private String allergy;
+    private String address;
 
-    public Allergies() { }
+    public Address() { }
 
-    public Allergies(final String allergyC) {
-        this.allergy = allergyC;
+    public Address(final String addressC) {
+        this.address = addressC;
     }
 
     public Long getId() {
@@ -36,20 +35,19 @@ public class Allergies {
         this.id = idS;
     }
 
-    public String getAllergy() {
-        return allergy;
+    public String getAddress() {
+        return address;
     }
 
-    public void setAllergy(final String allergyS) {
-        this.allergy = allergyS;
+    public void setAddress(final String addressS) {
+        this.address = addressS;
     }
 
     @Override
     public String toString() {
-        return "Allergies{"
+        return "Address{"
                 + " id = " + id
-                + "allergy = '" + allergy + '\''
+                + ", address = '" + address + '\''
                 + '}';
     }
 }
-

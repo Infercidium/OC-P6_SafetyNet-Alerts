@@ -1,82 +1,69 @@
 package com.infercidium.safetynet.service;
 
-import com.infercidium.safetynet.model.Allergies;
+import com.infercidium.safetynet.dto.PersonsAndMedicalRecordsDTO;
 import com.infercidium.safetynet.model.MedicalRecords;
-import com.infercidium.safetynet.model.Medications;
-import com.infercidium.safetynet.repository.AllergiesRepository;
+import com.infercidium.safetynet.model.Persons;
 import com.infercidium.safetynet.repository.MedicalrecordsRepository;
-import com.infercidium.safetynet.repository.MedicationsRepository;
 import org.apache.commons.lang.NullArgumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.Map;
 
 @Service
 public class MedicalRecordsService implements MedicalRecordsI {
 
-    private final PersonsService personsS;
     private static final Logger LOGGER = LoggerFactory.getLogger(MedicalRecordsService.class);
+    private static final int MAJORITE = 18;
 
-    private final MedicalrecordsRepository medicalrecordsR;
-    private final MedicationsRepository medicationsR;
-    private final AllergiesRepository allergiesR;
+    private final PersonsService personsS;
+    private final MedicalrecordsRepository medicalRecordsR;
+    private final SecondaryTableService secondaryTableS;
 
-    public MedicalRecordsService(final PersonsService personsSe, final MedicalrecordsRepository medicalrecordsRe, final MedicationsRepository medicationsRe, final AllergiesRepository allergiesRe) {
+    public MedicalRecordsService(
+            final PersonsService personsSe,
+            final MedicalrecordsRepository medicalrecordsRe,
+            final SecondaryTableService secondaryTableSe) {
         this.personsS = personsSe;
-        this.medicalrecordsR = medicalrecordsRe;
-        this.medicationsR = medicationsRe;
-        this.allergiesR = allergiesRe;
+        this.medicalRecordsR = medicalrecordsRe;
+        this.secondaryTableS = secondaryTableSe;
     }
 
     //Post, Put, delete
     @Override
-    public MedicalRecords createMedicalRecords(final MedicalRecords medicalRecords) {
-        MedicalRecords verify = medicalRecords;
-        if (personsS.personCheck(medicalRecords.getFirstName(), medicalRecords.getLastName())) {
-            medicalRecords.setPersons(personsS.getPerson(medicalRecords.getFirstName(), medicalRecords.getLastName()).get(0));
+    public MedicalRecords postMedicalRecords(final MedicalRecords medicalRecords, final String firstName, final String lastName) {
+        if (personsS.personCheck(firstName, lastName)) {
+            medicalRecords.setPersons(personsS.getPersonName(firstName, lastName));
         } else {
             throw new NullArgumentException("Null table binding");
         }
-        SecondaryTableService sts = new SecondaryTableService(medicationsR, allergiesR);
-            Set<Medications> medicationsSet = sts.checkMedicationMedicalRecords(medicalRecords.getMedications());
-            verify.setMedications(medicationsSet);
-            Set<Allergies> allergiesSet = sts.checkAllergieMedicalRecords(medicalRecords.getAllergies());
-            verify.setAllergies(allergiesSet);
-
-            MedicalRecords finalMedicalRecords = this.medicalrecordsR.save(verify);
-            return finalMedicalRecords;
-
+        medicalRecords.setAllergies(secondaryTableS.checkAllergies(medicalRecords.getAllergies()));
+        medicalRecords.setMedications(secondaryTableS.checkMedications(medicalRecords.getMedications()));
+        return this.medicalRecordsR.save(medicalRecords);
     }
 
     @Override
     public void editMedicalRecords(final String firstName, final String lastName, final MedicalRecords medicalRecords) {
-        MedicalRecords basicMedicalRecords = getMedicalRecord(firstName, lastName).get(0);
-        MedicalRecords medicalRecordsChanged = medicalRecords;
-        medicalRecordsChanged.setId(basicMedicalRecords.getId());
-        MedicalRecords medicalRecord = medicalRecordsVerification(basicMedicalRecords, medicalRecordsChanged);
-        this.medicalrecordsR.save(medicalRecord);
+        MedicalRecords basicMedicalRecords = getMedicalRecordName(firstName, lastName);
+        MedicalRecords medicalRecord = medicalRecordsVerification(basicMedicalRecords, medicalRecords);
+        this.medicalRecordsR.save(medicalRecord);
     }
 
     @Override
-    public void removeMedicalRecords(
-            final String firstName, final String lastName) {
-        List<MedicalRecords> medicalRecord = getMedicalRecord(firstName, lastName);
-        this.medicalrecordsR.delete(medicalRecord.get(0));
+    public void removeMedicalRecords(final String firstName, final String lastName) {
+        MedicalRecords medicalRecord = getMedicalRecordName(firstName, lastName);
+        this.medicalRecordsR.delete(medicalRecord);
     }
-
     //Get
     @Override
-    public List<MedicalRecords> getMedicalRecord(final String firstName, final String lastName) {
-        Optional<MedicalRecords> medicalRecord = this.medicalrecordsR.findByFirstNameIgnoreCaseAndLastNameIgnoreCase(firstName, lastName);
-        if (medicalRecord.isPresent()) {
-            List<MedicalRecords> medicalRecordList = new ArrayList<>();
-            medicalRecordList.add(medicalRecord.get());
-            return medicalRecordList;
+    public MedicalRecords getMedicalRecordName(final String firstName, final String lastName) {
+        MedicalRecords medicalRecord = this.medicalRecordsR.findByPersonsFirstNameIgnoreCaseAndPersonsLastNameIgnoreCase(firstName, lastName);
+        if (medicalRecord != null) {
+            return medicalRecord;
         } else {
             throw new NullPointerException();
         }
@@ -84,86 +71,76 @@ public class MedicalRecordsService implements MedicalRecordsI {
 
     @Override
     public List<MedicalRecords> getMedicalRecords() {
-        List<MedicalRecords> medicalRecords = this.medicalrecordsR.findAll();
+        List<MedicalRecords> medicalRecords = this.medicalRecordsR.findAll();
         if (medicalRecords.size() != 0) {
             return medicalRecords;
         } else {
             throw new NullPointerException();
         }
     }
-
-
     //URL lié à MedicalRecords
-
-    public List<MedicalRecords> getChildAlertChild(final String address) {
-        List<MedicalRecords> medicalRecords = medicalrecordsR.findByPersonsAddressIgnoreCase(address);
-        List<MedicalRecords> result = new ArrayList<>();
-        for(MedicalRecords medicalRecord : medicalRecords) {
-            if(medicalRecord.getAge() < 19) {
-                result.add(medicalRecord);
-            }
-        }
-        return result;
-    }
-
-    public List<MedicalRecords> getChildAlertAdult(final String address) {
-        List<MedicalRecords> medicalRecords = medicalrecordsR.findByPersonsAddressIgnoreCase(address);
-        List<MedicalRecords> result = new ArrayList<>();
-        for(MedicalRecords medicalRecord : medicalRecords) {
-            if(medicalRecord.getAge() > 18) {
-                result.add(medicalRecord);
-            }
-        }
-        return result;
-    }
-/*
     @Override
-    public MappingJacksonValue getPersonInfo(final String firstName,
-                                             final String lastName) {
-        Optional<MedicalRecords> medicalRecords = this.medicalrecordsR
-                .findByFirstNameIgnoreCaseAndLastNameIgnoreCase(
-                        firstName, lastName);
-        if (!medicalRecords.isPresent()) {
-            throw new NullPointerException();
-        }
-        Set<String> attribute = newHashSet("firstName", "lastName", "age",
-                "medications", "allergies", "persons");
-        SimpleBeanPropertyFilter medicalRecordFilter
-                = SimpleBeanPropertyFilter.filterOutAllExcept(attribute);
-        Set<String> attributeP = newHashSet("address", "email");
-        SimpleBeanPropertyFilter personFilter
-                = SimpleBeanPropertyFilter.filterOutAllExcept(attributeP);
-        FilterProvider listFilter = new SimpleFilterProvider()
-                .addFilter("MedicalRecordFilter", medicalRecordFilter)
-                .addFilter("PersonFilter", personFilter);
-        MappingJacksonValue personInfo
-                = new MappingJacksonValue(medicalRecords);
-        personInfo.setFilters(listFilter);
-        LOGGER.debug("Applying filters " + attribute);
-        LOGGER.debug("Applying person filters " + attributeP);
-        return personInfo;
-    }*/
+    public boolean checkMajority(final String firstName, final String lastName) {
+        MedicalRecords medicalRecords = getMedicalRecordName(firstName, lastName);
+        LOGGER.debug("Checking if the person is over " + MAJORITE);
+        return medicalRecords.getAge() > MAJORITE;
+    }
 
-    //Methode tiers
-    private MedicalRecords medicalRecordsVerification(
-            final MedicalRecords basicMedicalRecords,
-            final MedicalRecords medicalRecordsChanged) {
-        medicalRecordsChanged.setFirstName(basicMedicalRecords.getFirstName());
-        medicalRecordsChanged.setLastName(basicMedicalRecords.getLastName());
+    @Override
+    public List<Persons> getPersonsAddress(final String address) {
+        return personsS.getPersonsAddress(address);
+    }
+
+    @Override
+    public Map<String, Object> getChildAlertCount(final List<PersonsAndMedicalRecordsDTO> personsAndMedicalrecordsDTO) {
+        Map<String, Object> childAlert = new HashMap<>();
+        List<PersonsAndMedicalRecordsDTO> adultPersonsAndMedicalRecordsDTO = new ArrayList<>();
+        List<PersonsAndMedicalRecordsDTO> childPersonsAndMedicalRecordsDTO = new ArrayList<>();
+        int adult = 0;
+        int child = 0;
+        String adultString;
+        String childString;
+
+        for (PersonsAndMedicalRecordsDTO personsAndMedicalrecordsDto : personsAndMedicalrecordsDTO) {
+            MedicalRecords medicalRecords = getMedicalRecordName(personsAndMedicalrecordsDto.getFirstName(), personsAndMedicalrecordsDto.getLastName());
+            personsAndMedicalrecordsDto.setPhone(null);
+            if (checkMajority(medicalRecords.getFirstName(), medicalRecords.getLastName())) {
+                adult++;
+                adultPersonsAndMedicalRecordsDTO.add(personsAndMedicalrecordsDto);
+            } else {
+                personsAndMedicalrecordsDto.setAge(medicalRecords.getAge());
+                child++;
+                childPersonsAndMedicalRecordsDTO.add(personsAndMedicalrecordsDto);
+            }
+        }
+
+        adultString = adult > 1 ? "Adults" : "Adult";
+        childString = child > 1 ? "Children" : "Child";
+        childAlert.put(adultString, adultPersonsAndMedicalRecordsDTO);
+        childAlert.put(childString, childPersonsAndMedicalRecordsDTO);
+        LOGGER.debug("Counting and formatting of the list of inhabitants covered");
+        if (child == 0) {
+            childAlert.clear();
+        }
+        return childAlert;
+    }
+
+    //Method Tiers
+    private MedicalRecords medicalRecordsVerification(final MedicalRecords basicMedicalRecords, final MedicalRecords medicalRecordsChanged) {
+        medicalRecordsChanged.setId(basicMedicalRecords.getId());
         medicalRecordsChanged.setPersons(basicMedicalRecords.getPersons());
-        SecondaryTableService sts
-                = new SecondaryTableService(medicationsR, allergiesR);
-        Set<Medications> medicationsSet
-                = sts.checkMedicationMedicalRecords(
-                        medicalRecordsChanged.getMedications());
-        medicalRecordsChanged.setMedications(medicationsSet);
-        Set<Allergies> allergiesSet
-                = sts.checkAllergieMedicalRecords(
-                        medicalRecordsChanged.getAllergies());
-        medicalRecordsChanged.setAllergies(allergiesSet);
         if (medicalRecordsChanged.getBirthdate() == null) {
-            medicalRecordsChanged
-                    .setBirthdate(basicMedicalRecords.getBirthdate());
+            medicalRecordsChanged.setBirthdate(basicMedicalRecords.getBirthdate());
+        }
+        if (medicalRecordsChanged.getAllergies() == null) {
+            medicalRecordsChanged.setAllergies(basicMedicalRecords.getAllergies());
+        } else {
+            medicalRecordsChanged.setAllergies(secondaryTableS.checkAllergies(medicalRecordsChanged.getAllergies()));
+        }
+        if (medicalRecordsChanged.getMedications() == null) {
+            medicalRecordsChanged.setMedications(basicMedicalRecords.getMedications());
+        } else {
+            medicalRecordsChanged.setMedications(secondaryTableS.checkMedications(medicalRecordsChanged.getMedications()));
         }
         return medicalRecordsChanged;
     }

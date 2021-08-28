@@ -1,16 +1,20 @@
 package com.infercidium.safetynet.service;
 
+import com.infercidium.safetynet.dto.FirestationsDTO;
+import com.infercidium.safetynet.dto.MedicalRecordsDTO;
+import com.infercidium.safetynet.dto.PersonsDTO;
+import com.infercidium.safetynet.mapper.FirestationsMapper;
+import com.infercidium.safetynet.mapper.MedicalRecordsMapper;
+import com.infercidium.safetynet.mapper.PersonsMapper;
 import com.infercidium.safetynet.model.Allergies;
 import com.infercidium.safetynet.model.Firestations;
 import com.infercidium.safetynet.model.MedicalRecords;
 import com.infercidium.safetynet.model.Medications;
 import com.infercidium.safetynet.model.Persons;
-import com.infercidium.safetynet.repository.AllergiesRepository;
-import com.infercidium.safetynet.repository.FirestationsRepository;
-import com.infercidium.safetynet.repository.MedicalrecordsRepository;
-import com.infercidium.safetynet.repository.MedicationsRepository;
-import com.infercidium.safetynet.repository.PersonsRepository;
 import com.jsoniter.JsonIterator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -21,26 +25,33 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.Set;
 
+@Service
 public class DataBaseInitService implements DataBaseInitI {
 
-    private final PersonsRepository personR;
-    private final FirestationsRepository firestationsR;
-    private final MedicalrecordsRepository medicalrecordsR;
-    private final MedicationsRepository medicationsR;
-    private final AllergiesRepository allergiesR;
+    private static final Logger LOGGER = LoggerFactory.getLogger(DataBaseInitService.class);
 
-    public DataBaseInitService(final PersonsRepository personRe,
-                               final FirestationsRepository firestationsRe,
-                               final MedicalrecordsRepository medicalrecordsRe,
-                               final MedicationsRepository medicationsRe,
-                               final AllergiesRepository allergiesRe) {
-        this.personR = personRe;
-        this.firestationsR = firestationsRe;
-        this.medicalrecordsR = medicalrecordsRe;
-        this.medicationsR = medicationsRe;
-        this.allergiesR = allergiesRe;
+    private final FirestationsMapper firestationsM;
+    private final PersonsMapper personsM;
+    private final MedicalRecordsMapper medicalRecordsM;
+
+    private final FirestationsService firestationsS;
+    private final PersonsService personsS;
+    private final MedicalRecordsService medicalRecordsS;
+
+    public DataBaseInitService(final FirestationsMapper firestationsMa,
+                               final PersonsMapper personsMa,
+                               final MedicalRecordsMapper medicalRecordsMa,
+                               final FirestationsService firestationsSe,
+                               final PersonsService personsSe,
+                               final MedicalRecordsService medicalRecordsSe) {
+        this.firestationsM = firestationsMa;
+        this.personsM = personsMa;
+        this.medicalRecordsM = medicalRecordsMa;
+        this.firestationsS = firestationsSe;
+        this.personsS = personsSe;
+        this.medicalRecordsS = medicalRecordsSe;
     }
 
     @Override
@@ -69,112 +80,119 @@ public class DataBaseInitService implements DataBaseInitI {
 
     @Override
     public Map<String, Object> deserializeStringToMap(final String data) {
-        Map<String, Object> passageList
-                = JsonIterator.deserialize(data, Map.class);
+        Map<String, Object> passageList = JsonIterator.deserialize(data, Map.class);
         return passageList;
     }
 
     @Override
     public List<Map<String, String>> convertMaptoList(
             final Map<String, Object> passageList, final String name) {
-        List<Map<String, String>> list
-                = (List<Map<String, String>>) passageList.get(name);
+        List<Map<String, String>> list = (List<Map<String, String>>) passageList.get(name);
         return list;
     }
 
     @Override
     public List<Map<String, Object>> convertMedicalRecordsMaptoList(
             final Map<String, Object> passageList) {
-        List<Map<String, Object>> list
-                = (List<Map<String, Object>>) passageList.get("medicalrecords");
+        List<Map<String, Object>> list = (List<Map<String, Object>>) passageList.get("medicalrecords");
         return list;
     }
 
     @Override
-    public List<Persons> instantiateListPersons(
-            final List<Map<String, String>> persons) {
-        List<Persons> personsList = new ArrayList<>();
-        for (Map<String, String> person : persons) {
-            Persons person1 = new Persons();
-            person1.setFirstName(person.get("firstName"));
-            person1.setLastName(person.get("lastName"));
-            person1.setAddress(person.get("address"));
-            person1.setCity(person.get("city"));
-            person1.setZip(Integer.parseInt(person.get("zip")));
-            person1.setPhone(person.get("phone"));
-            person1.setEmail(person.get("email"));
-            personsList.add(person1);
-        }
-        return personsList;
-    }
-
-    @Override
-    public List<Firestations> instantiateListFirestations(
-            final List<Map<String, String>> firestations) {
+    public void instanciateListFirestations(final List<Map<String, String>> firestations) {
         List<Firestations> firestationsList = new ArrayList<>();
         for (Map<String, String> firestation : firestations) {
-            Firestations firestation1 = new Firestations();
-            firestation1.setAddress(firestation.get("address"));
-            firestation1.setStation(
-                    Integer.parseInt(firestation.get("station")));
-            firestationsList.add(firestation1);
+            FirestationsDTO firestationsDTO = new FirestationsDTO();
+            firestationsDTO.setAddress(firestation.get("address"));
+            firestationsDTO.setStation(Integer.parseInt(firestation.get("station")));
+            Firestations finalFirestation = firestationsM.dtoToModel(firestationsDTO);
+            firestationsList.add(finalFirestation);
+            boolean novel = true;
+            for (int i = 1; i < firestationsList.size(); i++) {
+                if (firestationsList.get(i - 1).getAddress().getAddress().equals(finalFirestation.getAddress().getAddress())) {
+                    LOGGER.debug("Duplicate address detected : " + finalFirestation.getAddress().getAddress() + ", station : " + finalFirestation.getStation() + " removed.");
+                    novel = false;
+                }
+            }
+            if (novel) {
+                firestationsS.postFirestation(finalFirestation);
+            }
         }
-        return firestationsList;
     }
 
     @Override
-    public List<MedicalRecords> instantiateListMedicalRecords(
-            final List<Map<String, Object>> medicalRecords) {
-        List<MedicalRecords> medicalRecordsList = new ArrayList<>();
-        SecondaryTableService sts
-                = new SecondaryTableService(medicationsR, allergiesR);
+    public void instanciateListPersons(final List<Map<String, String>> persons) {
+        List<Persons> personsList = new ArrayList<>();
+        for (Map<String, String> person : persons) {
+            PersonsDTO personsDTO = new PersonsDTO();
+            personsDTO.setFirstName(person.get("firstName"));
+            personsDTO.setLastName(person.get("lastName"));
+            personsDTO.setAddress(person.get("address"));
+            personsDTO.setCity(person.get("city"));
+            personsDTO.setZip(Integer.parseInt(person.get("zip")));
+            personsDTO.setPhone(person.get("phone"));
+            personsDTO.setEmail(person.get("email"));
+            Persons finalPerson = personsM.dtoToModel(personsDTO);
+            personsList.add(finalPerson);
+            boolean novel = true;
+            for (int i = 1; i < personsList.size(); i++) {
+                if (personsList.get(i - 1).getFirstName().equals(finalPerson.getFirstName()) && personsList.get(i - 1).getLastName().equals(finalPerson.getLastName())) {
+                    LOGGER.debug(finalPerson.getFirstName() + " " + finalPerson.getLastName() + " detected in duplicate, deletion.");
+                    novel = false;
+                }
+            }
+            if (novel) {
+                personsS.postPerson(finalPerson);
+            }
+        }
+    }
+
+    @Override
+    public void instanciateListMedicalRecords(final List<Map<String, Object>> medicalRecords) {
+        List<MedicalRecordsDTO> medicalRecordsDTOList = new ArrayList<>();
         for (Map<String, Object> medicalRecord : medicalRecords) {
-            MedicalRecords medicalRecords1 = new MedicalRecords();
-            medicalRecords1.setFirstName(
-                    (String) medicalRecord.get("firstName"));
-            medicalRecords1.setLastName((String) medicalRecord.get("lastName"));
-            DateTimeFormatter formatter
-                    = DateTimeFormatter.ofPattern("MM/dd/yyyy");
-            LocalDate localDate
-                    = LocalDate.parse((CharSequence) medicalRecord
-                    .get("birthdate"), formatter);
-            medicalRecords1.setBirthdate(localDate);
-            HashSet<Medications> medicationRecord
-                    = new HashSet<>(sts.checkMedicationMedicalRecords(
-                    (List<String>) medicalRecord.get("medications")));
-            medicalRecords1.setMedications(medicationRecord);
-            HashSet<Allergies> allergiesRecord
-                    = new HashSet<>(sts.checkAllergieMedicalRecords(
-                    (List<String>) medicalRecord.get("allergies")));
-            medicalRecords1.setAllergies(allergiesRecord);
-            medicalRecordsList.add(medicalRecords1);
+            MedicalRecordsDTO medicalRecordsDTO = new MedicalRecordsDTO();
+            medicalRecordsDTO.setFirstName(String.valueOf(medicalRecord.get("firstName")));
+            medicalRecordsDTO.setLastName(String.valueOf(medicalRecord.get("lastName")));
+            //Date Management
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+            LocalDate localDate = LocalDate.parse((CharSequence) medicalRecord.get("birthdate"), formatter);
+            medicalRecordsDTO.setBirthdate(localDate);
+            //Set management
+            medicalRecordsDTO.setMedications(instanciateListMedications((List<String>) medicalRecord.get("medications")));
+            medicalRecordsDTO.setAllergies(instanciateListAllergies((List<String>) medicalRecord.get("allergies")));
+            medicalRecordsDTOList.add(medicalRecordsDTO);
+            MedicalRecords finalMedicalRecord = medicalRecordsM.dtoToModel(medicalRecordsDTO);
+            boolean novel = true;
+            for (int i = 1; i < medicalRecordsDTOList.size(); i++) {
+                if (medicalRecordsDTOList.get(i - 1).getFirstName().equals(medicalRecordsDTO.getFirstName()) && medicalRecordsDTOList.get(i - 1).getLastName().equals(medicalRecordsDTO.getLastName())) {
+                    LOGGER.debug(medicalRecordsDTO.getFirstName() + " " + medicalRecordsDTO.getLastName() + " detected in duplicate, deletion.");
+                    novel = false;
+                }
+            }
+            if (novel) {
+                medicalRecordsS.postMedicalRecords(finalMedicalRecord, medicalRecordsDTO.getFirstName(), medicalRecordsDTO.getLastName());
+            }
         }
-        return medicalRecordsList;
     }
 
     @Override
-    public void saveAllList(final List<Persons> persons,
-                            final List<Firestations> firestations,
-                            final List<MedicalRecords> medicalRecords) {
-        this.personR.saveAll(persons);
-        this.firestationsR.saveAll(firestations);
-        List<MedicalRecords> medicalRecordsConnect
-                = connectMedicalRecordsToPersons(medicalRecords);
-        this.medicalrecordsR.saveAll(medicalRecordsConnect);
+    public Set<Medications> instanciateListMedications(final List<String> medications) {
+        Set<Medications> medicationsSet = new HashSet<>();
+        for (String medication : medications) {
+            Medications finalMedications = new Medications(medication);
+            medicationsSet.add(finalMedications);
+        }
+        return medicationsSet;
     }
 
     @Override
-    public List<MedicalRecords> connectMedicalRecordsToPersons(
-            final List<MedicalRecords> medicalRecords) {
-        List<MedicalRecords> medicalRecordsList = new ArrayList<>();
-        for (MedicalRecords medicalRecord : medicalRecords) {
-           Optional<Persons> person = personR
-                   .findByFirstNameIgnoreCaseAndLastNameIgnoreCase(
-                           medicalRecord.getFirstName(),
-                           medicalRecord.getLastName());
-           medicalRecord.setPersons(person.get());
-           medicalRecordsList.add(medicalRecord);
+    public Set<Allergies> instanciateListAllergies(final List<String> allergies) {
+        Set<Allergies> allergiesSet = new HashSet<>();
+        for (String allergy : allergies) {
+            Allergies finalAllergy = new Allergies(allergy);
+            allergiesSet.add(finalAllergy);
         }
-        return medicalRecordsList;
+        return allergiesSet;
     }
 }

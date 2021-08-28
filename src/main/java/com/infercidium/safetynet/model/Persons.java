@@ -1,6 +1,5 @@
 package com.infercidium.safetynet.model;
 
-import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.Column;
@@ -8,6 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Email;
@@ -16,25 +17,8 @@ import javax.validation.constraints.NotBlank;
 
 
 @Entity
-@JsonFilter("PersonFilter")
-@Table(uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"firstName", "lastName"})})
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"firstName", "lastName"})})
 public class Persons {
-
-
-    public Persons() { }
-
-    public Persons(final String firstNameC, final String lastNameC,
-                   final String addressC, final String cityC,
-                   final int zipC, final String phoneC, final String emailC) {
-        this.firstName = firstNameC;
-        this.lastName = lastNameC;
-        this.address = addressC;
-        this.city = cityC;
-        this.zip = zipC;
-        this.phone = phoneC;
-        this.email = emailC;
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,8 +33,9 @@ public class Persons {
     @NotBlank(message = "The last name cannot be null or empty.")
     private String lastName;
 
-    @NotBlank(message = "The address cannot be null or empty.")
-    private String address;
+    @ManyToOne
+    @JoinColumn(name = "Address_id")
+    private Address address;
 
     @NotBlank(message = "The city cannot be null or empty.")
     private String city;
@@ -63,6 +48,19 @@ public class Persons {
     @Email(message = "A standard email address format is expected.")
     private String email;
 
+    public Persons() { }
+
+    public Persons(final String firstNameC, final String lastNameC,
+                   final Address addressC, final String cityC,
+                   final int zipC, final String phoneC, final String emailC) {
+        this.firstName = firstNameC;
+        this.lastName = lastNameC;
+        this.address = addressC;
+        this.city = cityC;
+        this.zip = zipC;
+        this.phone = phoneC;
+        this.email = emailC;
+    }
 
     public Long getId() {
         return id;
@@ -88,11 +86,11 @@ public class Persons {
         this.lastName = lastNameS;
     }
 
-    public String getAddress() {
+    public Address getAddress() {
         return address;
     }
 
-    public void setAddress(final String addressS) {
+    public void setAddress(final Address addressS) {
         this.address = addressS;
     }
 
@@ -131,14 +129,14 @@ public class Persons {
     @Override
     public String toString() {
         return "Persons{"
-                + "id =" + id + '\''
-                + ", firstName ='" + firstName + '\''
-                + ", lastName ='" + lastName + '\''
-                + ", address ='" + address + '\''
-                + ", city ='" + city + '\''
-                + ", zip =" + zip + '\''
-                + ", phone ='" + phone + '\''
-                + ", email ='" + email + '\''
+                + "id = " + id
+                + ", firstName = '" + firstName + '\''
+                + ", lastName = '" + lastName + '\''
+                + ", address = '" + address + '\''
+                + ", city = '" + city + '\''
+                + ", zip = " + zip
+                + ", phone = '" + phone + '\''
+                + ", email = '" + email + '\''
                 + '}';
     }
 }

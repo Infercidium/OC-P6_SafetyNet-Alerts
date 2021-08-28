@@ -1,33 +1,36 @@
 package com.infercidium.safetynet.model;
 
-import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.validation.constraints.Min;
 
 @Entity
-@JsonFilter("FirestationFilter")
 public class Firestations {
-
-    public Firestations() { }
-
-    public Firestations(final String addressC, final int stationC) {
-        this.address = addressC;
-        this.station = stationC;
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonIgnore
     private Long id;
 
-    @NotBlank(message = "The address cannot be null or empty.")
-    private String address;
+    @ManyToOne
+    @JoinColumn(name = "Address_id", unique = true)
+    private Address address;
 
-    @NotNull(message = "The station cannot be null or empty.")
+    @Min(value = 1, message = "The station cannot be null or empty.")
     private int station;
+
+    public Firestations() { }
+
+    public Firestations(final Address addressC, final int stationC) {
+        this.address = addressC;
+        this.station = stationC;
+    }
 
     public Long getId() {
         return id;
@@ -37,11 +40,11 @@ public class Firestations {
         this.id = idS;
     }
 
-    public String getAddress() {
+    public Address getAddress() {
         return address;
     }
 
-    public void setAddress(final String addressS) {
+    public void setAddress(final Address addressS) {
         this.address = addressS;
     }
 
@@ -55,10 +58,10 @@ public class Firestations {
 
     @Override
     public String toString() {
-        return "Firestations{" + '\''
-                + "id =" + id + '\''
-                + ", address ='" + address + '\''
-                + ", station =" + station + '\''
+        return "Firestations{"
+                + " id = " + id
+                + ", address = '" + address + '\''
+                + ", station = " + station
                 + '}';
     }
 }

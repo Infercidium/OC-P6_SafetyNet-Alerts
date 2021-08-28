@@ -1,12 +1,15 @@
 package com.infercidium.safetynet.rest;
 
-import com.infercidium.safetynet.filter.MedicalRecordsFilter;
+import com.infercidium.safetynet.dto.PersonInfoDTO;
+import com.infercidium.safetynet.dto.PersonsAndMedicalRecordsDTO;
+import com.infercidium.safetynet.dto.MedicalRecordsDTO;
+import com.infercidium.safetynet.mapper.MedicalRecordsMapper;
 import com.infercidium.safetynet.model.MedicalRecords;
+import com.infercidium.safetynet.model.Persons;
 import com.infercidium.safetynet.service.MedicalRecordsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,29 +21,35 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
-import java.io.IOException;
 import java.net.URI;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 public class MedicalRecordsRest {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MedicalRecordsRest.class);
+    private static final Logger LOGGER
+            = LoggerFactory.getLogger(MedicalRecordsRest.class);
     private final MedicalRecordsService medicalRecordsS;
-    private final MedicalRecordsFilter medicalRecordsF;
-    public MedicalRecordsRest(final MedicalRecordsService medicalRecordsSe, final MedicalRecordsFilter medicalRecordsFe) {
+    private final MedicalRecordsMapper medicalRecordsM;
+    public MedicalRecordsRest(final MedicalRecordsService medicalRecordsSe,
+                              final MedicalRecordsMapper medicalRecordsMa) {
         this.medicalRecordsS = medicalRecordsSe;
-        this.medicalRecordsF = medicalRecordsFe;
+        this.medicalRecordsM = medicalRecordsMa;
     }
 
+    //Post, Put, Delete
     @PostMapping(value = "/medicalRecord")
-    public ResponseEntity<Void> createMedicalRecords(@Valid @RequestBody final MedicalRecords medicalRecords) {
-        MedicalRecords finalMedicalRecords = medicalRecordsS.createMedicalRecords(medicalRecords);
+    public ResponseEntity<Void> createMedicalRecords(@Valid @RequestBody final MedicalRecordsDTO medicalRecordsDTO) {
+        String firstName = medicalRecordsDTO.getFirstName();
+        String lastname = medicalRecordsDTO.getLastName();
+        MedicalRecords medicalRecords = medicalRecordsM.dtoToModel(medicalRecordsDTO);
+        MedicalRecords postMedicalRecords = medicalRecordsS.postMedicalRecords(medicalRecords, firstName, lastname);
 
         URI locate = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{firstName}/{lastName}")
-                .buildAndExpand(finalMedicalRecords.getFirstName(), finalMedicalRecords.getLastName())
+                .buildAndExpand(postMedicalRecords.getFirstName(), postMedicalRecords.getLastName())
                 .toUri();
 
         LOGGER.info("Saving " + medicalRecords.getFirstName() + " " + medicalRecords.getLastName() + " in the Medicalrecords table");
@@ -48,7 +57,8 @@ public class MedicalRecordsRest {
     }
 
     @PutMapping(value = "/medicalRecord/{firstName}/{lastName}")
-    public ResponseEntity<Void> editMedicalRecords(@PathVariable final String firstName, @PathVariable final String lastName, @RequestBody final MedicalRecords medicalRecords) {
+    public ResponseEntity<Void> editMedicalRecords(@PathVariable final String firstName, @PathVariable final String lastName, @RequestBody final MedicalRecordsDTO medicalRecordsDTO) {
+        MedicalRecords medicalRecords = medicalRecordsM.dtoToModel(medicalRecordsDTO);
         medicalRecordsS.editMedicalRecords(firstName, lastName, medicalRecords);
         LOGGER.info("MedicalRecord " + firstName + " " + lastName + " modification");
         return ResponseEntity.ok().build();
@@ -61,49 +71,38 @@ public class MedicalRecordsRest {
         return ResponseEntity.ok().build();
     }
 
+    //Get
     @GetMapping(value = "/medicalRecord/{firstName}/{lastName}")
-    public MappingJacksonValue getMedicalRecord(@PathVariable final String firstName, @PathVariable final String lastName) {
-        List<MedicalRecords> medicalRecord = medicalRecordsS.getMedicalRecord(firstName, lastName);
-        MappingJacksonValue filterMedicalRecords = medicalRecordsF.medicalRecordsNullFilter(medicalRecord);
+    public MedicalRecordsDTO getMedicalRecord(@PathVariable final String firstName, @PathVariable final String lastName) {
+        MedicalRecords medicalRecords = medicalRecordsS.getMedicalRecordName(firstName, lastName);
+        MedicalRecordsDTO medicalRecordsDTO = medicalRecordsM.modelToDto(medicalRecords);
         LOGGER.info("MedicalRecord found");
-        return filterMedicalRecords;
+        return medicalRecordsDTO;
     }
 
     @GetMapping(value = "/medicalRecords")
-    public MappingJacksonValue getMedicalRecords() {
+    public List<MedicalRecordsDTO> getMedicalRecords() {
         List<MedicalRecords> medicalRecords = medicalRecordsS.getMedicalRecords();
-        MappingJacksonValue filterMedicalRecords = medicalRecordsF.medicalRecordsNullFilter(medicalRecords);
+        List<MedicalRecordsDTO> medicalRecordsDTOS = medicalRecordsM.modelToDto(medicalRecords);
         LOGGER.info("List of MedicalRecords displayed");
-        return filterMedicalRecords;
+        return medicalRecordsDTOS;
     }
 
     //URL lié à MedicalRecords
     @GetMapping(value = "/childAlert")
-    public Object getChildAlert(@RequestParam final String address) {
-        Map<String, Object> finalResult = new HashMap<>();
-        List<MedicalRecords> child = medicalRecordsS.getChildAlertChild(address);
-        if(child.size() == 0) {
-            return finalResult;
-        } else {
-            Set<String> attributeA = medicalRecordsF.newFilterSet("firstName", "lastName");
-            Set<String> attributeC = medicalRecordsF.newFilterSet("firstName", "lastName", "age");
-            List<MedicalRecords> adult = medicalRecordsS.getChildAlertAdult(address);
-            MappingJacksonValue adultFilter = medicalRecordsF.medicalRecordsFilterAdd(adult, attributeA);
-            MappingJacksonValue childFilter = medicalRecordsF.medicalRecordsFilterAdd(child, attributeC);
-            finalResult.put("child", childFilter);
-            finalResult.put("adult", adultFilter);
-            return finalResult;
-        }
+    public Map<String, Object> getChildAlert(@RequestParam final String address) {
+        List<Persons> persons = medicalRecordsS.getPersonsAddress(address);
+        List<PersonsAndMedicalRecordsDTO> personsAndMedicalrecordsDTO = medicalRecordsM.personsModelToChildAlertAndFireDTO(persons);
+        Map<String, Object> childAlertResult = medicalRecordsS.getChildAlertCount(personsAndMedicalrecordsDTO);
+        LOGGER.info("List of children of address : " + address + ", found");
+        return childAlertResult;
     }
-/*
-    @GetMapping(value = "/personInfo")
-    public MappingJacksonValue getPersonInfo(
-            @RequestParam final String firstName,
-            @RequestParam final String lastName) {
-        MappingJacksonValue personInfo
-                = medicalRecordsS.getPersonInfo(firstName, lastName);
-        LOGGER.info("Information from " + firstName
-                + " " + lastName + " displayed");
-        return personInfo;
-    }*/
+
+    @GetMapping(value = "personInfo")
+    public PersonInfoDTO getPersonInfo(@RequestParam final String firstName, @RequestParam final String lastName) {
+        MedicalRecords medicalRecords = medicalRecordsS.getMedicalRecordName(firstName, lastName);
+        PersonInfoDTO personInfoDTO = medicalRecordsM.modelToPersonInfoDTO(medicalRecords);
+        LOGGER.info("Person information " + firstName + " " + lastName + " found");
+        return personInfoDTO;
+    }
 }
