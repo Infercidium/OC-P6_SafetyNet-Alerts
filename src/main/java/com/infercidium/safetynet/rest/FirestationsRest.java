@@ -126,10 +126,11 @@ public class FirestationsRest {
 
     @GetMapping(value = "/fire")
     public Map<String, Object> getFire(@RequestParam final String address) {
-        Integer station = firestationsS.getFirestationsAddress(address).getStation();
+        Firestations firestations = firestationsS.getFirestationsAddress(address);
+        Integer station = firestations.getStation();
         List<Persons> persons = firestationsS.getFireResidents(address);
         List<MedicalRecords> medicalRecords = firestationsS.getFireMedicalRecords(persons);
-        List<PersonsAndMedicalRecordsDTO> fireDTO = firestationsM.personsAndMedicalRecordsModelToChildAlertAndFireDTO(medicalRecords);
+        List<PersonsAndMedicalRecordsDTO> fireDTO = firestationsM.personsAndMedicalRecordsModelToPersonsAndMedicalRecordsDTO(medicalRecords);
         LOGGER.info("Station number and list of residents of " + address + " found");
         return firestationsS.getFireResult(station, fireDTO);
     }
