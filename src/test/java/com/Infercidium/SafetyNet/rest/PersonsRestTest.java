@@ -32,12 +32,15 @@ class PersonsRestTest {
 
     Persons persons = new Persons("Jean", "Bobine", new Address("1 rue du testing"), "Testy", 12345, "456-789-1011", "jbob@email.com");
     List<Persons> personsList = new ArrayList<>();
+
     PersonsDTO personsDTO = new PersonsDTO();
     PersonsDTO personsDTOmail = new PersonsDTO();
     List<PersonsDTO> personsDTOList = new ArrayList<>();
 
     @BeforeEach
     private void setUpPerTest() {
+        personsList.add(persons);
+
         personsDTO.setFirstName(persons.getFirstName());
         personsDTO.setLastName(persons.getLastName());
         personsDTO.setAddress(persons.getAddress().getAddress());
@@ -46,7 +49,6 @@ class PersonsRestTest {
         personsDTO.setPhone(persons.getPhone());
         personsDTO.setEmail(persons.getEmail());
         personsDTOmail.setEmail(persons.getEmail());
-        personsList.add(persons);
         personsDTOList.add(personsDTO);
 
         when(personsM.dtoToModel(personsDTO)).thenReturn(persons);

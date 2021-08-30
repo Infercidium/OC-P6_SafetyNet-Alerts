@@ -43,32 +43,40 @@ class FirestationsRestTest {
     private FirestationsRest firestationsRest;
 
     FirestationsDTO firestationsDTO = new FirestationsDTO();
+    List<FirestationsDTO> firestationsDTOList = new ArrayList<>();
+
     Firestations firestations = new Firestations(new Address("1 rue du testing"), 1);
     List<Firestations> firestationsList = new ArrayList<>();
+
     Persons persons = new Persons("Jean", "Bobine", firestations.getAddress(), "Testy", 12345, "456-789-1011", "jbob@email.com");
     List<Persons> personsList = new ArrayList<>();
+
     StationNumberDTO stationNumberDTO = new StationNumberDTO();
     List<StationNumberDTO> stationNumberDTOList = new ArrayList<>();
-    List<FirestationsDTO> firestationsDTOList = new ArrayList<>();
+
     LocalDate localDate = LocalDate.of(1990, 1, 1);
     MedicalRecords medicalRecords = new MedicalRecords(localDate, new HashSet<>(), new HashSet<>(), persons);
     List<MedicalRecords> medicalRecordsList = new ArrayList<>();
+
     PersonsAndMedicalRecordsDTO personsAndMedicalRecordsDTO = new PersonsAndMedicalRecordsDTO();
     List<PersonsAndMedicalRecordsDTO> personsAndMedicalRecordsDTOList = new ArrayList<>();
 
     @BeforeEach
     private void setUpPerTest() {
+        personsList.add(persons);
+        medicalRecordsList.add(medicalRecords);
+        firestationsList.add(firestations);
+
         firestationsDTO.setStation(1);
         firestationsDTO.setAddress("1 rue du testing");
-        firestationsList.add(firestations);
-        personsList.add(persons);
+        firestationsDTOList.add(firestationsDTO);
+
         stationNumberDTO.setFirstName(persons.getFirstName());
         stationNumberDTO.setLastName(persons.getLastName());
         stationNumberDTO.setAddress(persons.getAddress().getAddress());
         stationNumberDTO.setPhone(persons.getPhone());
         stationNumberDTOList.add(stationNumberDTO);
-        firestationsDTOList.add(firestationsDTO);
-        medicalRecordsList.add(medicalRecords);
+
         personsAndMedicalRecordsDTO.setFirstName(persons.getFirstName());
         personsAndMedicalRecordsDTO.setLastName(persons.getLastName());
         personsAndMedicalRecordsDTO.setMedications(medicalRecords.getMedications());
