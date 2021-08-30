@@ -28,6 +28,8 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = {FirestationsRest.class})
@@ -95,18 +97,21 @@ class FirestationsRestTest {
     @Test
     void editStationMap() {
         ResponseEntity<Void> responseEntity = firestationsRest.editStationMap(firestationsDTO.getAddress(), firestationsDTO);
+        verify(firestationsS, times(1)).editFirestation(firestationsDTO.getAddress(), firestations);
         assertEquals("200 OK", responseEntity.getStatusCode().toString());
     }
 
     @Test
     void removeStation() {
         ResponseEntity<Void> responseEntity = firestationsRest.removeStation(1);
+        verify(firestationsS, times(1)).removeStationMapping(1);
         assertEquals("200 OK", responseEntity.getStatusCode().toString());
     }
 
     @Test
     void removeAddress() {
         ResponseEntity<Void> responseEntity = firestationsRest.removeAddress(firestationsDTO.getAddress());
+        verify(firestationsS, times(1)).removeAddressMapping(firestationsDTO.getAddress());
         assertEquals("200 OK", responseEntity.getStatusCode().toString());
     }
 

@@ -1,11 +1,12 @@
 package com.Infercidium.SafetyNet.rest;
 
 import com.infercidium.safetynet.dto.MedicalRecordsDTO;
+import com.infercidium.safetynet.dto.PersonInfoDTO;
+import com.infercidium.safetynet.dto.PersonsAndMedicalRecordsDTO;
 import com.infercidium.safetynet.mapper.MedicalRecordsMapper;
 import com.infercidium.safetynet.model.Address;
 import com.infercidium.safetynet.model.MedicalRecords;
 import com.infercidium.safetynet.model.Persons;
-import com.infercidium.safetynet.rest.FirestationsRest;
 import com.infercidium.safetynet.rest.MedicalRecordsRest;
 import com.infercidium.safetynet.service.MedicalRecordsService;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,11 +18,14 @@ import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest(classes = {MedicalRecordsRest.class})
 class MedicalRecordsRestTest {
@@ -40,6 +44,10 @@ class MedicalRecordsRestTest {
     MedicalRecordsDTO medicalRecordsDTO = new MedicalRecordsDTO();
     List<MedicalRecordsDTO> medicalRecordsDTOList = new ArrayList<>();
     List<Persons> personsList = new ArrayList<>();
+    PersonsAndMedicalRecordsDTO personsAndMedicalRecordsDTO = new PersonsAndMedicalRecordsDTO();
+    List<PersonsAndMedicalRecordsDTO> personsAndMedicalRecordsDTOList = new ArrayList<>();
+    Map<String, Object> childAlertResult = new HashMap<>();
+    PersonInfoDTO personInfoDTO = new PersonInfoDTO();
 
     @BeforeEach
     private void setUpPerTest() {
@@ -67,13 +75,15 @@ class MedicalRecordsRestTest {
 
     @Test
     void editMedicalRecords() {
-        ResponseEntity<Void> responseEntity = medicalRecordsRest.editMedicalRecords("jean", "bobine", medicalRecordsDTO);
+        ResponseEntity<Void> responseEntity = medicalRecordsRest.editMedicalRecords(persons.getFirstName(), persons.getLastName(), medicalRecordsDTO);
+        verify(medicalRecordsS, times(1)).editMedicalRecords(persons.getFirstName(), persons.getLastName(), medicalRecords);
         assertEquals("200 OK", responseEntity.getStatusCode().toString());
     }
 
     @Test
     void removeMedicalRecords() {
-        ResponseEntity<Void> responseEntity = medicalRecordsRest.removeMedicalRecords("jean", "bobine");
+        ResponseEntity<Void> responseEntity = medicalRecordsRest.removeMedicalRecords(persons.getFirstName(), persons.getLastName());
+        verify(medicalRecordsS, times(1)).removeMedicalRecords(persons.getFirstName(), persons.getLastName());
         assertEquals("200 OK", responseEntity.getStatusCode().toString());
     }
 
@@ -95,11 +105,35 @@ class MedicalRecordsRestTest {
 
     @Test
     void getChildAlert() {
-
+        personsAndMedicalRecordsDTO.setFirstName(persons.getFirstName());
+        personsAndMedicalRecordsDTO.setLastName(persons.getLastName());
+        personsAndMedicalRecordsDTO.setMedications(medicalRecords.getMedications());
+        personsAndMedicalRecordsDTO.setAllergies(medicalRecords.getAllergies());
+        personsAndMedicalRecordsDTO.setAge(medicalRecords.getAge());
+        personsAndMedicalRecordsDTO.setPhone(persons.getPhone());
+        personsAndMedicalRecordsDTOList.add(personsAndMedicalRecordsDTO);
+        when(medicalRecordsS.getPersonsAddress(persons.getAddress().getAddress())).thenReturn(personsList);
+        when(medicalRecordsM.personsModelToChildAlertAndFireDTO(personsList)).thenReturn(personsAndMedicalRecordsDTOList);
+        when(medicalRecordsS.getChildAlertCount(personsAndMedicalRecordsDTOList)).thenReturn(childAlertResult);
+        Map<String, Object> result = medicalRecordsRest.getChildAlert(persons.getAddress().getAddress());
+        assertTrue(result.isEmpty());
     }
 
     @Test
     void getPersonInfo() {
-
+        personInfoDTO.setFirstName(persons.getFirstName());
+        personInfoDTO.setLastName(persons.getLastName());
+        personInfoDTO.setMedications(medicalRecords.getMedications());
+        personInfoDTO.setAllergies(medicalRecords.getAllergies());
+        personInfoDTO.setAge(medicalRecords.getAge());
+        personInfoDTO.setAddress(persons.getAddress().getAddress());
+        personInfoDTO.setEmail(persons.getEmail());
+        when(medicalRecordsM.modelToPersonInfoDTO(medicalRecords)).thenReturn(personInfoDTO);
+        PersonInfoDTO personInfoDto = medicalRecordsRest.getPersonInfo(persons.getFirstName(), persons.getLastName());
+        assertEquals(personInfoDTO.getFirstName(), personInfoDto.getFirstName());
+        assertEquals(personInfoDTO.getLastName(), personInfoDto.getLastName());
+        assertEquals(personInfoDTO.getAge(), personInfoDto.getAge());
+        assertEquals(personInfoDTO.getAddress(), personInfoDto.getAddress());
+        assertEquals(personInfoDTO.getEmail(), personInfoDto.getEmail());
     }
 }
