@@ -38,14 +38,18 @@ class MedicalRecordsRestTest {
     private MedicalRecordsRest medicalRecordsRest;
 
     Persons persons = new Persons("Jean", "Bobine", new Address("1 rue du testing"), "Testy", 12345, "456-789-1011", "jbob@email.com");
+    List<Persons> personsList = new ArrayList<>();
+
     LocalDate localDate = LocalDate.of(1990, 1, 1);
     MedicalRecords medicalRecords = new MedicalRecords(localDate, new HashSet<>(), new HashSet<>(), persons);
     List<MedicalRecords> medicalRecordsList = new ArrayList<>();
+
     MedicalRecordsDTO medicalRecordsDTO = new MedicalRecordsDTO();
     List<MedicalRecordsDTO> medicalRecordsDTOList = new ArrayList<>();
-    List<Persons> personsList = new ArrayList<>();
+
     PersonsAndMedicalRecordsDTO personsAndMedicalRecordsDTO = new PersonsAndMedicalRecordsDTO();
     List<PersonsAndMedicalRecordsDTO> personsAndMedicalRecordsDTOList = new ArrayList<>();
+
     Map<String, Object> childAlertResult = new HashMap<>();
     PersonInfoDTO personInfoDTO = new PersonInfoDTO();
 

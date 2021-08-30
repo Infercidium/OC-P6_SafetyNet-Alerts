@@ -4,7 +4,6 @@ import com.infercidium.safetynet.dto.PersonsDTO;
 import com.infercidium.safetynet.mapper.PersonsMapper;
 import com.infercidium.safetynet.model.Address;
 import com.infercidium.safetynet.model.Persons;
-import com.infercidium.safetynet.rest.MedicalRecordsRest;
 import com.infercidium.safetynet.rest.PersonsRest;
 import com.infercidium.safetynet.service.PersonsService;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,8 +16,10 @@ import org.springframework.http.ResponseEntity;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = {PersonsRest.class})
 class PersonsRestTest {
