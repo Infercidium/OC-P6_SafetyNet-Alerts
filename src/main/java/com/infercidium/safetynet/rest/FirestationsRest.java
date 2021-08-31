@@ -8,7 +8,7 @@ import com.infercidium.safetynet.mapper.FirestationsMapper;
 import com.infercidium.safetynet.model.Firestations;
 import com.infercidium.safetynet.model.MedicalRecords;
 import com.infercidium.safetynet.model.Persons;
-import com.infercidium.safetynet.service.FirestationsService;
+import com.infercidium.safetynet.service.FirestationsI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -39,7 +39,7 @@ public class FirestationsRest {
     /**
      * Instantiation of FirestationsService.
      */
-    private final FirestationsService firestationsS;
+    private final FirestationsI firestationsS;
 
     /**
      * Instantiation of FirestationsMapper.
@@ -51,7 +51,7 @@ public class FirestationsRest {
      * @param firestationsSe this is FirestationsService.
      * @param firestationsMa this is FirestationsMapper.
      */
-    public FirestationsRest(final FirestationsService firestationsSe,
+    public FirestationsRest(final FirestationsI firestationsSe,
                             final FirestationsMapper firestationsMa) {
         this.firestationsS = firestationsSe;
         this.firestationsM = firestationsMa;

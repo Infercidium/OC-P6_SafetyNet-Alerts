@@ -6,7 +6,7 @@ import com.infercidium.safetynet.dto.MedicalRecordsDTO;
 import com.infercidium.safetynet.mapper.MedicalRecordsMapper;
 import com.infercidium.safetynet.model.MedicalRecords;
 import com.infercidium.safetynet.model.Persons;
-import com.infercidium.safetynet.service.MedicalRecordsService;
+import com.infercidium.safetynet.service.MedicalRecordsI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -37,7 +37,7 @@ public class MedicalRecordsRest {
     /**
      * Instantiation of MedicalRecordsService.
      */
-    private final MedicalRecordsService medicalRecordsS;
+    private final MedicalRecordsI medicalRecordsS;
 
     /**
      * Instantiation of MedicalrecordsMapper.
@@ -49,7 +49,7 @@ public class MedicalRecordsRest {
      * @param medicalRecordsSe this is MedicalrecordsService.
      * @param medicalRecordsMa this is MedicalRecordsMapper.
      */
-    public MedicalRecordsRest(final MedicalRecordsService medicalRecordsSe,
+    public MedicalRecordsRest(final MedicalRecordsI medicalRecordsSe,
                               final MedicalRecordsMapper medicalRecordsMa) {
         this.medicalRecordsS = medicalRecordsSe;
         this.medicalRecordsM = medicalRecordsMa;

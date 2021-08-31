@@ -3,7 +3,7 @@ package com.infercidium.safetynet.rest;
 import com.infercidium.safetynet.dto.PersonsDTO;
 import com.infercidium.safetynet.mapper.PersonsMapper;
 import com.infercidium.safetynet.model.Persons;
-import com.infercidium.safetynet.service.PersonsService;
+import com.infercidium.safetynet.service.PersonsI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +33,7 @@ public class PersonsRest {
     /**
      * Instantiation of PersonsService.
      */
-    private final PersonsService personsS;
+    private final PersonsI personsS;
 
     /**
      * Instantiation of PersonsMapper.
@@ -45,7 +45,7 @@ public class PersonsRest {
      * @param personsSe this is PersonsService.
      * @param personsMa this is PersonsMapper.
      */
-    public PersonsRest(final PersonsService personsSe,
+    public PersonsRest(final PersonsI personsSe,
                        final PersonsMapper personsMa) {
         this.personsS = personsSe;
         this.personsM = personsMa;
