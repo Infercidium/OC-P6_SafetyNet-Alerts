@@ -30,10 +30,27 @@ import java.util.Map;
 @RestController
 public class FirestationsRest {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FirestationsRest.class);
+    /**
+     * Instantiation of LOGGER in order to inform in console.
+     */
+    private static final Logger LOGGER
+            = LoggerFactory.getLogger(FirestationsRest.class);
+
+    /**
+     * Instantiation of FirestationsService.
+     */
     private final FirestationsService firestationsS;
+
+    /**
+     * Instantiation of FirestationsMapper.
+     */
     private final FirestationsMapper firestationsM;
 
+    /**
+     * Class constructor.
+     * @param firestationsSe this is FirestationsService.
+     * @param firestationsMa this is FirestationsMapper.
+     */
     public FirestationsRest(final FirestationsService firestationsSe,
                             final FirestationsMapper firestationsMa) {
         this.firestationsS = firestationsSe;
@@ -41,10 +58,19 @@ public class FirestationsRest {
     }
 
     //Post, Put, Delete
+
+    /**
+     * Endpoint allowing to post a Firestation.
+     * @param firestationsDTO this is the information entered by the user.
+     * @return 201 Created if successful,
+     * 409 conflict if already exist or 400 bad request if bad field.
+     */
     @PostMapping(value = "/firestation")
-    public ResponseEntity<Void> createStationMap(@Valid @RequestBody final FirestationsDTO firestationsDTO) {
+    public ResponseEntity<Void> createStationMap(
+            @Valid @RequestBody final FirestationsDTO firestationsDTO) {
         Firestations firestations = firestationsM.dtoToModel(firestationsDTO);
-        Firestations postFirestation = firestationsS.postFirestation(firestations);
+        Firestations postFirestation
+                = firestationsS.postFirestation(firestations);
 
         URI locate = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -56,40 +82,81 @@ public class FirestationsRest {
         return ResponseEntity.created(locate).build();
     }
 
+    /**
+     * Endpoint allowing to post a Firestation.
+     * @param address : allows you to find the resource in the database.
+     * @param firestationsDTO this is the information entered by the user.
+     * @return 200 Ok if successful,
+     * 404 not found if non-existent or 400 bad request if bad field.
+     */
     @PutMapping(value = "/firestation/{address}")
-    public ResponseEntity<Void> editStationMap(@PathVariable final String address, @RequestBody final FirestationsDTO firestationsDTO) {
+    public ResponseEntity<Void> editStationMap(
+            @PathVariable final String address,
+            @RequestBody final FirestationsDTO firestationsDTO) {
         Firestations firestations = firestationsM.dtoToModel(firestationsDTO);
         firestationsS.editFirestation(address, firestations);
         LOGGER.info(address + " mapping modification");
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * Endpoint allowing to delete Firestations.
+     * @param station : allows you to find the resources in the database.
+     * @return 200 Ok if successful, 404 not found if it does not exist.
+     */
     @DeleteMapping(value = "/firestation/station/{station}")
     public ResponseEntity<Void> removeStation(@PathVariable final int station) {
         firestationsS.removeStationMapping(station);
-        LOGGER.info("Deletion of station : " + station + " and its linked addresses");
+        LOGGER.info("Deletion of station : "
+                + station + " and its linked addresses");
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * Endpoint allowing to delete a Firestation.
+     * @param address : allows you to find the resource in the database.
+     * @return 200 Ok if successful, 404 not found if it does not exist.
+     */
     @DeleteMapping(value = "/firestation/address/{address}")
-    public ResponseEntity<Void> removeAddress(@PathVariable final String address) {
+    public ResponseEntity<Void> removeAddress(
+            @PathVariable final String address) {
         firestationsS.removeAddressMapping(address);
         LOGGER.info(address + " deletion");
         return ResponseEntity.ok().build();
     }
     //Get
+
+    /**
+     * Endpoint to get Firestation.
+     * @param address : allows you to find the resource in the database.
+     * @return firestation and 200 Ok if successful
+     * or 404 not found if it does not exist.
+     */
     @GetMapping(value = "/firestation/{address}")
     public FirestationsDTO getAddress(@PathVariable final String address) {
-        Firestations firestations = firestationsS.getFirestationsAddress(address);
-        FirestationsDTO firestationsDTO = firestationsM.modelToDto(firestations);
+        Firestations firestations
+                = firestationsS.getFirestationsAddress(address);
+        FirestationsDTO firestationsDTO
+                = firestationsM.modelToDto(firestations);
         LOGGER.info("Firestation found");
         return firestationsDTO;
     }
 
+    /**
+     * Endpoint to get Firestations.
+     * @param station : allows you to find the resources in the database.
+     *                If default value (0), all the stations are called.
+     * @return List of firestation and 200 Ok if successful
+     * or 404 not found if it does not exist.
+     */
     @GetMapping(value = "/firestations")
-    public List<FirestationsDTO> getStation(@RequestParam(required = false, defaultValue = "0") final int station) {
-        List<Firestations> firestations = firestationsS.getFireStationsStation(station);
-        List<FirestationsDTO> firestationsDTO = firestationsM.modelToDto(firestations);
+    public List<FirestationsDTO> getStation(
+            @RequestParam(required = false, defaultValue = "0")
+            final int station) {
+        List<Firestations> firestations
+                = firestationsS.getFireStationsStation(station);
+        List<FirestationsDTO> firestationsDTO
+                = firestationsM.modelToDto(firestations);
         if (station > 0) {
             LOGGER.info("List of Firestations " + station + " displayed");
         } else {
@@ -99,52 +166,105 @@ public class FirestationsRest {
     }
     //URL lié à Firestations
 
+    /**
+     * This url returns a map containing the number of adults,
+     * the number of children and the list of residents
+     * covered by the Firestation.
+     * @param stationNumber : allows you to find the resource in the database.
+     * @return a Map and 200 Ok if successful
+     * or 404 not found if it does not exist.
+     */
     @GetMapping(value = "/firestation")
-    public Map<String, Object> getStationNumber(@RequestParam final int stationNumber) {
+    public Map<String, Object> getStationNumber(
+            @RequestParam final int stationNumber) {
         if (stationNumber < 1) {
             throw new NullPointerException();
         }
-        List<Firestations> firestations = firestationsS.getFireStationsStation(stationNumber);
-        List<Persons> persons = firestationsS.getFirestationsListToPersonsList(firestations);
-        List<StationNumberDTO> stationNumberDTO = firestationsM.personsModelToStationNumberDTO(persons);
-        Map<String, Object> stationNumberResult = firestationsS.getStationNumberCount(stationNumberDTO);
-        LOGGER.info("List of inhabitants covered by station " + stationNumber + " found");
+        List<Firestations> firestations
+                = firestationsS.getFireStationsStation(stationNumber);
+        List<Persons> persons
+                = firestationsS.getFirestationsListToPersonsList(firestations);
+        List<StationNumberDTO> stationNumberDTO
+                = firestationsM.personsModelToStationNumberDTO(persons);
+        Map<String, Object> stationNumberResult
+                = firestationsS.getStationNumberCount(stationNumberDTO);
+        LOGGER.info("List of inhabitants covered by station "
+                + stationNumber + " found");
         return stationNumberResult;
     }
 
+    /**
+     * This url refers to the list of telephone numbers of residents
+     * covered by the Firestation.
+     * @param firestation : allows you to find the resource in the database.
+     * @return a list and 200 Ok if successful
+     * or 404 not found if it does not exist.
+     */
     @GetMapping(value = "/phoneAlert")
     public List<PersonsDTO> getPhoneAlert(@RequestParam final int firestation) {
         if (firestation < 1) {
             throw new NullPointerException();
         }
-        List<Firestations> firestationsList = firestationsS.getFireStationsStation(firestation);
-        List<Persons> persons = firestationsS.getFirestationsListToPersonsList(firestationsList);
-        List<PersonsDTO> personsDTO = firestationsS.personsToPersonsdtoPhone(persons);
-        LOGGER.info("List of telephone numbers of residents served by the station " + firestation + " found");
+        List<Firestations> firestationsList
+                = firestationsS.getFireStationsStation(firestation);
+        List<Persons> persons
+                = firestationsS
+                .getFirestationsListToPersonsList(firestationsList);
+        List<PersonsDTO> personsDTO
+                = firestationsS.personsToPersonsdtoPhone(persons);
+        LOGGER.info("List of telephone numbers of residents "
+                + "served by the station " + firestation + " found");
         return personsDTO;
     }
 
+    /**
+     * This url asks for an address
+     * and returns a map containing the station covering the address
+     * and a list of people living at this address as well as their information.
+     * @param address : allows you to find the resource in the database.
+     * @return a map and 200 Ok if successful
+     * or 404 not found if it does not exist.
+     */
     @GetMapping(value = "/fire")
     public Map<String, Object> getFire(@RequestParam final String address) {
-        Firestations firestations = firestationsS.getFirestationsAddress(address);
+        Firestations firestations
+                = firestationsS.getFirestationsAddress(address);
         Integer station = firestations.getStation();
         List<Persons> persons = firestationsS.getFireResidents(address);
-        List<MedicalRecords> medicalRecords = firestationsS.getFireMedicalRecords(persons);
-        List<PersonsAndMedicalRecordsDTO> fireDTO = firestationsM.personsAndMedicalRecordsModelToPersonsAndMedicalRecordsDTO(medicalRecords);
-        LOGGER.info("Station number and list of residents of " + address + " found");
+        List<MedicalRecords> medicalRecords
+                = firestationsS.getFireMedicalRecords(persons);
+        List<PersonsAndMedicalRecordsDTO> fireDTO
+                = firestationsM
+                .personsAndMedicalRecordsModelToPersonsAndMedicalRecordsDTO(
+                        medicalRecords);
+        LOGGER.info("Station number and list of residents of "
+                + address + " found");
         return firestationsS.getFireResult(station, fireDTO);
     }
 
+    /**
+     * This url reviews a list of inhabitants
+     * by address covered by the Firestation.
+     * @param station : allows you to find the resource in the database.
+     * @return a map and 200 Ok if successful
+     * or 404 not found if it does not exist.
+     */
     @GetMapping(value = "/flood/stations")
     public Map<String, Object> getFlood(@RequestParam final int station) {
         if (station < 1) {
             throw new NullPointerException();
         }
-        List<Firestations> firestations = firestationsS.getFireStationsStation(station);
-        List<FirestationsDTO> firestationsDTO = firestationsM.modelToDto(firestations);
-        Map<String, List<Persons>> personsMap = firestationsS.getFloodResidents(firestationsDTO);
-        Map<String, List<MedicalRecords>> medicalRecordsMap = firestationsS.getFloodMedicalRecords(personsMap);
-        LOGGER.info("List of inhabitants by address served by station " + station + " found");
-        return firestationsM.personsAndMedicalRecordsModelToFloodDTO(medicalRecordsMap);
+        List<Firestations> firestations
+                = firestationsS.getFireStationsStation(station);
+        List<FirestationsDTO> firestationsDTO
+                = firestationsM.modelToDto(firestations);
+        Map<String, List<Persons>> personsMap
+                = firestationsS.getFloodResidents(firestationsDTO);
+        Map<String, List<MedicalRecords>> medicalRecordsMap
+                = firestationsS.getFloodMedicalRecords(personsMap);
+        LOGGER.info("List of inhabitants by address served by station "
+                + station + " found");
+        return firestationsM
+                .personsAndMedicalRecordsModelToFloodDTO(medicalRecordsMap);
     }
 }
