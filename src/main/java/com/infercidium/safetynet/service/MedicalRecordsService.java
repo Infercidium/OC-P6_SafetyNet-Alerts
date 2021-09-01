@@ -30,11 +30,15 @@ public class MedicalRecordsService implements MedicalRecordsI {
     /**
      * Instantiation of personsService.
      */
-    private final PersonsService personsS;
+    private final PersonsI personsS;
     /**
      * Instantiation of SecondaryTableService.
      */
-    private final SecondaryTableService secondaryTableS;
+    private final MedicationsI medicationsS;
+    /**
+     * Instantiation of SecondaryTableService.
+     */
+    private final AllergiesI allergiesS;
     /**
      * Instantiation of MedicalRecordsRepository.
      */
@@ -44,15 +48,18 @@ public class MedicalRecordsService implements MedicalRecordsI {
      * Class constructor.
      * @param personsSe this is PersonsService.
      * @param medicalrecordsRe this is MedicalRecordsRepository.
-     * @param secondaryTableSe this is SecondaryTableService.
+     * @param medicationsSe this is MedicationsService.
+     * @param allergiesSe this is AllergiesService.
      */
     public MedicalRecordsService(
-            final PersonsService personsSe,
+            final PersonsI personsSe,
             final MedicalrecordsRepository medicalrecordsRe,
-            final SecondaryTableService secondaryTableSe) {
+            final MedicationsI medicationsSe,
+            final AllergiesI allergiesSe) {
         this.personsS = personsSe;
         this.medicalRecordsR = medicalrecordsRe;
-        this.secondaryTableS = secondaryTableSe;
+        this.medicationsS = medicationsSe;
+        this.allergiesS = allergiesSe;
     }
 
     //Post, Put, delete
@@ -76,10 +83,10 @@ public class MedicalRecordsService implements MedicalRecordsI {
             throw new NullArgumentException("Null table binding");
         }
         medicalRecords.setAllergies(
-                secondaryTableS.checkAllergies(
+                allergiesS.checkAllergies(
                         medicalRecords.getAllergies()));
         medicalRecords.setMedications(
-                secondaryTableS.checkMedications(
+                medicationsS.checkMedications(
                         medicalRecords.getMedications()));
         return this.medicalRecordsR.save(medicalRecords);
     }
@@ -246,7 +253,7 @@ public class MedicalRecordsService implements MedicalRecordsI {
                     basicMedicalRecords.getAllergies());
         } else {
             medicalRecordsChanged.setAllergies(
-                    secondaryTableS.checkAllergies(
+                    allergiesS.checkAllergies(
                             medicalRecordsChanged.getAllergies()));
         }
         if (medicalRecordsChanged.getMedications() == null) {
@@ -254,7 +261,7 @@ public class MedicalRecordsService implements MedicalRecordsI {
                     basicMedicalRecords.getMedications());
         } else {
             medicalRecordsChanged.setMedications(
-                    secondaryTableS.checkMedications(
+                    medicationsS.checkMedications(
                             medicalRecordsChanged.getMedications()));
         }
         return medicalRecordsChanged;

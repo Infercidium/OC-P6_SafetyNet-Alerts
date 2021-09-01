@@ -1,7 +1,6 @@
 package com.infercidium.safetynet.repository;
 
 import com.infercidium.safetynet.model.Persons;
-import org.springframework.boot.actuate.trace.http.HttpTraceRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

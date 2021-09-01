@@ -17,8 +17,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -52,15 +55,15 @@ public class DataBaseInitService implements DataBaseInitI {
     /**
      * Instantiation of FirestationService.
      */
-    private final FirestationsService firestationsS;
+    private final FirestationsI firestationsS;
     /**
      * Instantiation of PersonsService.
      */
-    private final PersonsService personsS;
+    private final PersonsI personsS;
     /**
      * Instantiation of MedicalrecordsService.
      */
-    private final MedicalRecordsService medicalRecordsS;
+    private final MedicalRecordsI medicalRecordsS;
 
     /**
      * Class constructor.
@@ -74,9 +77,9 @@ public class DataBaseInitService implements DataBaseInitI {
     public DataBaseInitService(final FirestationsMapper firestationsMa,
                                final PersonsMapper personsMa,
                                final MedicalRecordsMapper medicalRecordsMa,
-                               final FirestationsService firestationsSe,
-                               final PersonsService personsSe,
-                               final MedicalRecordsService medicalRecordsSe) {
+                               final FirestationsI firestationsSe,
+                               final PersonsI personsSe,
+                               final MedicalRecordsI medicalRecordsSe) {
         this.firestationsM = firestationsMa;
         this.personsM = personsMa;
         this.medicalRecordsM = medicalRecordsMa;
@@ -93,23 +96,17 @@ public class DataBaseInitService implements DataBaseInitI {
     @Override
     public String convertFileToString(final String path) {
         StringBuilder data = new StringBuilder();
-        String datatemp;
-        BufferedReader readBuffer = null;
-        try {
-            readBuffer = new BufferedReader(new FileReader(path));
-            while ((datatemp = readBuffer.readLine()) != null) {
-                data.append(datatemp);
+        try (InputStream inputStream = new FileInputStream(path);
+             InputStreamReader inputStreamReader
+                     = new InputStreamReader(inputStream, "UTF-8");
+             BufferedReader bufferedReader
+                     = new BufferedReader(inputStreamReader)) {
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                data.append(line);
             }
         } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (readBuffer != null) {
-                    readBuffer.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            return String.valueOf(e);
         }
         return data.toString();
     }
@@ -160,7 +157,8 @@ public class DataBaseInitService implements DataBaseInitI {
      */
     @Override
     public void instanciateListFirestations(
-            final List<Map<String, String>> firestations) {
+            final List<Map<String, String>> firestations)
+            throws SQLIntegrityConstraintViolationException {
         List<Firestations> firestationsList = new ArrayList<>();
         for (Map<String, String> firestation : firestations) {
             FirestationsDTO firestationsDTO = new FirestationsDTO();
@@ -173,7 +171,9 @@ public class DataBaseInitService implements DataBaseInitI {
             boolean novel = true;
             for (int i = 1; i < firestationsList.size(); i++) {
                 if (firestationsList.get(i - 1).getAddress().getAddress()
-                        .equals(finalFirestation.getAddress().getAddress())) {
+                        .equals(finalFirestation.getAddress().getAddress())
+                        && firestationsList.get(i - 1).getStation()
+                        == finalFirestation.getStation()) {
                     LOGGER.debug("Duplicate address detected : "
                             + finalFirestation.getAddress().getAddress()
                             + ", station : " + finalFirestation.getStation()

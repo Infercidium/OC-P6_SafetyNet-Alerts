@@ -9,21 +9,19 @@ import com.infercidium.safetynet.model.Firestations;
 import com.infercidium.safetynet.model.MedicalRecords;
 import com.infercidium.safetynet.model.Persons;
 import com.infercidium.safetynet.repository.FirestationsRepository;
+import com.infercidium.safetynet.service.AddressI;
 import com.infercidium.safetynet.service.FirestationsService;
-import com.infercidium.safetynet.service.MedicalRecordsService;
-import com.infercidium.safetynet.service.PersonsService;
-import com.infercidium.safetynet.service.SecondaryTableService;
+import com.infercidium.safetynet.service.MedicalRecordsI;
+import com.infercidium.safetynet.service.PersonsI;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -37,11 +35,11 @@ class FirestationsServiceTest {
     @MockBean
     private FirestationsRepository firestationsR;
     @MockBean
-    private SecondaryTableService secondaryTableS;
+    private AddressI addressS;
     @MockBean
-    private PersonsService personsS;
+    private PersonsI personsS;
     @MockBean
-    private MedicalRecordsService medicalRecordsS;
+    private MedicalRecordsI medicalRecordsS;
     @Autowired
     private FirestationsService firestationsService;
 
@@ -92,23 +90,26 @@ class FirestationsServiceTest {
         personsAndMedicalRecordsDTOList.add(personsAndMedicalRecordsDTO);
 
         when(firestationsR.save(firestations)).thenReturn(firestations);
-        when(firestationsR.findByAddressAddressIgnoreCase(firestationsDTO.getAddress())).thenReturn(firestations);
+        when(firestationsR.findByAddressAddressIgnoreCase(firestationsDTO.getAddress())).thenReturn(firestationsList);
         when(firestationsR.findByStation(firestationsDTO.getStation())).thenReturn(firestationsList);
+        when(firestationsR.findByAddressAddressIgnoreCaseAndStation(firestationsDTO.getAddress(),firestationsDTO.getStation())).thenReturn(firestations);
         when(personsS.getPersonsAddress(firestationsDTO.getAddress())).thenReturn(personsList);
         when(medicalRecordsS.getMedicalRecordName(medicalRecords.getFirstName(), medicalRecords.getLastName())).thenReturn(medicalRecords);
     }
 
     @Test
-    void postFirestation() {
+    void postFirestation() throws SQLIntegrityConstraintViolationException {
+        when(firestationsR.findByAddressAddressIgnoreCaseAndStation(firestationsDTO.getAddress(),firestationsDTO.getStation())).thenReturn(null);
         Address address = new Address(firestationsDTO.getAddress());
-        when(secondaryTableS.checkAddress(firestations.getAddress())).thenReturn(address);
+        when(addressS.checkAddress(firestations.getAddress())).thenReturn(address);
         Firestations postFirestations = firestationsService.postFirestation(firestations);
         assertEquals(firestations, postFirestations);
     }
 
     @Test
     void editFirestation() {
-        firestationsService.editFirestation(firestationsDTO.getAddress(), firestations);
+        firestations.setId(1L);
+        firestationsService.editFirestation(firestationsDTO.getAddress(), firestationsDTO.getStation(),  firestations);
         verify(firestationsR, times(1)).save(firestations);
     }
 
@@ -121,13 +122,13 @@ class FirestationsServiceTest {
     @Test
     void removeAddressMapping() {
         firestationsService.removeAddressMapping(firestationsDTO.getAddress());
-        verify(firestationsR, times(1)).delete(firestations);
+        verify(firestationsR, times(1)).deleteAll(firestationsList);
     }
 
     @Test
     void getFirestationsAddress() {
-        Firestations firestation = firestationsService.getFirestationsAddress(firestationsDTO.getAddress());
-        assertEquals(firestations, firestation);
+        List<Firestations> firestation = firestationsService.getFirestationsAddress(firestationsDTO.getAddress());
+        assertEquals(firestationsList, firestation);
     }
 
     @Test
@@ -174,8 +175,9 @@ class FirestationsServiceTest {
 
     @Test
     void getFireResult() {
-        Map<String, Object> result = firestationsService.getFireResult(firestationsDTO.getStation(), personsAndMedicalRecordsDTOList);
-        assertEquals(firestationsDTO.getStation(), result.get("Station"));
+        Map<String, Object> result = firestationsService.getFireResult(Collections.singletonList(firestationsDTO.getStation()), personsAndMedicalRecordsDTOList);
+        System.out.println(result);
+        assertEquals("[" + firestationsDTO.getStation() + "]", result.get("Station").toString());
         assertEquals(personsAndMedicalRecordsDTOList, result.get("Resident"));
     }
 

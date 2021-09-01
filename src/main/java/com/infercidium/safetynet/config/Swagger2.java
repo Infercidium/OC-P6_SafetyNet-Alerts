@@ -11,11 +11,17 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @Configuration
 @EnableSwagger2
 public class Swagger2 {
+
+    /**
+     * Swagger2-ui layout method.
+     * @return The information for the html page.
+     */
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
-                .apis(RequestHandlerSelectors.any())
+                .apis(RequestHandlerSelectors.basePackage(
+                        "com.infercidium.safetynet"))
                 .paths(PathSelectors.any())
                 .build();
     }

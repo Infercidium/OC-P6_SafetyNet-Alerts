@@ -8,6 +8,7 @@ import com.infercidium.safetynet.model.Firestations;
 import com.infercidium.safetynet.model.MedicalRecords;
 import com.infercidium.safetynet.model.Persons;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 import java.util.Map;
 
@@ -19,14 +20,17 @@ public interface FirestationsI {
      * @param firestations to save.
      * @return firestations saved.
      */
-    Firestations postFirestation(Firestations firestations);
+    Firestations postFirestation(Firestations firestations)
+            throws SQLIntegrityConstraintViolationException;
 
     /**
      * Edit Method Service.
      * @param address to check Firestations.
+     * @param station to check Firestations.
      * @param firestations to edit.
      */
-    void editFirestation(String address, Firestations firestations);
+    void editFirestation(String address, int station,
+                         Firestations firestations);
 
     /**
      * RemoveStation Method Service.
@@ -46,7 +50,7 @@ public interface FirestationsI {
      * @param address to check Firestations.
      * @return firestations checked.
      */
-    Firestations getFirestationsAddress(String address);
+    List<Firestations> getFirestationsAddress(String address);
 
     /**
      * GetAll Method Service.
@@ -100,7 +104,7 @@ public interface FirestationsI {
      * @return Map expected in result.
      */
     Map<String, Object> getFireResult(
-            Integer station,
+            List<Integer> station,
             List<PersonsAndMedicalRecordsDTO> fireDTO);
 
     /**

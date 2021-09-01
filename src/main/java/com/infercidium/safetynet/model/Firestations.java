@@ -25,7 +25,7 @@ public class Firestations {
      * Address attribute.
      */
     @ManyToOne
-    @JoinColumn(name = "Address_id", unique = true)
+    @JoinColumn(name = "Address_id")
     private Address address;
 
     /**

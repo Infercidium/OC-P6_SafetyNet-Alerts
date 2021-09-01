@@ -4,8 +4,8 @@ import com.infercidium.safetynet.dto.PersonsDTO;
 import com.infercidium.safetynet.model.Address;
 import com.infercidium.safetynet.model.Persons;
 import com.infercidium.safetynet.repository.PersonsRepository;
+import com.infercidium.safetynet.service.AddressI;
 import com.infercidium.safetynet.service.PersonsService;
-import com.infercidium.safetynet.service.SecondaryTableService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ class PersonsServiceTest {
     @MockBean
     private PersonsRepository personsR;
     @MockBean
-    private SecondaryTableService secondaryTableS;
+    private AddressI addressS;
     @Autowired
     private PersonsService personsService;
 
@@ -43,7 +43,7 @@ class PersonsServiceTest {
         personsDTO.setEmail(persons.getEmail());
         personsDTOList.add(personsDTO);
 
-        when(secondaryTableS.checkAddress(persons.getAddress())).thenReturn(persons.getAddress());
+        when(addressS.checkAddress(persons.getAddress())).thenReturn(persons.getAddress());
         when(personsR.save(persons)).thenReturn(persons);
         when(personsR.findByFirstNameIgnoreCaseAndLastNameIgnoreCase(persons.getFirstName(), persons.getLastName())).thenReturn(persons);
     }

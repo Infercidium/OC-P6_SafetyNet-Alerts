@@ -3,6 +3,7 @@ package com.infercidium.safetynet.service;
 import com.infercidium.safetynet.model.Allergies;
 import com.infercidium.safetynet.model.Medications;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -45,7 +46,8 @@ public interface DataBaseInitI {
      *  Instantiating and saving Firestations.
      * @param firestations : the list to instantiate and save.
      */
-    void instanciateListFirestations(List<Map<String, String>> firestations);
+    void instanciateListFirestations(List<Map<String, String>> firestations)
+            throws SQLIntegrityConstraintViolationException;
 
     /**
      * Instantiating and saving Persons.

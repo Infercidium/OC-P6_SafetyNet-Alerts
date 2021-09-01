@@ -56,7 +56,7 @@ public class MedicalRecords {
      * Persons attribute.
      */
     @OneToOne
-    @JoinColumn(nullable = false)
+    @JoinColumn(nullable = false, unique = true)
     private Persons persons;
 
     /**

@@ -5,9 +5,10 @@ import com.infercidium.safetynet.model.Address;
 import com.infercidium.safetynet.model.MedicalRecords;
 import com.infercidium.safetynet.model.Persons;
 import com.infercidium.safetynet.repository.MedicalrecordsRepository;
+import com.infercidium.safetynet.service.AllergiesI;
 import com.infercidium.safetynet.service.MedicalRecordsService;
-import com.infercidium.safetynet.service.PersonsService;
-import com.infercidium.safetynet.service.SecondaryTableService;
+import com.infercidium.safetynet.service.MedicationsI;
+import com.infercidium.safetynet.service.PersonsI;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,11 +31,13 @@ import static org.mockito.Mockito.when;
 class MedicalRecordsServiceTest {
 
     @MockBean
-    private PersonsService personsS;
+    private PersonsI personsS;
     @MockBean
     private MedicalrecordsRepository medicalRecordsR;
     @MockBean
-    private SecondaryTableService secondaryTableS;
+    private MedicationsI medicationsS;
+    @MockBean
+    private AllergiesI allergiesS;
     @Autowired
     private MedicalRecordsService medicalRecordsService;
 
@@ -61,8 +64,8 @@ class MedicalRecordsServiceTest {
         personsAndMedicalRecordsDTO.setPhone(persons.getPhone());
         personsAndMedicalRecordsDTOList.add(personsAndMedicalRecordsDTO);
 
-        when(secondaryTableS.checkAllergies(medicalRecords.getAllergies())).thenReturn(medicalRecords.getAllergies());
-        when(secondaryTableS.checkMedications(medicalRecords.getMedications())).thenReturn(medicalRecords.getMedications());
+        when(allergiesS.checkAllergies(medicalRecords.getAllergies())).thenReturn(medicalRecords.getAllergies());
+        when(medicationsS.checkMedications(medicalRecords.getMedications())).thenReturn(medicalRecords.getMedications());
 
         when(medicalRecordsR.save(medicalRecords)).thenReturn(medicalRecords);
         when(medicalRecordsR.findByPersonsFirstNameIgnoreCaseAndPersonsLastNameIgnoreCase(persons.getFirstName(), persons.getLastName())).thenReturn(medicalRecords);

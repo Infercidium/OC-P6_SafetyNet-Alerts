@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,31 +32,31 @@ public class FirestationsService implements FirestationsI {
      */
     private final FirestationsRepository firestationsR;
     /**
-     * Instantiation of SecondaryTableService.
+     * Instantiation of AddressService.
      */
-    private final SecondaryTableService secondaryTableS;
+    private final AddressI addressS;
     /**
      * Instantiation of PersonsService.
      */
-    private final PersonsService personsS;
+    private final PersonsI personsS;
     /**
      * Instantiation of MedicalRecordsService.
      */
-    private final MedicalRecordsService medicalRecordsS;
+    private final MedicalRecordsI medicalRecordsS;
 
     /**
      * Class constructor.
      * @param firestationsRe this is FirestationsRepository.
-     * @param secondaryTableSe this is SecondaryTableService.
+     * @param addressSe this is AddressService.
      * @param personsSe this is PersonsService.
      * @param medicalRecordsSe this is MedicalRecordsService.
      */
     public FirestationsService(final FirestationsRepository firestationsRe,
-                               final SecondaryTableService secondaryTableSe,
-                               final PersonsService personsSe,
-                               final MedicalRecordsService medicalRecordsSe) {
+                               final AddressI addressSe,
+                               final PersonsI personsSe,
+                               final MedicalRecordsI medicalRecordsSe) {
         this.firestationsR = firestationsRe;
-        this.secondaryTableS = secondaryTableSe;
+        this.addressS = addressSe;
         this.personsS = personsSe;
         this.medicalRecordsS = medicalRecordsSe;
     }
@@ -68,21 +69,30 @@ public class FirestationsService implements FirestationsI {
      * @return firestations saved.
      */
     @Override
-    public Firestations postFirestation(final Firestations firestations) {
+    public Firestations postFirestation(final Firestations firestations)
+            throws SQLIntegrityConstraintViolationException {
         firestations.setAddress(
-                secondaryTableS.checkAddress(firestations.getAddress()));
-        return this.firestationsR.save(firestations);
+                addressS.checkAddress(firestations.getAddress()));
+        boolean duplicate = duplicateCheck(firestations);
+        if (duplicate) {
+            throw new SQLIntegrityConstraintViolationException();
+        } else {
+            return this.firestationsR.save(firestations);
+        }
     }
 
     /**
      * Edit Method Service.
      * @param address to check Firestations.
+     * @param station to check Firestations.
      * @param firestations to edit.
      */
     @Override
-    public void editFirestation(final String address,
+    public void editFirestation(final String address, final int station,
                                 final Firestations firestations) {
-        Firestations basicFirestation = getFirestationsAddress(address);
+        Firestations basicFirestation
+                = firestationsR.findByAddressAddressIgnoreCaseAndStation(
+                        address, station);
         firestations.setId(basicFirestation.getId());
         firestations.setAddress(basicFirestation.getAddress());
         this.firestationsR.save(firestations);
@@ -104,8 +114,8 @@ public class FirestationsService implements FirestationsI {
      */
     @Override
     public void removeAddressMapping(final String address) {
-        Firestations firestations = getFirestationsAddress(address);
-        this.firestationsR.delete(firestations);
+        List<Firestations> firestations = getFirestationsAddress(address);
+        this.firestationsR.deleteAll(firestations);
     }
     //Get
 
@@ -115,10 +125,10 @@ public class FirestationsService implements FirestationsI {
      * @return firestations checked.
      */
     @Override
-    public Firestations getFirestationsAddress(final String address) {
-        Firestations firestations
+    public List<Firestations> getFirestationsAddress(final String address) {
+        List<Firestations> firestations
                 = firestationsR.findByAddressAddressIgnoreCase(address);
-        if (firestations != null) {
+        if (!firestations.isEmpty()) {
             return firestations;
         } else {
             throw new NullPointerException();
@@ -214,8 +224,10 @@ public class FirestationsService implements FirestationsI {
         List<PersonsDTO> personsDTO = new ArrayList<>();
         for (Persons person : persons) {
             PersonsDTO personsDto = new PersonsDTO();
-            personsDto.setPhone(person.getPhone());
-            personsDTO.add(personsDto);
+            if (!phoneDuplicate(personsDTO, person.getPhone())) {
+                personsDto.setPhone(person.getPhone());
+                personsDTO.add(personsDto);
+            }
         }
         LOGGER.debug("Retrieval of residents' telephone numbers");
         return personsDTO;
@@ -258,11 +270,12 @@ public class FirestationsService implements FirestationsI {
      */
     @Override
     public Map<String, Object> getFireResult(
-            final Integer station,
+            final List<Integer> station,
             final List<PersonsAndMedicalRecordsDTO> fireDTO) {
         Map<String, Object> fireResult = new HashMap<>();
         String residentString = fireDTO.size() > 1 ? "Residents" : "Resident";
-        fireResult.put("Station", station);
+        String stationString = station.size() > 1 ? "Stations" : "Station";
+        fireResult.put(stationString, station);
         fireResult.put(residentString, fireDTO);
         return fireResult;
     }
@@ -307,5 +320,36 @@ public class FirestationsService implements FirestationsI {
             medicalRecordsMap.put(address, medicalRecords);
         }
         return medicalRecordsMap;
+    }
+
+    //Method Tiers
+
+    /**
+     * Firestation Duplication Verification and Protection.
+     * @param firestations : the one that is tested.
+     * @return True if duplicate Firestations or False if new Firestations.
+     */
+    private boolean duplicateCheck(final Firestations firestations) {
+        Firestations firestation = firestationsR
+                .findByAddressAddressIgnoreCaseAndStation(
+                        firestations.getAddress().getAddress(),
+                        firestations.getStation());
+        return firestation != null;
+    }
+
+    /**
+     * Check if phone exists in PersonsDTO list.
+     * @param personsDTO this is a list.
+     * @param phone this is phone to verify.
+     * @return True if phone exist in list or False if phone is new.
+     */
+    private boolean phoneDuplicate(final List<PersonsDTO> personsDTO,
+                                   final String phone) {
+        for (PersonsDTO personsDto : personsDTO) {
+            if (personsDto.getPhone().equals(phone)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

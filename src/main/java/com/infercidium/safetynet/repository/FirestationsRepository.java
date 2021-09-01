@@ -14,7 +14,7 @@ public interface FirestationsRepository
      * @param address : address in character string.
      * @return corresponding Firestations.
      */
-    Firestations findByAddressAddressIgnoreCase(String address);
+    List<Firestations> findByAddressAddressIgnoreCase(String address);
 
     /**
      * Consult the database to search for Firestations.
@@ -22,4 +22,13 @@ public interface FirestationsRepository
      * @return corresponding firestations.
      */
     List<Firestations> findByStation(int station);
+
+    /**
+     * Consult the database to search for Firestations.
+     * @param address : address in character string.
+     * @param station : station in numbers.
+     * @return corresponding firestations.
+     */
+    Firestations findByAddressAddressIgnoreCaseAndStation(
+            String address, int station);
 }

@@ -18,6 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.ResponseEntity;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -90,12 +91,12 @@ class FirestationsRestTest {
         when(firestationsM.modelToDto(firestationsList)).thenReturn(Collections.singletonList(firestationsDTO));
 
         when(firestationsS.getFireStationsStation(1)).thenReturn(firestationsList);
-        when(firestationsS.getFirestationsAddress(firestationsDTO.getAddress())).thenReturn(firestations);
+        when(firestationsS.getFirestationsAddress(firestationsDTO.getAddress())).thenReturn(firestationsList);
         when(firestationsS.getFirestationsListToPersonsList(firestationsList)).thenReturn(personsList);
     }
 
     @Test
-    void createStationMap() {
+    void createStationMap() throws SQLIntegrityConstraintViolationException {
         when(firestationsS.postFirestation(firestations)).thenReturn(firestations);
         ResponseEntity<Void> responseEntity = firestationsRest.createStationMap(firestationsDTO);
         assertEquals("201 CREATED", responseEntity.getStatusCode().toString());
@@ -104,8 +105,8 @@ class FirestationsRestTest {
 
     @Test
     void editStationMap() {
-        ResponseEntity<Void> responseEntity = firestationsRest.editStationMap(firestationsDTO.getAddress(), firestationsDTO);
-        verify(firestationsS, times(1)).editFirestation(firestationsDTO.getAddress(), firestations);
+        ResponseEntity<Void> responseEntity = firestationsRest.editStationMap(firestationsDTO.getAddress(), firestationsDTO.getStation(), firestationsDTO);
+        verify(firestationsS, times(1)).editFirestation(firestationsDTO.getAddress(), firestationsDTO.getStation(), firestations);
         assertEquals("200 OK", responseEntity.getStatusCode().toString());
     }
 
@@ -125,9 +126,9 @@ class FirestationsRestTest {
 
     @Test
     void getAddress() {
-        FirestationsDTO firestationsDto = firestationsRest.getAddress(firestationsDTO.getAddress());
-        assertEquals(1, firestationsDto.getStation());
-        assertEquals("1 rue du testing", firestationsDto.getAddress());
+        List<FirestationsDTO> firestationsDto = firestationsRest.getAddress(firestationsDTO.getAddress());
+        assertEquals(1, firestationsDto.get(0).getStation());
+        assertEquals("1 rue du testing", firestationsDto.get(0).getAddress());
     }
 
     @Test
@@ -170,7 +171,7 @@ class FirestationsRestTest {
         Map<String, Object> fireMap = new HashMap<>();
         fireMap.put("Station", 1);
         fireMap.put("Resident", personsAndMedicalRecordsDTOList);
-        when(firestationsS.getFireResult(1, personsAndMedicalRecordsDTOList)).thenReturn(fireMap);
+        when(firestationsS.getFireResult(Collections.singletonList(1), personsAndMedicalRecordsDTOList)).thenReturn(fireMap);
         Map<String, Object> result = firestationsRest.getFire(persons.getAddress().getAddress());
         assertEquals(result.get("Resident"), personsAndMedicalRecordsDTOList);
         assertEquals(1, result.get("Station"));

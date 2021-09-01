@@ -24,19 +24,19 @@ public class PersonsService implements PersonsI {
      */
     private final PersonsRepository personsR;
     /**
-     * Instantiation of SecondaryTableService.
+     * Instantiation of AddressService.
      */
-    private final SecondaryTableService secondaryTableS;
+    private final AddressI addressS;
 
     /**
      * Class constructor.
      * @param personsRe this is PersonsRepository.
-     * @param secondaryTableSe this is SecondarytableService.
+     * @param addressSe this is addressService.
      */
     public PersonsService(final PersonsRepository personsRe,
-                          final SecondaryTableService secondaryTableSe) {
+                          final AddressI addressSe) {
         this.personsR = personsRe;
-        this.secondaryTableS = secondaryTableSe;
+        this.addressS = addressSe;
     }
 
     //Post, Put, Delete
@@ -48,7 +48,7 @@ public class PersonsService implements PersonsI {
      */
     @Override
     public Persons postPerson(final Persons persons) {
-        persons.setAddress(secondaryTableS.checkAddress(persons.getAddress()));
+        persons.setAddress(addressS.checkAddress(persons.getAddress()));
         return this.personsR.save(persons);
     }
 
@@ -121,7 +121,12 @@ public class PersonsService implements PersonsI {
     @Override
     public List<Persons> getPersonsAddress(final String address) {
         LOGGER.debug("List of Person Found");
-        return this.personsR.findByAddressAddressIgnoreCase(address);
+        List<Persons> persons
+                = this.personsR.findByAddressAddressIgnoreCase(address);
+        if (persons.isEmpty()) {
+            throw new NullPointerException();
+        }
+        return persons;
     }
 
     /**
@@ -131,8 +136,12 @@ public class PersonsService implements PersonsI {
      */
     @Override
     public List<Persons> getPersonsCity(final String city) {
+        List<Persons> persons = this.personsR.findByCityIgnoreCase(city);
+        if (persons.isEmpty()) {
+            throw new NullPointerException();
+        }
         LOGGER.debug("List of Person Found");
-        return this.personsR.findByCityIgnoreCase(city);
+        return persons;
     }
 
     /**
@@ -146,8 +155,10 @@ public class PersonsService implements PersonsI {
         List<PersonsDTO> personsDTO = new ArrayList<>();
         for (Persons person : persons) {
             PersonsDTO personsDto = new PersonsDTO();
-            personsDto.setEmail(person.getEmail());
-            personsDTO.add(personsDto);
+            if (!emailDuplicate(personsDTO, person.getEmail())) {
+                personsDto.setEmail(person.getEmail());
+                personsDTO.add(personsDto);
+            }
         }
         LOGGER.debug("Retrieving emails people");
         return personsDTO;
@@ -170,7 +181,7 @@ public class PersonsService implements PersonsI {
             personChanged.setAddress(basicPerson.getAddress());
         } else {
             personChanged.setAddress(
-                    secondaryTableS.checkAddress(
+                    addressS.checkAddress(
                             personChanged.getAddress()));
         }
         if (personChanged.getCity() == null) {
@@ -202,5 +213,21 @@ public class PersonsService implements PersonsI {
                         firstName, lastName);
         LOGGER.debug("Verification of the person's existence");
         return persons != null;
+    }
+
+    /**
+     * Check if email exists in PersonsDTO list.
+     * @param personsDTO this is a list.
+     * @param email this is email to verify.
+     * @return True if email exist in list or False if email is new.
+     */
+    private boolean emailDuplicate(final List<PersonsDTO> personsDTO,
+                                   final String email) {
+        for (PersonsDTO personsDto : personsDTO) {
+            if (personsDto.getEmail().equals(email)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

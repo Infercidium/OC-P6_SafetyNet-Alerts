@@ -24,6 +24,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -67,7 +69,8 @@ public class FirestationsRest {
      */
     @PostMapping(value = "/firestation")
     public ResponseEntity<Void> createStationMap(
-            @Valid @RequestBody final FirestationsDTO firestationsDTO) {
+            @Valid @RequestBody final FirestationsDTO firestationsDTO)
+            throws SQLIntegrityConstraintViolationException {
         Firestations firestations = firestationsM.dtoToModel(firestationsDTO);
         Firestations postFirestation
                 = firestationsS.postFirestation(firestations);
@@ -85,16 +88,18 @@ public class FirestationsRest {
     /**
      * Endpoint allowing to post a Firestation.
      * @param address : allows you to find the resource in the database.
+     * @param station allows you to find the ressource in the database.
      * @param firestationsDTO this is the information entered by the user.
      * @return 200 Ok if successful,
      * 404 not found if non-existent or 400 bad request if bad field.
      */
-    @PutMapping(value = "/firestation/{address}")
+    @PutMapping(value = "/firestation/{address}&{station}")
     public ResponseEntity<Void> editStationMap(
             @PathVariable final String address,
+            @PathVariable final int station,
             @RequestBody final FirestationsDTO firestationsDTO) {
         Firestations firestations = firestationsM.dtoToModel(firestationsDTO);
-        firestationsS.editFirestation(address, firestations);
+        firestationsS.editFirestation(address, station, firestations);
         LOGGER.info(address + " mapping modification");
         return ResponseEntity.ok().build();
     }
@@ -133,10 +138,11 @@ public class FirestationsRest {
      * or 404 not found if it does not exist.
      */
     @GetMapping(value = "/firestation/{address}")
-    public FirestationsDTO getAddress(@PathVariable final String address) {
-        Firestations firestations
+    public List<FirestationsDTO> getAddress(
+            @PathVariable final String address) {
+        List<Firestations> firestations
                 = firestationsS.getFirestationsAddress(address);
-        FirestationsDTO firestationsDTO
+        List<FirestationsDTO> firestationsDTO
                 = firestationsM.modelToDto(firestations);
         LOGGER.info("Firestation found");
         return firestationsDTO;
@@ -227,9 +233,12 @@ public class FirestationsRest {
      */
     @GetMapping(value = "/fire")
     public Map<String, Object> getFire(@RequestParam final String address) {
-        Firestations firestations
+        List<Firestations> firestations
                 = firestationsS.getFirestationsAddress(address);
-        Integer station = firestations.getStation();
+        List<Integer> station = new ArrayList<>();
+        for (Firestations firestation : firestations) {
+            station.add(firestation.getStation());
+        }
         List<Persons> persons = firestationsS.getFireResidents(address);
         List<MedicalRecords> medicalRecords
                 = firestationsS.getFireMedicalRecords(persons);
