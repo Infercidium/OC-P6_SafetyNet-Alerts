@@ -5,13 +5,16 @@ This API works with Java Spring and stores data in H2.
 ## Composing
 
 ### DataBase
-The H2 database is temporary, a `DataBaseInit` method allows it to be initialized at launch using the `data.Json` file included in the API.
-No storage method has yet been set up but it is possible to be able to replace the `data.Json` file with a new file having the data from the updated database.
+The H2 database is temporary, a `DataBaseInit` method is used to initialize it at launch using the` data.Json` file included in the API.
+
+We can make H2 persistent by changing in **`application.properties`**: *`spring.datasource.url=jdbc:h2:mem:alerts`* by *`spring.datasource.url=jdbc:h2:file:alerts/db`*. 
+It will then be necessary to modify the initialization so that it is launched only in an empty database for example.
 
 ### API
 
 ## Launch
-
+API uses spring boot, use the following command to start it:
+`./mvnw.cmd spring-boot:run`
 
 ## Testing
 This API has Unit and Integrations tests written.
