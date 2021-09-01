@@ -52,5 +52,19 @@ This API has Unit and Integrations tests written.
 It is possible to have access to Surefire Report and Jacoco to visualize the execution time and the coverage of the tests following this path:
 `SafetyNet/target/site/project-reports.html`
 
+### Test Report
+
 After using the following command in the terminal:
 `mvn clean verify site`
+
+To access the report without the integration tests:
+`mvn clean test site`
+
+### Checkstyle Report
+
+Checkstyle results takes into account the classes generated automatically by the Mapper, adding more than 300 uncorrectable errors.
+But it is possible to make them disappear with the command:
+`mvn site`
+
+However after that it is possible that the API is having difficulties working correctly, in this case you have to do:
+`mvn clean`
