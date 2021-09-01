@@ -82,7 +82,7 @@ public class Medications {
     public String toString() {
         return "Medication{"
                 + " id = " + id
-                + "medication = '" + medication + '\''
+                + ", medication = '" + medication + '\''
                 + '}';
         }
     }

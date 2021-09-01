@@ -83,7 +83,7 @@ public class Allergies {
     public String toString() {
         return "Allergies{"
                 + " id = " + id
-                + "allergy = '" + allergy + '\''
+                + ", allergy = '" + allergy + '\''
                 + '}';
     }
 }
