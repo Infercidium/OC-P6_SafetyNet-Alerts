@@ -6,8 +6,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class SafetyNetApplication {
 
-	public static void main(String[] args) {
+	/**
+	 * The main API method used to launch the application.
+	 * @param args the application main arguments.
+	 */
+	public static void main(final String[] args) {
 		SpringApplication.run(SafetyNetApplication.class, args);
 	}
-
 }
