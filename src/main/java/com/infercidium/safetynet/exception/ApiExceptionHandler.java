@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -111,6 +112,21 @@ public class ApiExceptionHandler {
     public ResponseEntity<String> handleHttpMessageNotReadableException(
             final HttpMessageNotReadableException e) {
         String message = "Invalid resource field";
+        LOGGER.error(message, e);
+        return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Exception handling method: MissingServletRequestParameterException.
+     * It is triggered if the attribute of a DTO or a model is not correct.
+     * @param e represents the exception raised by the API
+     *      *          and raised by the manager.
+     * @return the response "Invalid request parameter" and a http 400 status.
+     */
+    @ExceptionHandler(value = {MissingServletRequestParameterException.class})
+    public ResponseEntity<String> handleMissingServletRequestParameterException(
+            final MissingServletRequestParameterException e) {
+        String message = "Invalid request parameter";
         LOGGER.error(message, e);
         return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
     }
