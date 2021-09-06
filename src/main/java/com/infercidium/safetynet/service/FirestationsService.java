@@ -4,6 +4,7 @@ import com.infercidium.safetynet.dto.PersonsAndMedicalRecordsDTO;
 import com.infercidium.safetynet.dto.FirestationsDTO;
 import com.infercidium.safetynet.dto.PersonsDTO;
 import com.infercidium.safetynet.dto.StationNumberDTO;
+import com.infercidium.safetynet.model.Address;
 import com.infercidium.safetynet.model.Firestations;
 import com.infercidium.safetynet.model.MedicalRecords;
 import com.infercidium.safetynet.model.Persons;
@@ -13,10 +14,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLIntegrityConstraintViolationException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class FirestationsService implements FirestationsI {
@@ -71,14 +70,11 @@ public class FirestationsService implements FirestationsI {
     @Override
     public Firestations postFirestation(final Firestations firestations)
             throws SQLIntegrityConstraintViolationException {
-        firestations.setAddress(
-                addressS.checkAddress(firestations.getAddress()));
-        boolean duplicate = duplicateCheck(firestations);
-        if (duplicate) {
-            throw new SQLIntegrityConstraintViolationException();
-        } else {
-            return this.firestationsR.save(firestations);
+        for (Address address: firestations.getAddress()) {
+            address = addressS.checkAddress(address);
+            firestations.addAddress(address);
         }
+        return this.firestationsR.save(firestations);
     }
 
     /**
@@ -166,13 +162,19 @@ public class FirestationsService implements FirestationsI {
     public List<Persons> getFirestationsListToPersonsList(
             final List<Firestations> firestations) {
         List<Persons> personsList = new ArrayList<>();
-        for (Firestations firestation : firestations) {
-            List<Persons> persons = personsS
-                    .getPersonsAddress(firestation.getAddress().getAddress());
+        List<Address> addressList = new ArrayList<>();
+        for (Firestations firestation: firestations) {
+            addressList.addAll(firestation.getAddress());
+        }
+        addressList = addressList.stream().distinct().collect(Collectors.toList());
+        for (Address address : addressList) {
+            List<Persons> persons = new ArrayList<>();
+
+            personsS.getPersonsAddress(address.getAddress());
             personsList.addAll(persons);
             LOGGER.debug("List of people linked to the station "
-                    + firestation.getStation() + " by address : "
-                    + firestation.getAddress().getAddress());
+                    + " by address : "
+                    + address.getAddress());
         }
         return personsList;
     }
@@ -289,8 +291,11 @@ public class FirestationsService implements FirestationsI {
     public Map<String, List<Persons>> getFloodResidents(
             final List<FirestationsDTO> firestationsDTO) {
         Map<String, List<Persons>> personsMap = new HashMap<>();
+        List<String> addressList = new ArrayList<>();
         for (FirestationsDTO firestationsDto :firestationsDTO) {
-            String address = firestationsDto.getAddress();
+            addressList.addAll(firestationsDto.getAddress());
+        }
+        for (String address: addressList) {
             personsMap.put(address, personsS.getPersonsAddress(address));
         }
         LOGGER.debug("List of Persons by address");
@@ -329,13 +334,13 @@ public class FirestationsService implements FirestationsI {
      * @param firestations : the one that is tested.
      * @return True if duplicate Firestations or False if new Firestations.
      */
-    private boolean duplicateCheck(final Firestations firestations) {
+    /*private boolean duplicateCheck(final Firestations firestations) {
         Firestations firestation = firestationsR
                 .findByAddressAddressIgnoreCaseAndStation(
                         firestations.getAddress().getAddress(),
                         firestations.getStation());
         return firestation != null;
-    }
+    }*/
 
     /**
      * Check if phone exists in PersonsDTO list.

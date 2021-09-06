@@ -162,13 +162,13 @@ public class DataBaseInitService implements DataBaseInitI {
         List<Firestations> firestationsList = new ArrayList<>();
         for (Map<String, String> firestation : firestations) {
             FirestationsDTO firestationsDTO = new FirestationsDTO();
-            firestationsDTO.setAddress(firestation.get("address"));
+            firestationsDTO.addAddress(firestation.get("address"));
             firestationsDTO.setStation(
                     Integer.parseInt(firestation.get("station")));
             Firestations finalFirestation
                     = firestationsM.dtoToModel(firestationsDTO);
             firestationsList.add(finalFirestation);
-            boolean novel = true;
+            /*boolean novel = true;
             for (int i = 1; i < firestationsList.size(); i++) {
                 if (firestationsList.get(i - 1).getAddress().getAddress()
                         .equals(finalFirestation.getAddress().getAddress())
@@ -181,9 +181,9 @@ public class DataBaseInitService implements DataBaseInitI {
                     novel = false;
                 }
             }
-            if (novel) {
+            if (novel) {*/
                 firestationsS.postFirestation(finalFirestation);
-            }
+            //}
         }
     }
 
