@@ -4,6 +4,7 @@ import com.infercidium.safetynet.dto.FirestationsDTO;
 import com.infercidium.safetynet.dto.PersonsAndMedicalRecordsDTO;
 import com.infercidium.safetynet.dto.PersonsDTO;
 import com.infercidium.safetynet.dto.StationNumberDTO;
+import com.infercidium.safetynet.model.Address;
 import com.infercidium.safetynet.model.Firestations;
 import com.infercidium.safetynet.model.MedicalRecords;
 import com.infercidium.safetynet.model.Persons;
@@ -20,7 +21,7 @@ public interface FirestationsI {
      * @param firestations to save.
      * @return firestations saved.
      */
-    Firestations postFirestation(Firestations firestations)
+    Firestations postFirestation(Address address, Firestations firestations)
             throws SQLIntegrityConstraintViolationException;
 
     /**

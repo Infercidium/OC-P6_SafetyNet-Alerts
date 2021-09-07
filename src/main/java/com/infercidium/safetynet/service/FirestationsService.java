@@ -4,6 +4,7 @@ import com.infercidium.safetynet.dto.PersonsAndMedicalRecordsDTO;
 import com.infercidium.safetynet.dto.FirestationsDTO;
 import com.infercidium.safetynet.dto.PersonsDTO;
 import com.infercidium.safetynet.dto.StationNumberDTO;
+import com.infercidium.safetynet.model.Address;
 import com.infercidium.safetynet.model.Firestations;
 import com.infercidium.safetynet.model.MedicalRecords;
 import com.infercidium.safetynet.model.Persons;
@@ -13,10 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLIntegrityConstraintViolationException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class FirestationsService implements FirestationsI {
@@ -69,15 +67,19 @@ public class FirestationsService implements FirestationsI {
      * @return firestations saved.
      */
     @Override
-    public Firestations postFirestation(final Firestations firestations) //TODO Refaire Firestations Post
-            throws SQLIntegrityConstraintViolationException {
-        //firestations.setAddress(addressS.checkAddress(firestations.getAddress()));
-       /* boolean duplicate = duplicateCheck(firestations);
-        if (duplicate) {
+    public Firestations postFirestation(final Address address, final Firestations firestations) throws SQLIntegrityConstraintViolationException {
+        Address addressComplete = addressS.checkAddress(address);
+        Firestations firestation = firestationsR.findByStation(firestations.getStation()).get(0);
+        if (firestation == null) {
+            firestation = firestations;
+            firestation.getAddress().clear();
+        }
+        if (firestation.getAddress().contains(addressComplete)) {
             throw new SQLIntegrityConstraintViolationException();
-        } else {*/
-            return this.firestationsR.save(firestations);
-        //}
+        } else {
+            firestation.addAddress(address);
+            return this.firestationsR.save(firestation);
+        }
     }
 
     /**
@@ -87,8 +89,7 @@ public class FirestationsService implements FirestationsI {
      * @param firestations to edit.
      */
     @Override
-    public void editFirestation(final String address, final int station,
-                                final Firestations firestations) {
+    public void editFirestation(final String address, final int station, final Firestations firestations) {
         Firestations basicFirestation
                 = firestationsR.findByAddressAddressIgnoreCaseAndStation(
                         address, station);
@@ -327,11 +328,13 @@ public class FirestationsService implements FirestationsI {
      * @param firestations : the one that is tested.
      * @return True if duplicate Firestations or False if new Firestations.
      */
-    /*private boolean duplicateCheck(final Firestations firestations) { //todo encore utile ?
-        Firestations firestation = firestationsR
-                .findByAddressAddressIgnoreCaseAndStation(firestations.getAddress(), firestations.getStation());
-        return firestation != null;
-    }*/
+    private boolean duplicateCheck(final Firestations firestations) {
+        Firestations firestation = firestationsR.findByStation(firestations.getStation()).get(0);
+            if (firestation.getAddress().containsAll(firestations.getAddress())) {
+                return true;
+            }
+        return false;
+    }
 
     /**
      * Check if phone exists in PersonsDTO list.

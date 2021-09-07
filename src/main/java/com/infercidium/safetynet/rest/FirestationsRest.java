@@ -1,9 +1,6 @@
 package com.infercidium.safetynet.rest;
 
-import com.infercidium.safetynet.dto.FirestationsDTO;
-import com.infercidium.safetynet.dto.PersonsAndMedicalRecordsDTO;
-import com.infercidium.safetynet.dto.PersonsDTO;
-import com.infercidium.safetynet.dto.StationNumberDTO;
+import com.infercidium.safetynet.dto.*;
 import com.infercidium.safetynet.mapper.FirestationsMapper;
 import com.infercidium.safetynet.model.Firestations;
 import com.infercidium.safetynet.model.MedicalRecords;
@@ -63,14 +60,14 @@ public class FirestationsRest {
 
     /**
      * Endpoint allowing to post a Firestation.
-     * @param firestationsDTO this is the information entered by the user.
+     * @param firestationsAddressDTO this is the information entered by the user.
      * @return 201 Created if successful,
      * 409 conflict if already exist or 400 bad request if bad field.
      */
     @PostMapping(value = "/firestation")
-    public ResponseEntity<Void> createStationMap(
-            @Valid @RequestBody final FirestationsDTO firestationsDTO)
-            throws SQLIntegrityConstraintViolationException {
+    public ResponseEntity<Void> createStationMap(@Valid @RequestBody final FirestationsAddressDTO firestationsAddressDTO) throws SQLIntegrityConstraintViolationException {
+        FirestationsDTO firestationsDTO = new FirestationsDTO();
+        firestationsDTO.addAddress(firestationsAddressDTO.getAddress());
         Firestations firestations = firestationsM.dtoToModel(firestationsDTO);
         Firestations postFirestation
                 = firestationsS.postFirestation(firestations);
