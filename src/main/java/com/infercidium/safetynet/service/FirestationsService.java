@@ -69,16 +69,15 @@ public class FirestationsService implements FirestationsI {
      * @return firestations saved.
      */
     @Override
-    public Firestations postFirestation(final Firestations firestations)
+    public Firestations postFirestation(final Firestations firestations) //TODO Refaire Firestations Post
             throws SQLIntegrityConstraintViolationException {
-        firestations.setAddress(
-                addressS.checkAddress(firestations.getAddress()));
-        boolean duplicate = duplicateCheck(firestations);
+        //firestations.setAddress(addressS.checkAddress(firestations.getAddress()));
+       /* boolean duplicate = duplicateCheck(firestations);
         if (duplicate) {
             throw new SQLIntegrityConstraintViolationException();
-        } else {
+        } else {*/
             return this.firestationsR.save(firestations);
-        }
+        //}
     }
 
     /**
@@ -162,27 +161,26 @@ public class FirestationsService implements FirestationsI {
      * @param firestations : list of Firestations used.
      * @return list of Persons.
      */
-    @Override
+    /*@Override
     public List<Persons> getFirestationsListToPersonsList(
             final List<Firestations> firestations) {
         List<Persons> personsList = new ArrayList<>();
         for (Firestations firestation : firestations) {
-            List<Persons> persons = personsS
-                    .getPersonsAddress(firestation.getAddress().getAddress());
+            List<Persons> persons = personsS.getPersonsAddress(firestation.getAddress());
             personsList.addAll(persons);
             LOGGER.debug("List of people linked to the station "
                     + firestation.getStation() + " by address : "
-                    + firestation.getAddress().getAddress());
+                    + firestation.getAddress());
         }
         return personsList;
-    }
+    }*/
 
     /**
      * Formatting the response for the StationNumber URL.
      * @param stationNumberDTO : list to count.
      * @return Map expected in result.
      */
-    @Override
+    /*@Override
     public Map<String, Object> getStationNumberCount(
             final List<StationNumberDTO> stationNumberDTO) {
         Map<String, Object> stationNumber = new HashMap<>();
@@ -211,14 +209,14 @@ public class FirestationsService implements FirestationsI {
         LOGGER.debug("Counting and formatting "
                 + "of the list of inhabitants covered");
         return stationNumber;
-    }
+    }*/
 
     /**
      *Extract the phone from the Persons list in PersonsDTO.
      * @param persons : list of Persons used.
      * @return list of phone.
      */
-    @Override
+    /*@Override
     public List<PersonsDTO> personsToPersonsdtoPhone(
             final List<Persons> persons) {
         List<PersonsDTO> personsDTO = new ArrayList<>();
@@ -231,24 +229,24 @@ public class FirestationsService implements FirestationsI {
         }
         LOGGER.debug("Retrieval of residents' telephone numbers");
         return personsDTO;
-    }
+    }*/
 
     /**
      * Relay method.
      * @param address to check Persons.
      * @return list of Persons checked.
      */
-    @Override
+    /*@Override
     public List<Persons> getFireResidents(final String address) {
         return personsS.getPersonsAddress(address);
-    }
+    }*/
 
     /**
      * Convert list of Persons to list of MedicalRecords.
      * @param persons : list to convert.
      * @return list Medicalrecords.
      */
-    @Override
+    /*@Override
     public List<MedicalRecords> getFireMedicalRecords(
             final List<Persons> persons) {
         List<MedicalRecords> medicalRecords = new ArrayList<>();
@@ -260,7 +258,7 @@ public class FirestationsService implements FirestationsI {
         }
         LOGGER.debug("List of Persons in MedicalRecords List");
         return medicalRecords;
-    }
+    }*/
 
     /**
      * Formatting the response for the Fire URL.
@@ -268,7 +266,7 @@ public class FirestationsService implements FirestationsI {
      * @param fireDTO : list of inhabitants.
      * @return Map expected in result.
      */
-    @Override
+   /* @Override
     public Map<String, Object> getFireResult(
             final List<Integer> station,
             final List<PersonsAndMedicalRecordsDTO> fireDTO) {
@@ -278,14 +276,14 @@ public class FirestationsService implements FirestationsI {
         fireResult.put(stationString, station);
         fireResult.put(residentString, fireDTO);
         return fireResult;
-    }
+    }*/
 
     /**
      * Formatting step for the response for the Flood URL.
      * @param firestationsDTO : list of Firestations.
      * @return Map expected for final step of formatting.
      */
-    @Override
+    /*@Override
     public Map<String, List<Persons>> getFloodResidents(
             final List<FirestationsDTO> firestationsDTO) {
         Map<String, List<Persons>> personsMap = new HashMap<>();
@@ -295,7 +293,7 @@ public class FirestationsService implements FirestationsI {
         }
         LOGGER.debug("List of Persons by address");
         return personsMap;
-    }
+    }*/
 
     /**
      * Formatting the response for the Flood URL.
@@ -303,7 +301,7 @@ public class FirestationsService implements FirestationsI {
      *                   in a list of address key.
      * @return Map expected in result.
      */
-    @Override
+    /*@Override
     public Map<String, List<MedicalRecords>> getFloodMedicalRecords(
             final Map<String, List<Persons>> personsMap) {
         Map<String, List<MedicalRecords>> medicalRecordsMap = new HashMap<>();
@@ -320,7 +318,7 @@ public class FirestationsService implements FirestationsI {
             medicalRecordsMap.put(address, medicalRecords);
         }
         return medicalRecordsMap;
-    }
+    }*/
 
     //Method Tiers
 
@@ -329,13 +327,11 @@ public class FirestationsService implements FirestationsI {
      * @param firestations : the one that is tested.
      * @return True if duplicate Firestations or False if new Firestations.
      */
-    private boolean duplicateCheck(final Firestations firestations) {
+    /*private boolean duplicateCheck(final Firestations firestations) { //todo encore utile ?
         Firestations firestation = firestationsR
-                .findByAddressAddressIgnoreCaseAndStation(
-                        firestations.getAddress().getAddress(),
-                        firestations.getStation());
+                .findByAddressAddressIgnoreCaseAndStation(firestations.getAddress(), firestations.getStation());
         return firestation != null;
-    }
+    }*/
 
     /**
      * Check if phone exists in PersonsDTO list.

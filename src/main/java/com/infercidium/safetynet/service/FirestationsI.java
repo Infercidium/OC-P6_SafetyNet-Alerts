@@ -65,37 +65,37 @@ public interface FirestationsI {
      * @param firestations : list of Firestations used.
      * @return list of Persons.
      */
-    List<Persons> getFirestationsListToPersonsList(
-            List<Firestations> firestations);
+    /*List<Persons> getFirestationsListToPersonsList(
+            List<Firestations> firestations);*/
 
     /**
      * Formatting the response for the StationNumber URL.
      * @param stationNumberDTO : list to count.
      * @return Map expected in result.
      */
-    Map<String, Object> getStationNumberCount(
-            List<StationNumberDTO> stationNumberDTO);
+    /*Map<String, Object> getStationNumberCount(
+            List<StationNumberDTO> stationNumberDTO);*/
 
     /**
      *Extract the phone from the Persons list in PersonsDTO.
      * @param persons : list of Persons used.
      * @return list of phone.
      */
-    List<PersonsDTO> personsToPersonsdtoPhone(List<Persons> persons);
+    //List<PersonsDTO> personsToPersonsdtoPhone(List<Persons> persons);
 
     /**
      * Relay method.
      * @param address to check Persons.
      * @return list of Persons checked.
      */
-    List<Persons> getFireResidents(String address);
+    //List<Persons> getFireResidents(String address);
 
     /**
      * Convert list of Persons to list of MedicalRecords.
      * @param persons : list to convert.
      * @return list Medicalrecords.
      */
-    List<MedicalRecords> getFireMedicalRecords(List<Persons> persons);
+    //List<MedicalRecords> getFireMedicalRecords(List<Persons> persons);
 
     /**
      * Formatting the response for the Fire URL.
@@ -103,17 +103,17 @@ public interface FirestationsI {
      * @param fireDTO : list of inhabitants.
      * @return Map expected in result.
      */
-    Map<String, Object> getFireResult(
+    /*Map<String, Object> getFireResult(
             List<Integer> station,
-            List<PersonsAndMedicalRecordsDTO> fireDTO);
+            List<PersonsAndMedicalRecordsDTO> fireDTO);*/
 
     /**
      * Formatting step for the response for the Flood URL.
      * @param firestationsDTO : list of Firestations.
      * @return Map expected for final step of formatting.
      */
-    Map<String, List<Persons>> getFloodResidents(
-            List<FirestationsDTO> firestationsDTO);
+    /*Map<String, List<Persons>> getFloodResidents(
+            List<FirestationsDTO> firestationsDTO);*/
 
     /**
      * Formatting the response for the Flood URL.
@@ -121,6 +121,6 @@ public interface FirestationsI {
      *                   in a list of address key.
      * @return Map expected in result.
      */
-    Map<String, List<MedicalRecords>> getFloodMedicalRecords(
-            Map<String, List<Persons>> personsMap);
+   /* Map<String, List<MedicalRecords>> getFloodMedicalRecords(
+            Map<String, List<Persons>> personsMap);*/
 }

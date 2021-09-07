@@ -180,7 +180,7 @@ public class FirestationsRest {
      * @return a Map and 200 Ok if successful
      * or 404 not found if it does not exist.
      */
-    @GetMapping(value = "/firestation")
+    /*@GetMapping(value = "/firestation")
     public Map<String, Object> getStationNumber(
             @RequestParam final int stationNumber) {
         if (stationNumber < 1) {
@@ -197,7 +197,7 @@ public class FirestationsRest {
         LOGGER.info("List of inhabitants covered by station "
                 + stationNumber + " found");
         return stationNumberResult;
-    }
+    }*/
 
     /**
      * This url refers to the list of telephone numbers of residents
@@ -206,7 +206,7 @@ public class FirestationsRest {
      * @return a list and 200 Ok if successful
      * or 404 not found if it does not exist.
      */
-    @GetMapping(value = "/phoneAlert")
+    /*@GetMapping(value = "/phoneAlert")
     public List<PersonsDTO> getPhoneAlert(@RequestParam final int firestation) {
         if (firestation < 1) {
             throw new NullPointerException();
@@ -221,7 +221,7 @@ public class FirestationsRest {
         LOGGER.info("List of telephone numbers of residents "
                 + "served by the station " + firestation + " found");
         return personsDTO;
-    }
+    }*/
 
     /**
      * This url asks for an address
@@ -231,7 +231,7 @@ public class FirestationsRest {
      * @return a map and 200 Ok if successful
      * or 404 not found if it does not exist.
      */
-    @GetMapping(value = "/fire")
+    /*@GetMapping(value = "/fire")
     public Map<String, Object> getFire(@RequestParam final String address) {
         List<Firestations> firestations
                 = firestationsS.getFirestationsAddress(address);
@@ -249,7 +249,7 @@ public class FirestationsRest {
         LOGGER.info("Station number and list of residents of "
                 + address + " found");
         return firestationsS.getFireResult(station, fireDTO);
-    }
+    }*/
 
     /**
      * This url reviews a list of inhabitants
@@ -258,7 +258,7 @@ public class FirestationsRest {
      * @return a map and 200 Ok if successful
      * or 404 not found if it does not exist.
      */
-    @GetMapping(value = "/flood/stations")
+    /*@GetMapping(value = "/flood/stations")
     public Map<String, Object> getFlood(@RequestParam final int station) {
         if (station < 1) {
             throw new NullPointerException();
@@ -275,5 +275,5 @@ public class FirestationsRest {
                 + station + " found");
         return firestationsM
                 .personsAndMedicalRecordsModelToFloodDTO(medicalRecordsMap);
-    }
+    }*/
 }

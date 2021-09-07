@@ -2,13 +2,9 @@ package com.infercidium.safetynet.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import javax.validation.constraints.Min;
+import java.util.Set;
 
 @Entity
 public class Firestations {
@@ -24,9 +20,11 @@ public class Firestations {
     /**
      * Address attribute.
      */
-    @ManyToOne
-    @JoinColumn(name = "Address_id")
-    private Address address;
+    @ManyToMany
+    @JoinTable(name = "Firestations_Address",
+            joinColumns = @JoinColumn(name = "Firestations_id"),
+            inverseJoinColumns = @JoinColumn(name = "Address_id"))
+    private Set<Address> address;
 
     /**
      * Station attribute.
@@ -45,7 +43,7 @@ public class Firestations {
      * @param addressC this is the address attribute.
      * @param stationC this is the station attribute.
      */
-    public Firestations(final Address addressC, final int stationC) {
+    public Firestations(final Set<Address> addressC, final int stationC) {
         this.address = addressC;
         this.station = stationC;
     }
@@ -70,7 +68,7 @@ public class Firestations {
      * Address getter.
      * @return address attribute.
      */
-    public Address getAddress() {
+    public Set<Address> getAddress() {
         return address;
     }
 
@@ -78,7 +76,7 @@ public class Firestations {
      * Address setter.
      * @param addressS becomes the new address attribute.
      */
-    public void setAddress(final Address addressS) {
+    public void setAddress(final Set<Address> addressS) {
         this.address = addressS;
     }
 
@@ -96,6 +94,12 @@ public class Firestations {
      */
     public void setStation(final int stationS) {
         this.station = stationS;
+    }
+
+    public void addAddress(final Address address) {
+        if (!this.address.contains(address)) {
+            this.address.add(address);
+        }
     }
 
     /**
