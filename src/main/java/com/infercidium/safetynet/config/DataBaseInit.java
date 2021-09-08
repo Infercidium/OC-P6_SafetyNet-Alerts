@@ -64,9 +64,9 @@ public class DataBaseInit {
             dbis.instanciateListPersons(persons);
             LOGGER.debug("Instantiating and saving "
                     + "the list of persons in H2 table");
-            /*dbis.instanciateListFirestations(firestations);
+            dbis.instanciateListFirestations(firestations);
             LOGGER.debug("Instantiating and saving "
-                    + "the list of firestations in H2 table");*/
+                    + "the list of firestations in H2 table");
             dbis.instanciateListMedicalRecords(medicalRecords);
             LOGGER.debug("Instantiating and saving "
                     + "the list of medicalRecords in H2 table");

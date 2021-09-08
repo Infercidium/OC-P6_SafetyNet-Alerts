@@ -2,6 +2,7 @@ package com.infercidium.safetynet.dto;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import java.util.HashSet;
 import java.util.Set;
 
 public class FirestationsDTO {
@@ -17,6 +18,14 @@ public class FirestationsDTO {
      */
     @Min(value = 1, message = "The station cannot be null or empty.")
     private int station;
+
+    public FirestationsDTO(FirestationsAddressDTO firestationsAddressDTO) {
+        address = new HashSet<>();
+        this.address.add(firestationsAddressDTO.getAddress());
+        this.station = firestationsAddressDTO.getStation();
+    }
+
+    public FirestationsDTO() { }
 
     /**
      * Address getter.

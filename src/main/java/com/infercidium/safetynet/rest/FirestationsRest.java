@@ -2,6 +2,7 @@ package com.infercidium.safetynet.rest;
 
 import com.infercidium.safetynet.dto.*;
 import com.infercidium.safetynet.mapper.FirestationsMapper;
+import com.infercidium.safetynet.model.Address;
 import com.infercidium.safetynet.model.Firestations;
 import com.infercidium.safetynet.model.MedicalRecords;
 import com.infercidium.safetynet.model.Persons;
@@ -66,11 +67,10 @@ public class FirestationsRest {
      */
     @PostMapping(value = "/firestation")
     public ResponseEntity<Void> createStationMap(@Valid @RequestBody final FirestationsAddressDTO firestationsAddressDTO) throws SQLIntegrityConstraintViolationException {
-        FirestationsDTO firestationsDTO = new FirestationsDTO();
-        firestationsDTO.addAddress(firestationsAddressDTO.getAddress());
+        FirestationsDTO firestationsDTO = new FirestationsDTO(firestationsAddressDTO);
         Firestations firestations = firestationsM.dtoToModel(firestationsDTO);
-        Firestations postFirestation
-                = firestationsS.postFirestation(firestations);
+        Address address = new Address(firestationsAddressDTO.getAddress());
+        Firestations postFirestation = firestationsS.postFirestation(address, firestations);
 
         URI locate = ServletUriComponentsBuilder
                 .fromCurrentRequest()

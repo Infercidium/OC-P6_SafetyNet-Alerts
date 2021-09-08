@@ -69,17 +69,30 @@ public class FirestationsService implements FirestationsI {
     @Override
     public Firestations postFirestation(final Address address, final Firestations firestations) throws SQLIntegrityConstraintViolationException {
         Address addressComplete = addressS.checkAddress(address);
-        Firestations firestation = firestationsR.findByStation(firestations.getStation()).get(0);
-        if (firestation == null) {
+        List<Firestations> firestationsList = firestationsR.findByStation(firestations.getStation());
+        Firestations firestation = new Firestations();
+        if (firestationsList.isEmpty()) {
             firestation = firestations;
             firestation.getAddress().clear();
+        } else {
+            firestation.setId(firestationsList.get(0).getId());
+            firestation.setStation(firestationsList.get(0).getStation());
+            firestation.setAddress(firestationsList.get(0).getAddress());
+            System.out.println(firestation);
+            
         }
-        if (firestation.getAddress().contains(addressComplete)) {
+        if (checkAddressFirestations(addressComplete, firestation)) {
             throw new SQLIntegrityConstraintViolationException();
         } else {
-            firestation.addAddress(address);
+            firestation.addAddress(addressComplete);
             return this.firestationsR.save(firestation);
         }
+    }
+
+    @Override
+    public boolean checkAddressFirestations(final Address address, final Firestations firestations) {
+        Address addressComplete = addressS.checkAddress(address);
+        return firestations.getAddress().contains(addressComplete);
     }
 
     /**
@@ -322,20 +335,6 @@ public class FirestationsService implements FirestationsI {
     }*/
 
     //Method Tiers
-
-    /**
-     * Firestation Duplication Verification and Protection.
-     * @param firestations : the one that is tested.
-     * @return True if duplicate Firestations or False if new Firestations.
-     */
-    private boolean duplicateCheck(final Firestations firestations) {
-        Firestations firestation = firestationsR.findByStation(firestations.getStation()).get(0);
-            if (firestation.getAddress().containsAll(firestations.getAddress())) {
-                return true;
-            }
-        return false;
-    }
-
     /**
      * Check if phone exists in PersonsDTO list.
      * @param personsDTO this is a list.

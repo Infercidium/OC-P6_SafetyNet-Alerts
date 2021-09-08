@@ -24,6 +24,8 @@ public interface FirestationsI {
     Firestations postFirestation(Address address, Firestations firestations)
             throws SQLIntegrityConstraintViolationException;
 
+    boolean checkAddressFirestations(Address address, Firestations firestations);
+
     /**
      * Edit Method Service.
      * @param address to check Firestations.
