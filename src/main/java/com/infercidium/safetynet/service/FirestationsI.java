@@ -15,115 +15,39 @@ import java.util.Map;
 
 public interface FirestationsI {
 
-    //Post, Put, Delete
-    /**
-     * Post Method Service.
-     * @param firestations to save.
-     * @return firestations saved.
-     */
-    Firestations postFirestation(Address address, Firestations firestations)
-            throws SQLIntegrityConstraintViolationException;
+    /*public Firestations postFirestation(final Address address, final Firestations firestations) throws SQLIntegrityConstraintViolationException {
+            Address addressComplete = addressS.checkAddress(address);
+            List<Firestations> firestationsList = firestationsR.findByStation(firestations.getStation());
+            Firestations firestation;
+            if (firestationsList.isEmpty()) {
+                firestation = firestations;
+                firestation.getAddress().clear();
+            } else if (firestationsList.get(0).getAddress().contains(addressComplete)) {
+                throw new SQLIntegrityConstraintViolationException();
+            } else {
+                firestation = firestationsList.get(0);
+            }
+            firestation.addAddress(addressComplete);
+            return this.firestationsR.save(firestation);
+        }*/
 
-    boolean checkAddressFirestations(Address address, Firestations firestations);
+    Firestations createMapage(Address address, Firestations firestations);
 
-    /**
-     * Edit Method Service.
-     * @param address to check Firestations.
-     * @param station to check Firestations.
-     * @param firestations to edit.
-     */
-    void editFirestation(String address, int station,
-                         Firestations firestations);
+    void editFirestation(String address, int station, Firestations firestations);
 
-    /**
-     * RemoveStation Method Service.
-     * @param station to check Firestations.
-     */
-    void removeStationMapping(int station);
+    void removeMapage(String address, int station);
 
-    /**
-     * RemoveAddress Method Service.
-     * @param address to check Firestations.
-     */
-    void removeAddressMapping(String address);
+    void removeStation(int station);
 
-    //Get
-    /**
-     * Get Method Service.
-     * @param address to check Firestations.
-     * @return firestations checked.
-     */
+    void removeAddress(String address);
+
     List<Firestations> getFirestationsAddress(String address);
 
-    /**
-     * GetAll Method Service.
-     * @param station to check Firestations.
-     * @return firestations checked.
-     */
-    List<Firestations> getFireStationsStation(int station);
+    Firestations getFirestationsStation(int station);
 
-    //URL lié à Persons
-    /**
-     * Convert the list of Firestations to the list of Persons.
-     * @param firestations : list of Firestations used.
-     * @return list of Persons.
-     */
-    /*List<Persons> getFirestationsListToPersonsList(
-            List<Firestations> firestations);*/
+    boolean mapageCheck(String address, int station);
 
-    /**
-     * Formatting the response for the StationNumber URL.
-     * @param stationNumberDTO : list to count.
-     * @return Map expected in result.
-     */
-    /*Map<String, Object> getStationNumberCount(
-            List<StationNumberDTO> stationNumberDTO);*/
+    boolean addressCheck(String address);
 
-    /**
-     *Extract the phone from the Persons list in PersonsDTO.
-     * @param persons : list of Persons used.
-     * @return list of phone.
-     */
-    //List<PersonsDTO> personsToPersonsdtoPhone(List<Persons> persons);
-
-    /**
-     * Relay method.
-     * @param address to check Persons.
-     * @return list of Persons checked.
-     */
-    //List<Persons> getFireResidents(String address);
-
-    /**
-     * Convert list of Persons to list of MedicalRecords.
-     * @param persons : list to convert.
-     * @return list Medicalrecords.
-     */
-    //List<MedicalRecords> getFireMedicalRecords(List<Persons> persons);
-
-    /**
-     * Formatting the response for the Fire URL.
-     * @param station : station number.
-     * @param fireDTO : list of inhabitants.
-     * @return Map expected in result.
-     */
-    /*Map<String, Object> getFireResult(
-            List<Integer> station,
-            List<PersonsAndMedicalRecordsDTO> fireDTO);*/
-
-    /**
-     * Formatting step for the response for the Flood URL.
-     * @param firestationsDTO : list of Firestations.
-     * @return Map expected for final step of formatting.
-     */
-    /*Map<String, List<Persons>> getFloodResidents(
-            List<FirestationsDTO> firestationsDTO);*/
-
-    /**
-     * Formatting the response for the Flood URL.
-     * @param personsMap : Map obtained containing the inhabitants
-     *                   in a list of address key.
-     * @return Map expected in result.
-     */
-   /* Map<String, List<MedicalRecords>> getFloodMedicalRecords(
-            Map<String, List<Persons>> personsMap);*/
+    boolean stationCheck(int station);
 }

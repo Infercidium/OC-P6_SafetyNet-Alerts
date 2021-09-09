@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
 import javax.validation.constraints.Min;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -22,7 +21,7 @@ public class Firestations {
     /**
      * Address attribute.
      */
-    @ManyToMany
+    @ManyToMany(fetch=FetchType.EAGER)
     @JoinTable(name = "Firestations_Address",
             joinColumns = @JoinColumn(name = "Firestations_id"),
             inverseJoinColumns = @JoinColumn(name = "Address_id"))
@@ -108,9 +107,11 @@ public class Firestations {
     }
 
     public void addAddress(final Address address) {
-        if (!this.address.contains(address)) {
-            this.address.add(address);
-        }
+        this.address.add(address);
+    }
+
+    public void removeAddress(final Address address) {
+        this.address.remove(address);
     }
 
     /**
@@ -126,18 +127,5 @@ public class Firestations {
                 + ", address = " + address
                 + ", station = " + station
                 + '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Firestations)) return false;
-        Firestations that = (Firestations) o;
-        return getStation() == that.getStation() && getId().equals(that.getId()) && getAddress().equals(that.getAddress());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId(), getAddress(), getStation());
     }
 }

@@ -149,7 +149,7 @@ public class DataBaseInitService implements DataBaseInitI {
      * @param firestations : the list to instantiate and save.
      */
     @Override
-    public void instanciateListFirestations(final List<Map<String, String>> firestations) throws SQLIntegrityConstraintViolationException {
+    public void instanciateListFirestations(final List<Map<String, String>> firestations) {
 
         for (Map<String, String> firestation : firestations) {
             FirestationsAddressDTO firestationsAddressDTO = new FirestationsAddressDTO();
@@ -158,10 +158,11 @@ public class DataBaseInitService implements DataBaseInitI {
             FirestationsDTO firestationsDTO = new FirestationsDTO(firestationsAddressDTO);
             Firestations finalFirestation = firestationsM.dtoToModel(firestationsDTO);
             Address address = new Address(firestation.get("address"));
-            if (!firestationsS.checkAddressFirestations(address, finalFirestation)) {
-                firestationsS.postFirestation(address, finalFirestation);
-            } else {
+
+            if (firestationsS.mapageCheck(address.getAddress(), finalFirestation.getStation())) {
                 LOGGER.debug("Duplicate address detected : " + address + ", station : " + finalFirestation.getStation() + " removed.");
+            } else {
+                firestationsS.createMapage(address, finalFirestation);
             }
         }
     }

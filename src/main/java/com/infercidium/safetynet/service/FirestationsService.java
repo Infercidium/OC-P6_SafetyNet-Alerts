@@ -1,20 +1,14 @@
 package com.infercidium.safetynet.service;
 
-import com.infercidium.safetynet.dto.PersonsAndMedicalRecordsDTO;
-import com.infercidium.safetynet.dto.FirestationsDTO;
 import com.infercidium.safetynet.dto.PersonsDTO;
-import com.infercidium.safetynet.dto.StationNumberDTO;
 import com.infercidium.safetynet.model.Address;
 import com.infercidium.safetynet.model.Firestations;
-import com.infercidium.safetynet.model.MedicalRecords;
-import com.infercidium.safetynet.model.Persons;
 import com.infercidium.safetynet.repository.FirestationsRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.sql.SQLIntegrityConstraintViolationException;
-import java.util.*;
+import java.util.List;
 
 @Service
 public class FirestationsService implements FirestationsI {
@@ -63,36 +57,22 @@ public class FirestationsService implements FirestationsI {
 
     /**
      * Post Method Service.
+     * @param address to add.
      * @param firestations to save.
      * @return firestations saved.
      */
     @Override
-    public Firestations postFirestation(final Address address, final Firestations firestations) throws SQLIntegrityConstraintViolationException {
+    public Firestations createMapage(final Address address, final Firestations firestations) {
         Address addressComplete = addressS.checkAddress(address);
-        List<Firestations> firestationsList = firestationsR.findByStation(firestations.getStation());
-        Firestations firestation = new Firestations();
-        if (firestationsList.isEmpty()) {
+        Firestations firestation;
+        if (stationCheck(firestations.getStation())) {
+            firestation = firestationsR.findByStation(firestations.getStation());
+        } else {
             firestation = firestations;
             firestation.getAddress().clear();
-        } else {
-            firestation.setId(firestationsList.get(0).getId());
-            firestation.setStation(firestationsList.get(0).getStation());
-            firestation.setAddress(firestationsList.get(0).getAddress());
-            System.out.println(firestation);
-            
         }
-        if (checkAddressFirestations(addressComplete, firestation)) {
-            throw new SQLIntegrityConstraintViolationException();
-        } else {
-            firestation.addAddress(addressComplete);
-            return this.firestationsR.save(firestation);
-        }
-    }
-
-    @Override
-    public boolean checkAddressFirestations(final Address address, final Firestations firestations) {
-        Address addressComplete = addressS.checkAddress(address);
-        return firestations.getAddress().contains(addressComplete);
+        firestation.addAddress(addressComplete);
+        return this.firestationsR.save(firestation);
     }
 
     /**
@@ -103,33 +83,37 @@ public class FirestationsService implements FirestationsI {
      */
     @Override
     public void editFirestation(final String address, final int station, final Firestations firestations) {
-        Firestations basicFirestation
-                = firestationsR.findByAddressAddressIgnoreCaseAndStation(
-                        address, station);
-        firestations.setId(basicFirestation.getId());
-        firestations.setAddress(basicFirestation.getAddress());
-        this.firestationsR.save(firestations);
+        Address addressComplete = new Address(address);
+        removeMapage(address, station);
+        createMapage(addressComplete, firestations);
     }
 
-    /**
-     * RemoveStation Method Service.
-     * @param station to check Firestations.
-     */
     @Override
-    public void removeStationMapping(final int station) {
-        List<Firestations> firestations = getFireStationsStation(station);
-        this.firestationsR.deleteAll(firestations);
+    public void removeMapage(final String address, final int station) {
+        Address addressComplete = addressS.checkAddress(new Address(address));
+        Firestations firestation = firestationsR.findByAddressAddressIgnoreCaseAndStation(address, station);
+        firestation.removeAddress(addressComplete);
+        if (firestation.getAddress().isEmpty()) {
+            firestationsR.delete(firestation);
+        } else {
+            firestationsR.save(firestation);
+        }
     }
 
-    /**
-     * RemoveAddress Method Service.
-     * @param address to check Firestations.
-     */
     @Override
-    public void removeAddressMapping(final String address) {
-        List<Firestations> firestations = getFirestationsAddress(address);
-        this.firestationsR.deleteAll(firestations);
+    public void removeStation(final int station) {
+        Firestations firestation = getFirestationsStation(station);
+        firestationsR.delete(firestation);
     }
+
+    @Override
+    public void removeAddress(final String address) {
+        List<Firestations> firestationsList = getFirestationsAddress(address);
+        for (Firestations firestation : firestationsList) {
+            removeMapage(address, firestation.getStation());
+        }
+    }
+
     //Get
 
     /**
@@ -139,33 +123,18 @@ public class FirestationsService implements FirestationsI {
      */
     @Override
     public List<Firestations> getFirestationsAddress(final String address) {
-        List<Firestations> firestations
-                = firestationsR.findByAddressAddressIgnoreCase(address);
-        if (!firestations.isEmpty()) {
-            return firestations;
+        List<Firestations> firestations;
+        if (address.equals("null")) {
+            firestations = firestationsR.findAll();
         } else {
-            throw new NullPointerException();
+             firestations = firestationsR.findByAddressAddressIgnoreCase(address);
         }
+        return firestations;
     }
 
-    /**
-     * GetAll Method Service.
-     * @param station to check Firestations.
-     * @return firestations checked.
-     */
     @Override
-    public List<Firestations> getFireStationsStation(final int station) {
-        List<Firestations> firestations;
-        if (station == 0) {
-            firestations = this.firestationsR.findAll();
-        } else {
-            firestations = this.firestationsR.findByStation(station);
-        }
-        if (firestations.size() != 0) {
-            return firestations;
-        } else {
-            throw new NullPointerException();
-        }
+    public Firestations getFirestationsStation(final int station) {
+        return firestationsR.findByStation(station);
     }
 
     //URL lié à Persons
@@ -349,5 +318,19 @@ public class FirestationsService implements FirestationsI {
             }
         }
         return false;
+    }
+    @Override
+    public boolean mapageCheck(final String address, final int station) {
+        return firestationsR.findByAddressAddressIgnoreCaseAndStation(address, station) != null;
+    }
+
+    @Override
+    public boolean addressCheck(final String address) {
+        return firestationsR.findByAddressAddressIgnoreCase(address) != null;
+    }
+
+    @Override
+    public boolean stationCheck(final int station) {
+        return firestationsR.findByStation(station) != null;
     }
 }
