@@ -2,16 +2,14 @@ package com.infercidium.safetynet.dto;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
-import java.util.HashSet;
-import java.util.Set;
 
-public class FirestationsDTO {
+public class FirestationsAddressDTO {
 
     /**
      * Address attribute.
      */
     @NotBlank(message = "Address cannot be null or empty.")
-    private Set<String> address;
+    private String address;
 
     /**
      * Station attribute.
@@ -19,19 +17,11 @@ public class FirestationsDTO {
     @Min(value = 1, message = "The station cannot be null or empty.")
     private int station;
 
-    public FirestationsDTO(FirestationsAddressDTO firestationsAddressDTO) {
-        address = new HashSet<>();
-        this.address.add(firestationsAddressDTO.getAddress());
-        this.station = firestationsAddressDTO.getStation();
-    }
-
-    public FirestationsDTO() { }
-
     /**
      * Address getter.
      * @return address attribute.
      */
-    public Set<String> getAddress() {
+    public String getAddress() {
         return address;
     }
 
@@ -39,7 +29,7 @@ public class FirestationsDTO {
      * Address setter.
      * @param addressS becomes the new address attribute.
      */
-    public void setAddress(final Set<String> addressS) {
+    public void setAddress(final String addressS) {
         this.address = addressS;
     }
 
@@ -57,11 +47,5 @@ public class FirestationsDTO {
      */
     public void setStation(final int stationS) {
         this.station = stationS;
-    }
-
-    public void addAddress(final String address) {
-        if (!this.address.contains(address)) {
-            this.address.add(address);
-        }
     }
 }

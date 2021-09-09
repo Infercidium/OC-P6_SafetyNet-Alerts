@@ -15,16 +15,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringBootTest(classes = {FirestationsMapperImpl.class})
+@SpringBootTest(classes = {FirestationsMapperImpl.class}) //todo réactiver
 class FirestationsMapperTest {
 
-   /* @Autowired
+    /*@Autowired
     private FirestationsMapper firestationsMapperImpl;
 
     FirestationsDTO firestationsDTO = new FirestationsDTO();
@@ -59,7 +63,7 @@ class FirestationsMapperTest {
 
     @Test
     void map() {
-        Set<Address> result = firestationsMapperImpl.map("1 rue du testing");
+        Address result = firestationsMapperImpl.map("1 rue du testing");
         assertEquals(firestations.getAddress().toString(), result.toString());
     }
 

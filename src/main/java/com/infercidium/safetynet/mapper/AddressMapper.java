@@ -6,10 +6,12 @@ import org.mapstruct.Mapper;
 import java.util.Set;
 
 @Mapper(componentModel = "spring")
-public interface AddressMapper {
+public abstract class AddressMapper {
 
-    Address addressFromString(String address);
-    String stringFromAddress(Address address);
-    Set<Address> addressFromString(Set<String> address);
-    Set<String> strinngFromAddress(Set<Address> address);
+    public abstract Address addressFromString(String address);
+    public String stringFromAddress(Address address) {
+        return address.getAddress();
+    }
+    public abstract Set<Address> addressFromString(Set<String> address);
+    public abstract Set<String> strinngFromAddress(Set<Address> address);
 }

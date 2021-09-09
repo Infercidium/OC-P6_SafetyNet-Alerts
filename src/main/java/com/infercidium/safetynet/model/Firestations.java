@@ -1,7 +1,6 @@
 package com.infercidium.safetynet.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 import javax.validation.constraints.Min;
@@ -22,8 +21,8 @@ public class Firestations {
     /**
      * Address attribute.
      */
-    @ManyToMany
-    @JoinTable(name = "Firestation_address",
+    @ManyToMany(fetch=FetchType.EAGER)
+    @JoinTable(name = "Firestations_Address",
             joinColumns = @JoinColumn(name = "Firestations_id"),
             inverseJoinColumns = @JoinColumn(name = "Address_id"))
     private Set<Address> address;
@@ -32,7 +31,6 @@ public class Firestations {
      * Station attribute.
      */
     @Min(value = 1, message = "The station cannot be null or empty.")
-    @Column(unique = true)
     private int station;
 
     /**
@@ -45,6 +43,7 @@ public class Firestations {
     /**
      * Constructor taking all the attributes not automatically generated,
      * instantiating all the attribute values.
+     *
      * @param addressC this is the address attribute.
      * @param stationC this is the station attribute.
      */
@@ -55,6 +54,7 @@ public class Firestations {
 
     /**
      * Id getter.
+     *
      * @return id attribute.
      */
     public Long getId() {
@@ -63,6 +63,7 @@ public class Firestations {
 
     /**
      * Id setter.
+     *
      * @param idS becomes the new id attribute.
      */
     public void setId(final Long idS) {
@@ -71,6 +72,7 @@ public class Firestations {
 
     /**
      * Address getter.
+     *
      * @return address attribute.
      */
     public Set<Address> getAddress() {
@@ -79,6 +81,7 @@ public class Firestations {
 
     /**
      * Address setter.
+     *
      * @param addressS becomes the new address attribute.
      */
     public void setAddress(final Set<Address> addressS) {
@@ -87,6 +90,7 @@ public class Firestations {
 
     /**
      * Station getter.
+     *
      * @return station attribute.
      */
     public int getStation() {
@@ -95,6 +99,7 @@ public class Firestations {
 
     /**
      * Station setter.
+     *
      * @param stationS becomes the new station attribute.
      */
     public void setStation(final int stationS) {
@@ -102,21 +107,24 @@ public class Firestations {
     }
 
     public void addAddress(final Address address) {
-        if (!this.address.contains(address)) {
-            this.address.add(address);
-        }
+        this.address.add(address);
+    }
+
+    public void removeAddress(final Address address) {
+        this.address.remove(address);
     }
 
     /**
      * ToString method allows you to see the content.
+     *
      * @return a String containing the name
      * of all the attributes and their contents.
      */
     @Override
     public String toString() {
         return "Firestations{"
-                + " id = " + id
-                + ", address = '" + address + '\''
+                + "id = " + id
+                + ", address = " + address
                 + ", station = " + station
                 + '}';
     }

@@ -1,21 +1,14 @@
 package com.infercidium.safetynet.service;
 
-import com.infercidium.safetynet.dto.PersonsAndMedicalRecordsDTO;
-import com.infercidium.safetynet.dto.FirestationsDTO;
 import com.infercidium.safetynet.dto.PersonsDTO;
-import com.infercidium.safetynet.dto.StationNumberDTO;
 import com.infercidium.safetynet.model.Address;
 import com.infercidium.safetynet.model.Firestations;
-import com.infercidium.safetynet.model.MedicalRecords;
-import com.infercidium.safetynet.model.Persons;
 import com.infercidium.safetynet.repository.FirestationsRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.sql.SQLIntegrityConstraintViolationException;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
 
 @Service
 public class FirestationsService implements FirestationsI {
@@ -64,17 +57,22 @@ public class FirestationsService implements FirestationsI {
 
     /**
      * Post Method Service.
+     * @param address to add.
      * @param firestations to save.
      * @return firestations saved.
      */
     @Override
-    public Firestations postFirestation(final Firestations firestations)
-            throws SQLIntegrityConstraintViolationException {
-        for (Address address: firestations.getAddress()) {
-            address = addressS.checkAddress(address);
-            firestations.addAddress(address);
+    public Firestations createMapage(final Address address, final Firestations firestations) {
+        Address addressComplete = addressS.checkAddress(address);
+        Firestations firestation;
+        if (stationCheck(firestations.getStation())) {
+            firestation = firestationsR.findByStation(firestations.getStation());
+        } else {
+            firestation = firestations;
+            firestation.getAddress().clear();
         }
-        return this.firestationsR.save(firestations);
+        firestation.addAddress(addressComplete);
+        return this.firestationsR.save(firestation);
     }
 
     /**
@@ -84,35 +82,38 @@ public class FirestationsService implements FirestationsI {
      * @param firestations to edit.
      */
     @Override
-    public void editFirestation(final String address, final int station,
-                                final Firestations firestations) {
-        Firestations basicFirestation
-                = firestationsR.findByAddressAddressIgnoreCaseAndStation(
-                        address, station);
-        firestations.setId(basicFirestation.getId());
-        firestations.setAddress(basicFirestation.getAddress());
-        this.firestationsR.save(firestations);
+    public void editFirestation(final String address, final int station, final Firestations firestations) {
+        Address addressComplete = new Address(address);
+        removeMapage(address, station);
+        createMapage(addressComplete, firestations);
     }
 
-    /**
-     * RemoveStation Method Service.
-     * @param station to check Firestations.
-     */
     @Override
-    public void removeStationMapping(final int station) {
-        List<Firestations> firestations = getFireStationsStation(station);
-        this.firestationsR.deleteAll(firestations);
+    public void removeMapage(final String address, final int station) {
+        Address addressComplete = addressS.checkAddress(new Address(address));
+        Firestations firestation = firestationsR.findByAddressAddressIgnoreCaseAndStation(address, station);
+        firestation.removeAddress(addressComplete);
+        if (firestation.getAddress().isEmpty()) {
+            firestationsR.delete(firestation);
+        } else {
+            firestationsR.save(firestation);
+        }
     }
 
-    /**
-     * RemoveAddress Method Service.
-     * @param address to check Firestations.
-     */
     @Override
-    public void removeAddressMapping(final String address) {
-        List<Firestations> firestations = getFirestationsAddress(address);
-        this.firestationsR.deleteAll(firestations);
+    public void removeStation(final int station) {
+        Firestations firestation = getFirestationsStation(station);
+        firestationsR.delete(firestation);
     }
+
+    @Override
+    public void removeAddress(final String address) {
+        List<Firestations> firestationsList = getFirestationsAddress(address);
+        for (Firestations firestation : firestationsList) {
+            removeMapage(address, firestation.getStation());
+        }
+    }
+
     //Get
 
     /**
@@ -122,33 +123,18 @@ public class FirestationsService implements FirestationsI {
      */
     @Override
     public List<Firestations> getFirestationsAddress(final String address) {
-        List<Firestations> firestations
-                = firestationsR.findByAddressAddressIgnoreCase(address);
-        if (!firestations.isEmpty()) {
-            return firestations;
+        List<Firestations> firestations;
+        if (address.equals("null")) {
+            firestations = firestationsR.findAll();
         } else {
-            throw new NullPointerException();
+             firestations = firestationsR.findByAddressAddressIgnoreCase(address);
         }
+        return firestations;
     }
 
-    /**
-     * GetAll Method Service.
-     * @param station to check Firestations.
-     * @return firestations checked.
-     */
     @Override
-    public List<Firestations> getFireStationsStation(final int station) {
-        List<Firestations> firestations;
-        if (station == 0) {
-            firestations = this.firestationsR.findAll();
-        } else {
-            firestations = this.firestationsR.findByStation(station);
-        }
-        if (firestations.size() != 0) {
-            return firestations;
-        } else {
-            throw new NullPointerException();
-        }
+    public Firestations getFirestationsStation(final int station) {
+        return firestationsR.findByStation(station);
     }
 
     //URL lié à Persons
@@ -158,33 +144,26 @@ public class FirestationsService implements FirestationsI {
      * @param firestations : list of Firestations used.
      * @return list of Persons.
      */
-    @Override
+    /*@Override
     public List<Persons> getFirestationsListToPersonsList(
             final List<Firestations> firestations) {
         List<Persons> personsList = new ArrayList<>();
-        List<Address> addressList = new ArrayList<>();
-        for (Firestations firestation: firestations) {
-            addressList.addAll(firestation.getAddress());
-        }
-        addressList = addressList.stream().distinct().collect(Collectors.toList());
-        for (Address address : addressList) {
-            List<Persons> persons = new ArrayList<>();
-
-            personsS.getPersonsAddress(address.getAddress());
+        for (Firestations firestation : firestations) {
+            List<Persons> persons = personsS.getPersonsAddress(firestation.getAddress());
             personsList.addAll(persons);
             LOGGER.debug("List of people linked to the station "
-                    + " by address : "
-                    + address.getAddress());
+                    + firestation.getStation() + " by address : "
+                    + firestation.getAddress());
         }
         return personsList;
-    }
+    }*/
 
     /**
      * Formatting the response for the StationNumber URL.
      * @param stationNumberDTO : list to count.
      * @return Map expected in result.
      */
-    @Override
+    /*@Override
     public Map<String, Object> getStationNumberCount(
             final List<StationNumberDTO> stationNumberDTO) {
         Map<String, Object> stationNumber = new HashMap<>();
@@ -213,14 +192,14 @@ public class FirestationsService implements FirestationsI {
         LOGGER.debug("Counting and formatting "
                 + "of the list of inhabitants covered");
         return stationNumber;
-    }
+    }*/
 
     /**
      *Extract the phone from the Persons list in PersonsDTO.
      * @param persons : list of Persons used.
      * @return list of phone.
      */
-    @Override
+    /*@Override
     public List<PersonsDTO> personsToPersonsdtoPhone(
             final List<Persons> persons) {
         List<PersonsDTO> personsDTO = new ArrayList<>();
@@ -233,24 +212,24 @@ public class FirestationsService implements FirestationsI {
         }
         LOGGER.debug("Retrieval of residents' telephone numbers");
         return personsDTO;
-    }
+    }*/
 
     /**
      * Relay method.
      * @param address to check Persons.
      * @return list of Persons checked.
      */
-    @Override
+    /*@Override
     public List<Persons> getFireResidents(final String address) {
         return personsS.getPersonsAddress(address);
-    }
+    }*/
 
     /**
      * Convert list of Persons to list of MedicalRecords.
      * @param persons : list to convert.
      * @return list Medicalrecords.
      */
-    @Override
+    /*@Override
     public List<MedicalRecords> getFireMedicalRecords(
             final List<Persons> persons) {
         List<MedicalRecords> medicalRecords = new ArrayList<>();
@@ -262,7 +241,7 @@ public class FirestationsService implements FirestationsI {
         }
         LOGGER.debug("List of Persons in MedicalRecords List");
         return medicalRecords;
-    }
+    }*/
 
     /**
      * Formatting the response for the Fire URL.
@@ -270,7 +249,7 @@ public class FirestationsService implements FirestationsI {
      * @param fireDTO : list of inhabitants.
      * @return Map expected in result.
      */
-    @Override
+   /* @Override
     public Map<String, Object> getFireResult(
             final List<Integer> station,
             final List<PersonsAndMedicalRecordsDTO> fireDTO) {
@@ -280,27 +259,24 @@ public class FirestationsService implements FirestationsI {
         fireResult.put(stationString, station);
         fireResult.put(residentString, fireDTO);
         return fireResult;
-    }
+    }*/
 
     /**
      * Formatting step for the response for the Flood URL.
      * @param firestationsDTO : list of Firestations.
      * @return Map expected for final step of formatting.
      */
-    @Override
+    /*@Override
     public Map<String, List<Persons>> getFloodResidents(
             final List<FirestationsDTO> firestationsDTO) {
         Map<String, List<Persons>> personsMap = new HashMap<>();
-        List<String> addressList = new ArrayList<>();
         for (FirestationsDTO firestationsDto :firestationsDTO) {
-            addressList.addAll(firestationsDto.getAddress());
-        }
-        for (String address: addressList) {
+            String address = firestationsDto.getAddress();
             personsMap.put(address, personsS.getPersonsAddress(address));
         }
         LOGGER.debug("List of Persons by address");
         return personsMap;
-    }
+    }*/
 
     /**
      * Formatting the response for the Flood URL.
@@ -308,7 +284,7 @@ public class FirestationsService implements FirestationsI {
      *                   in a list of address key.
      * @return Map expected in result.
      */
-    @Override
+    /*@Override
     public Map<String, List<MedicalRecords>> getFloodMedicalRecords(
             final Map<String, List<Persons>> personsMap) {
         Map<String, List<MedicalRecords>> medicalRecordsMap = new HashMap<>();
@@ -325,22 +301,26 @@ public class FirestationsService implements FirestationsI {
             medicalRecordsMap.put(address, medicalRecords);
         }
         return medicalRecordsMap;
-    }
+    }*/
 
     //Method Tiers
-
-    /**
-     * Firestation Duplication Verification and Protection.
-     * @param firestations : the one that is tested.
-     * @return True if duplicate Firestations or False if new Firestations.
-     */
-    /*private boolean duplicateCheck(final Firestations firestations) {
-        Firestations firestation = firestationsR
-                .findByAddressAddressIgnoreCaseAndStation(
-                        firestations.getAddress().getAddress(),
-                        firestations.getStation());
+    @Override
+    public boolean mapageCheck(final String address, final int station) {
+        Firestations firestation = firestationsR.findByAddressAddressIgnoreCaseAndStation(address, station);
         return firestation != null;
-    }*/
+    }
+
+    @Override
+    public boolean addressCheck(final String address) {
+        List<Firestations> firestationsList = firestationsR.findByAddressAddressIgnoreCase(address);
+        return !firestationsList.isEmpty();
+    }
+
+    @Override
+    public boolean stationCheck(final int station) {
+        Firestations firestation = firestationsR.findByStation(station);
+        return firestation != null;
+    }
 
     /**
      * Check if phone exists in PersonsDTO list.

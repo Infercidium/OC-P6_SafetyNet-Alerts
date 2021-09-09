@@ -12,14 +12,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest(classes = {PersonsMapperImpl.class})
+@SpringBootTest(classes = {PersonsMapperImpl.class}) //todo réactiver
 class PersonsMapperTest {
 
-   /* @Autowired
+    /*@Autowired
     private PersonsMapper personsMapperImpl;
 
     Persons persons = new Persons("Jean", "Bobine", new Address("1 rue du testing"), "Testy", 12345, "456-789-1011", "jbob@email.com");
@@ -50,7 +49,7 @@ class PersonsMapperTest {
 
     @Test
     void map() {
-        Set<Address> address = personsMapperImpl.map(persons.getAddress().getAddress());
+        Address address = personsMapperImpl.map(persons.getAddress().getAddress());
         assertEquals(personsDTO.getAddress(), address.getAddress());
     }
 

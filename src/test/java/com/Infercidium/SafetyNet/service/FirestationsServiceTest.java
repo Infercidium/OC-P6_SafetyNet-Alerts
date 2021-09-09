@@ -29,7 +29,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest(classes = {FirestationsService.class})
+@SpringBootTest(classes = {FirestationsService.class}) //todo réactiver
 class FirestationsServiceTest {
 
    /* @MockBean
