@@ -21,7 +21,7 @@ public interface FirestationsRepository
      * @param station : station in numbers.
      * @return corresponding firestations.
      */
-    List<Firestations> findByStation(int station);
+    Firestations findByStation(int station);
 
     /**
      * Consult the database to search for Firestations.

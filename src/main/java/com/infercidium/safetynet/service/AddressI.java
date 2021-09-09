@@ -2,6 +2,8 @@ package com.infercidium.safetynet.service;
 
 import com.infercidium.safetynet.model.Address;
 
+import java.util.Set;
+
 public interface AddressI {
 
     /**

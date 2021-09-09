@@ -6,6 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
+
 @Service
 public class AddressService implements AddressI {
 
@@ -37,7 +39,7 @@ public class AddressService implements AddressI {
     public Address checkAddress(final Address address) {
         Address addressCheck;
         if (addressR.findByAddressIgnoreCase(address.getAddress()) == null) {
-            addressCheck = addressR.save(address);
+            addressCheck = addressR.saveAndFlush(address);
             LOGGER.debug("Save " + address + " in the Address table");
         } else {
             addressCheck = addressR

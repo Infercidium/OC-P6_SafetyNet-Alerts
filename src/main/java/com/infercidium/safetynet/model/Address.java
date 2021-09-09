@@ -8,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotBlank;
+import java.util.Objects;
 
 @Entity
 public class Address {
@@ -84,5 +85,18 @@ public class Address {
                 + " id = " + id
                 + ", address = '" + address + '\''
                 + '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Address)) return false;
+        Address address1 = (Address) o;
+        return getAddress().equals(address1.getAddress()) || getId().equals(address1.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getAddress());
     }
 }

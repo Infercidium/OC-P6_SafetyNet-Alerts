@@ -3,6 +3,8 @@ package com.infercidium.safetynet.repository;
 import com.infercidium.safetynet.model.Address;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Set;
+
 public interface AddressRepository extends JpaRepository<Address, Long> {
 
     /**

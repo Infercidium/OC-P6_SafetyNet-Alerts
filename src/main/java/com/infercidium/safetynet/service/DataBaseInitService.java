@@ -1,16 +1,13 @@
 package com.infercidium.safetynet.service;
 
+import com.infercidium.safetynet.dto.FirestationsAddressDTO;
 import com.infercidium.safetynet.dto.FirestationsDTO;
 import com.infercidium.safetynet.dto.MedicalRecordsDTO;
 import com.infercidium.safetynet.dto.PersonsDTO;
 import com.infercidium.safetynet.mapper.FirestationsMapper;
 import com.infercidium.safetynet.mapper.MedicalRecordsMapper;
 import com.infercidium.safetynet.mapper.PersonsMapper;
-import com.infercidium.safetynet.model.Allergies;
-import com.infercidium.safetynet.model.Firestations;
-import com.infercidium.safetynet.model.MedicalRecords;
-import com.infercidium.safetynet.model.Medications;
-import com.infercidium.safetynet.model.Persons;
+import com.infercidium.safetynet.model.*;
 import com.jsoniter.JsonIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,11 +21,7 @@ import java.io.InputStreamReader;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class DataBaseInitService implements DataBaseInitI {
@@ -156,33 +149,20 @@ public class DataBaseInitService implements DataBaseInitI {
      * @param firestations : the list to instantiate and save.
      */
     @Override
-    public void instanciateListFirestations(
-            final List<Map<String, String>> firestations)
-            throws SQLIntegrityConstraintViolationException {
-        List<Firestations> firestationsList = new ArrayList<>();
+    public void instanciateListFirestations(final List<Map<String, String>> firestations) {
+
         for (Map<String, String> firestation : firestations) {
-            FirestationsDTO firestationsDTO = new FirestationsDTO();
-            firestationsDTO.setAddress(firestation.get("address"));
-            firestationsDTO.setStation(
-                    Integer.parseInt(firestation.get("station")));
-            Firestations finalFirestation
-                    = firestationsM.dtoToModel(firestationsDTO);
-            firestationsList.add(finalFirestation);
-            boolean novel = true;
-            for (int i = 1; i < firestationsList.size(); i++) {
-                if (firestationsList.get(i - 1).getAddress().getAddress()
-                        .equals(finalFirestation.getAddress().getAddress())
-                        && firestationsList.get(i - 1).getStation()
-                        == finalFirestation.getStation()) {
-                    LOGGER.debug("Duplicate address detected : "
-                            + finalFirestation.getAddress().getAddress()
-                            + ", station : " + finalFirestation.getStation()
-                            + " removed.");
-                    novel = false;
-                }
-            }
-            if (novel) {
-                firestationsS.postFirestation(finalFirestation);
+            FirestationsAddressDTO firestationsAddressDTO = new FirestationsAddressDTO();
+            firestationsAddressDTO.setAddress(firestation.get("address"));
+            firestationsAddressDTO.setStation(Integer.parseInt(firestation.get("station")));
+            FirestationsDTO firestationsDTO = new FirestationsDTO(firestationsAddressDTO);
+            Firestations finalFirestation = firestationsM.dtoToModel(firestationsDTO);
+            Address address = new Address(firestation.get("address"));
+
+            if (firestationsS.mapageCheck(address.getAddress(), finalFirestation.getStation())) {
+                LOGGER.debug("Mapping of address: " + address + " and station: " + finalFirestation.getStation() + " already existing detected, deletion of duplicate.");
+            } else {
+                firestationsS.createMapage(address, finalFirestation);
             }
         }
     }
