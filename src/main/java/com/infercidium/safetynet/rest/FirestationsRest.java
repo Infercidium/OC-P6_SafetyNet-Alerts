@@ -98,7 +98,7 @@ public class FirestationsRest {
             throws SQLIntegrityConstraintViolationException {
         FirestationsDTO firestationsDTO = new FirestationsDTO(firestationsAddressDTO);
         Firestations firestations = firestationsM.dtoToModel(firestationsDTO);
-        if (firestationsS.mapageCheck(address, station)) {
+        if (!firestationsS.mapageCheck(address, station)) {
             throw new NullPointerException();
         } else if (firestationsS.mapageCheck(address, firestations.getStation())) {
             throw new SQLIntegrityConstraintViolationException();
@@ -136,7 +136,7 @@ public class FirestationsRest {
             LOGGER.info(address + " deletion");
         } else if (firestationsS.mapageCheck(address, station)) {
             firestationsS.removeMapage(address, station);
-            LOGGER.info("mapping " + address + " and " + station +" delete");
+            LOGGER.info("Mapping " + address + " and " + station +" delete");
         } else {
             throw new NullPointerException();
         }
@@ -152,7 +152,7 @@ public class FirestationsRest {
      */
     @GetMapping(value = "/firestations")
     public List<FirestationsDTO> getAddress(@RequestParam(required = false, defaultValue = "null") final String address) {
-        if (!firestationsS.addressCheck(address) && address != null) {
+        if (!firestationsS.addressCheck(address) && !address.equals("null")) {
             throw new NullPointerException();
         }
         List<Firestations> firestations = firestationsS.getFirestationsAddress(address);

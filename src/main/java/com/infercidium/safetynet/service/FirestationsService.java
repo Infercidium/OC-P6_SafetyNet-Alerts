@@ -304,6 +304,24 @@ public class FirestationsService implements FirestationsI {
     }*/
 
     //Method Tiers
+    @Override
+    public boolean mapageCheck(final String address, final int station) {
+        Firestations firestation = firestationsR.findByAddressAddressIgnoreCaseAndStation(address, station);
+        return firestation != null;
+    }
+
+    @Override
+    public boolean addressCheck(final String address) {
+        List<Firestations> firestationsList = firestationsR.findByAddressAddressIgnoreCase(address);
+        return !firestationsList.isEmpty();
+    }
+
+    @Override
+    public boolean stationCheck(final int station) {
+        Firestations firestation = firestationsR.findByStation(station);
+        return firestation != null;
+    }
+
     /**
      * Check if phone exists in PersonsDTO list.
      * @param personsDTO this is a list.
@@ -318,19 +336,5 @@ public class FirestationsService implements FirestationsI {
             }
         }
         return false;
-    }
-    @Override
-    public boolean mapageCheck(final String address, final int station) {
-        return firestationsR.findByAddressAddressIgnoreCaseAndStation(address, station) != null;
-    }
-
-    @Override
-    public boolean addressCheck(final String address) {
-        return firestationsR.findByAddressAddressIgnoreCase(address) != null;
-    }
-
-    @Override
-    public boolean stationCheck(final int station) {
-        return firestationsR.findByStation(station) != null;
     }
 }

@@ -160,7 +160,7 @@ public class DataBaseInitService implements DataBaseInitI {
             Address address = new Address(firestation.get("address"));
 
             if (firestationsS.mapageCheck(address.getAddress(), finalFirestation.getStation())) {
-                LOGGER.debug("Duplicate address detected : " + address + ", station : " + finalFirestation.getStation() + " removed.");
+                LOGGER.debug("Mapping of address: " + address + " and station: " + finalFirestation.getStation() + " already existing detected, deletion of duplicate.");
             } else {
                 firestationsS.createMapage(address, finalFirestation);
             }
