@@ -30,7 +30,7 @@ import static org.mockito.Mockito.*;
 @SpringBootTest(classes = {MedicalRecordsRest.class})
 class MedicalRecordsRestTest {
 
-    @MockBean
+    /*@MockBean
     private MedicalRecordsService medicalRecordsS;
     @MockBean
     private MedicalRecordsMapper medicalRecordsM;
@@ -139,5 +139,5 @@ class MedicalRecordsRestTest {
         assertEquals(personInfoDTO.getAge(), personInfoDto.getAge());
         assertEquals(personInfoDTO.getAddress(), personInfoDto.getAddress());
         assertEquals(personInfoDTO.getEmail(), personInfoDto.getEmail());
-    }
+    }*/
 }

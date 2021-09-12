@@ -1,37 +1,11 @@
 package com.Infercidium.SafetyNet.rest;
 
-import com.infercidium.safetynet.dto.FirestationsDTO;
-import com.infercidium.safetynet.dto.PersonsAndMedicalRecordsDTO;
-import com.infercidium.safetynet.dto.PersonsDTO;
-import com.infercidium.safetynet.dto.StationNumberDTO;
-import com.infercidium.safetynet.mapper.FirestationsMapper;
-import com.infercidium.safetynet.model.Address;
-import com.infercidium.safetynet.model.Firestations;
-import com.infercidium.safetynet.model.MedicalRecords;
-import com.infercidium.safetynet.model.Persons;
 import com.infercidium.safetynet.rest.FirestationsRest;
-import com.infercidium.safetynet.service.FirestationsService;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.ResponseEntity;
-
-import java.sql.SQLIntegrityConstraintViolationException;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = {FirestationsRest.class}) //todo réactiver
 class FirestationsRestTest {

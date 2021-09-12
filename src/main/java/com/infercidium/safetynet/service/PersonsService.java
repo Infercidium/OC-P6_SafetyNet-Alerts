@@ -1,6 +1,7 @@
 package com.infercidium.safetynet.service;
 
 import com.infercidium.safetynet.dto.PersonsDTO;
+import com.infercidium.safetynet.model.Address;
 import com.infercidium.safetynet.model.Persons;
 import com.infercidium.safetynet.repository.PersonsRepository;
 import org.slf4j.Logger;
@@ -9,9 +10,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
-public class PersonsService implements PersonsI {
+public class PersonsService implements PersonsI, CommunityEmailI {
 
     /**
      * Instantiation of LOGGER in order to inform in console.
@@ -111,58 +114,6 @@ public class PersonsService implements PersonsI {
             throw new NullPointerException();
         }
     }
-    //URL lié à Persons
-
-    /**
-     * Finds people living at the address.
-     * @param address to check Persons.
-     * @return list of Persons.
-     */
-    @Override
-    public List<Persons> getPersonsAddress(final String address) {
-        LOGGER.debug("List of Person Found");
-        List<Persons> persons
-                = this.personsR.findByAddressAddressIgnoreCase(address);
-        if (persons.isEmpty()) {
-            throw new NullPointerException();
-        }
-        return persons;
-    }
-
-    /**
-     * Find the people living in the city.
-     * @param city to check Persons.
-     * @return list of Persons.
-     */
-    @Override
-    public List<Persons> getPersonsCity(final String city) {
-        List<Persons> persons = this.personsR.findByCityIgnoreCase(city);
-        if (persons.isEmpty()) {
-            throw new NullPointerException();
-        }
-        LOGGER.debug("List of Person Found");
-        return persons;
-    }
-
-    /**
-     * Extract the email from the Persons list in PersonsDTO.
-     * @param persons : list of Persons used.
-     * @return list of Email.
-     */
-    @Override
-    public List<PersonsDTO> personsToPersonsdtoEmail(
-            final List<Persons> persons) {
-        List<PersonsDTO> personsDTO = new ArrayList<>();
-        for (Persons person : persons) {
-            PersonsDTO personsDto = new PersonsDTO();
-            if (!emailDuplicate(personsDTO, person.getEmail())) {
-                personsDto.setEmail(person.getEmail());
-                personsDTO.add(personsDto);
-            }
-        }
-        LOGGER.debug("Retrieving emails people");
-        return personsDTO;
-    }
 
     //Methods Tiers
 
@@ -180,8 +131,7 @@ public class PersonsService implements PersonsI {
         if (personChanged.getAddress() == null) {
             personChanged.setAddress(basicPerson.getAddress());
         } else {
-            personChanged.setAddress(
-                    addressS.checkAddress(
+            personChanged.setAddress(addressS.checkAddress(
                             personChanged.getAddress()));
         }
         if (personChanged.getCity() == null) {
@@ -215,6 +165,41 @@ public class PersonsService implements PersonsI {
         return persons != null;
     }
 
+    //URL CommunityEmail
+    /**
+     * Find the people living in the city.
+     * @param city to check Persons.
+     * @return list of Persons.
+     */
+    @Override
+    public List<PersonsDTO> getPersonsEmail(final String city) {
+        List<Persons> persons = this.personsR.findByCityIgnoreCase(city);
+        if (persons.isEmpty()) {
+            throw new NullPointerException();
+        }
+        LOGGER.debug("List of Person Found");
+        return personsToPersonsdtoEmail(persons);
+    }
+
+    /**
+     * Extract the email from the Persons list in PersonsDTO.
+     * @param persons : list of Persons used.
+     * @return list of Email.
+     */
+    private List<PersonsDTO> personsToPersonsdtoEmail(
+            final List<Persons> persons) {
+        List<PersonsDTO> personsDTO = new ArrayList<>();
+        for (Persons person : persons) {
+            PersonsDTO personsDto = new PersonsDTO();
+            if (!emailDuplicate(personsDTO, person.getEmail())) {
+                personsDto.setEmail(person.getEmail());
+                personsDTO.add(personsDto);
+            }
+        }
+        LOGGER.debug("Retrieving emails people");
+        return personsDTO;
+    }
+
     /**
      * Check if email exists in PersonsDTO list.
      * @param personsDTO this is a list.
@@ -229,5 +214,22 @@ public class PersonsService implements PersonsI {
             }
         }
         return false;
+    }
+
+    //URL
+    @Override
+    public List<Persons> addressSetToPersonsList(
+            final Set<Address> addressSet) {
+        List<Persons> personsList = new ArrayList<>();
+        for (Address address : addressSet) {
+            List<Persons> persons = getPersons();
+            List<Persons> filtered
+                    = persons.stream()
+                    .filter(person -> person.getAddress()
+                            .getAddress().equals(address.getAddress()))
+                    .collect(Collectors.toList());
+            personsList.addAll(filtered);
+        }
+        return personsList;
     }
 }

@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest(classes = {MedicalRecordsMapperImpl.class})
 class MedicalRecordsMapperTest {
 
-    @Autowired
+    /*@Autowired
     private MedicalRecordsMapper medicalRecordsMapperImpl;
 
     Persons persons = new Persons("Jean", "Bobine", new Address("1 rue du testing"), "Testy", 12345, "456-789-1011", "jbob@email.com");
@@ -87,5 +87,5 @@ class MedicalRecordsMapperTest {
         assertEquals(persons.getAddress().getAddress() ,personInfoDto.getAddress());
         assertEquals(persons.getEmail(), personInfoDto.getEmail());
         assertEquals(medicalRecords.getAge(), personInfoDto.getAge());
-    }
+    }*/
 }

@@ -1,11 +1,10 @@
 package com.infercidium.safetynet.rest;
 
-import com.infercidium.safetynet.dto.*;
+import com.infercidium.safetynet.dto.FirestationsAddressDTO;
+import com.infercidium.safetynet.dto.FirestationsDTO;
 import com.infercidium.safetynet.mapper.FirestationsMapper;
 import com.infercidium.safetynet.model.Address;
 import com.infercidium.safetynet.model.Firestations;
-import com.infercidium.safetynet.model.MedicalRecords;
-import com.infercidium.safetynet.model.Persons;
 import com.infercidium.safetynet.service.FirestationsI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -23,11 +23,10 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.validation.Valid;
 import java.net.URI;
 import java.sql.SQLIntegrityConstraintViolationException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @RestController
+@RequestMapping(value = "/firestation")
 public class FirestationsRest {
 
     /**
@@ -39,7 +38,7 @@ public class FirestationsRest {
     /**
      * Instantiation of FirestationsService.
      */
-    private final FirestationsI firestationsS;
+    private final FirestationsI firestationsI;
 
     /**
      * Instantiation of FirestationsMapper.
@@ -48,12 +47,12 @@ public class FirestationsRest {
 
     /**
      * Class constructor.
-     * @param firestationsSe this is FirestationsService.
+     * @param firestationsIn this is FirestationsService.
      * @param firestationsMa this is FirestationsMapper.
      */
-    public FirestationsRest(final FirestationsI firestationsSe,
+    public FirestationsRest(final FirestationsI firestationsIn,
                             final FirestationsMapper firestationsMa) {
-        this.firestationsS = firestationsSe;
+        this.firestationsI = firestationsIn;
         this.firestationsM = firestationsMa;
     }
 
@@ -61,21 +60,23 @@ public class FirestationsRest {
 
     /**
      * Endpoint allowing to post a Firestation.
-     * @param firestationsAddressDTO this is the information entered by the user.
+     * @param firestationsAddressDTO this is the information
+     *                               entered by the user.
      * @return 201 Created if successful,
      * 409 conflict if already exist or 400 bad request if bad field.
      */
-    @PostMapping(value = "/firestation")
-    public ResponseEntity<Void> createStationMap(@Valid @RequestBody final FirestationsAddressDTO firestationsAddressDTO) throws SQLIntegrityConstraintViolationException {
-        FirestationsDTO firestationsDTO = new FirestationsDTO(firestationsAddressDTO);
+    @PostMapping
+    public ResponseEntity<Void> createStationMap(
+            @Valid
+            @RequestBody final FirestationsAddressDTO firestationsAddressDTO)
+            throws SQLIntegrityConstraintViolationException {
+        FirestationsDTO firestationsDTO
+                = new FirestationsDTO(firestationsAddressDTO);
         Firestations firestations = firestationsM.dtoToModel(firestationsDTO);
         Address address = new Address(firestationsAddressDTO.getAddress());
 
-        if (firestationsS.mapageCheck(address.getAddress(), firestations.getStation())) {
-            throw new SQLIntegrityConstraintViolationException();
-        }
-
-        Firestations postFirestation = firestationsS.createMapage(address, firestations);
+        Firestations postFirestation
+                = firestationsI.createMapage(address, firestations);
         URI locate = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{address}")
@@ -89,21 +90,22 @@ public class FirestationsRest {
     /**
      * Endpoint allowing to post a Firestation.
      * @param address : allows you to find the resource in the database.
-     * @param station allows you to find the ressource in the database.
+     * @param station : allows you to find the ressource in the database.
+     * @param firestationsAddressDTO : changes to be made.
      * @return 200 Ok if successful,
      * 404 not found if non-existent or 400 bad request if bad field.
      */
-    @PutMapping(value = "/firestation/{address}&{station}")
-    public ResponseEntity<Void> editStationMap(@PathVariable final String address, @PathVariable final int station, @RequestBody final FirestationsAddressDTO firestationsAddressDTO)
+    @PutMapping(value = "/{address}&{station}")
+    public ResponseEntity<Void> editStationMap(
+            @PathVariable final String address,
+            @PathVariable final int station,
+            @RequestBody final FirestationsAddressDTO firestationsAddressDTO)
             throws SQLIntegrityConstraintViolationException {
-        FirestationsDTO firestationsDTO = new FirestationsDTO(firestationsAddressDTO);
+        FirestationsDTO firestationsDTO
+                = new FirestationsDTO(firestationsAddressDTO);
         Firestations firestations = firestationsM.dtoToModel(firestationsDTO);
-        if (!firestationsS.mapageCheck(address, station)) {
-            throw new NullPointerException();
-        } else if (firestationsS.mapageCheck(address, firestations.getStation())) {
-            throw new SQLIntegrityConstraintViolationException();
-        }
-        firestationsS.editFirestation(address, station, firestations);
+
+        firestationsI.editFirestation(address, station, firestations);
         LOGGER.info(address + " mapping modification");
         return ResponseEntity.ok().build();
     }
@@ -113,32 +115,31 @@ public class FirestationsRest {
      * @param station : allows you to find the resources in the database.
      * @return 200 Ok if successful, 404 not found if it does not exist.
      */
-    @DeleteMapping(value = "/firestation/station/{station}")
+    @DeleteMapping(value = "/station/{station}")
     public ResponseEntity<Void> removeStation(@PathVariable final int station) {
-        if (!firestationsS.stationCheck(station)) {
-            throw new NullPointerException();
-        }
-        firestationsS.removeStation(station);
-        LOGGER.info("Deletion of station : " + station + " and its linked addresses");
+        firestationsI.removeStation(station);
+        LOGGER.info("Deletion of station : "
+                + station + " and its linked addresses");
         return ResponseEntity.ok().build();
     }
 
     /**
      * Endpoint allowing to delete a Firestation.
      * @param address : allows you to find the resource in the database.
+     * @param station : allows you to specify a precise mapping.
      * @return 200 Ok if successful, 404 not found if it does not exist.
      */
-    @DeleteMapping(value = "/firestation/address/{address}")
-    public ResponseEntity<Void> removeAddress(@PathVariable final String address,
-                                              @RequestParam(required = false, defaultValue = "0") final int station) {
-        if (firestationsS.addressCheck(address) && station == 0) {
-            firestationsS.removeAddress(address);
+    @DeleteMapping(value = "/address/{address}")
+    public ResponseEntity<Void> removeAddress(
+            @PathVariable final String address,
+            @RequestParam(required = false, defaultValue = "0")
+            final int station) {
+        if (station == 0) {
+            firestationsI.removeAddress(address);
             LOGGER.info(address + " deletion");
-        } else if (firestationsS.mapageCheck(address, station)) {
-            firestationsS.removeMapage(address, station);
-            LOGGER.info("Mapping " + address + " and " + station +" delete");
         } else {
-            throw new NullPointerException();
+            firestationsI.removeAddress(address, station);
+            LOGGER.info("Mapping " + address + " and " + station + " delete");
         }
         return ResponseEntity.ok().build();
     }
@@ -150,13 +151,14 @@ public class FirestationsRest {
      * @return firestation and 200 Ok if successful
      * or 404 not found if it does not exist.
      */
-    @GetMapping(value = "/firestations")
-    public List<FirestationsDTO> getAddress(@RequestParam(required = false, defaultValue = "null") final String address) {
-        if (!firestationsS.addressCheck(address) && !address.equals("null")) {
-            throw new NullPointerException();
-        }
-        List<Firestations> firestations = firestationsS.getFirestationsAddress(address);
-        List<FirestationsDTO> firestationsDTO = firestationsM.modelToDto(firestations);
+    @GetMapping(value = "/")
+    public List<FirestationsDTO> getAddress(
+            @RequestParam(required = false, defaultValue = "null")
+            final String address) {
+        List<Firestations> firestations
+                = firestationsI.getFirestationsAddress(address);
+        List<FirestationsDTO> firestationsDTO
+                = firestationsM.modelToDto(firestations);
         LOGGER.info("Firestations found");
         return firestationsDTO;
     }
@@ -168,119 +170,10 @@ public class FirestationsRest {
      * @return List of firestation and 200 Ok if successful
      * or 404 not found if it does not exist.
      */
-    @GetMapping(value = "/firestation{station}")
+    @GetMapping(value = "/{station}")
     public FirestationsDTO getStation(@PathVariable final int station) {
-        if (!firestationsS.stationCheck(station)) {
-            throw new NullPointerException();
-        }
-        Firestations firestations = firestationsS.getFirestationsStation(station);
-        FirestationsDTO firestationsDTO = firestationsM.modelToDto(firestations);
-        return firestationsDTO;
+        Firestations firestations
+                = firestationsI.getFirestationsStation(station);
+        return firestationsM.modelToDto(firestations);
     }
-    //URL lié à Firestations
-
-    /**
-     * This url returns a map containing the number of adults,
-     * the number of children and the list of residents
-     * covered by the Firestation.
-     * @param stationNumber : allows you to find the resource in the database.
-     * @return a Map and 200 Ok if successful
-     * or 404 not found if it does not exist.
-     */
-    /*@GetMapping(value = "/firestation")
-    public Map<String, Object> getStationNumber(
-            @RequestParam final int stationNumber) {
-        if (stationNumber < 1) {
-            throw new NullPointerException();
-        }
-        List<Firestations> firestations
-                = firestationsS.getFireStationsStation(stationNumber);
-        List<Persons> persons
-                = firestationsS.getFirestationsListToPersonsList(firestations);
-        List<StationNumberDTO> stationNumberDTO
-                = firestationsM.personsModelToStationNumberDTO(persons);
-        Map<String, Object> stationNumberResult
-                = firestationsS.getStationNumberCount(stationNumberDTO);
-        LOGGER.info("List of inhabitants covered by station "
-                + stationNumber + " found");
-        return stationNumberResult;
-    }*/
-
-    /**
-     * This url refers to the list of telephone numbers of residents
-     * covered by the Firestation.
-     * @param firestation : allows you to find the resource in the database.
-     * @return a list and 200 Ok if successful
-     * or 404 not found if it does not exist.
-     */
-    /*@GetMapping(value = "/phoneAlert")
-    public List<PersonsDTO> getPhoneAlert(@RequestParam final int firestation) {
-        if (firestation < 1) {
-            throw new NullPointerException();
-        }
-        List<Firestations> firestationsList
-                = firestationsS.getFireStationsStation(firestation);
-        List<Persons> persons
-                = firestationsS
-                .getFirestationsListToPersonsList(firestationsList);
-        List<PersonsDTO> personsDTO
-                = firestationsS.personsToPersonsdtoPhone(persons);
-        LOGGER.info("List of telephone numbers of residents "
-                + "served by the station " + firestation + " found");
-        return personsDTO;
-    }*/
-
-    /**
-     * This url asks for an address
-     * and returns a map containing the station covering the address
-     * and a list of people living at this address as well as their information.
-     * @param address : allows you to find the resource in the database.
-     * @return a map and 200 Ok if successful
-     * or 404 not found if it does not exist.
-     */
-    /*@GetMapping(value = "/fire")
-    public Map<String, Object> getFire(@RequestParam final String address) {
-        List<Firestations> firestations
-                = firestationsS.getFirestationsAddress(address);
-        List<Integer> station = new ArrayList<>();
-        for (Firestations firestation : firestations) {
-            station.add(firestation.getStation());
-        }
-        List<Persons> persons = firestationsS.getFireResidents(address);
-        List<MedicalRecords> medicalRecords
-                = firestationsS.getFireMedicalRecords(persons);
-        List<PersonsAndMedicalRecordsDTO> fireDTO
-                = firestationsM
-                .personsAndMedicalRecordsModelToPersonsAndMedicalRecordsDTO(
-                        medicalRecords);
-        LOGGER.info("Station number and list of residents of "
-                + address + " found");
-        return firestationsS.getFireResult(station, fireDTO);
-    }*/
-
-    /**
-     * This url reviews a list of inhabitants
-     * by address covered by the Firestation.
-     * @param station : allows you to find the resource in the database.
-     * @return a map and 200 Ok if successful
-     * or 404 not found if it does not exist.
-     */
-    /*@GetMapping(value = "/flood/stations")
-    public Map<String, Object> getFlood(@RequestParam final int station) {
-        if (station < 1) {
-            throw new NullPointerException();
-        }
-        List<Firestations> firestations
-                = firestationsS.getFireStationsStation(station);
-        List<FirestationsDTO> firestationsDTO
-                = firestationsM.modelToDto(firestations);
-        Map<String, List<Persons>> personsMap
-                = firestationsS.getFloodResidents(firestationsDTO);
-        Map<String, List<MedicalRecords>> medicalRecordsMap
-                = firestationsS.getFloodMedicalRecords(personsMap);
-        LOGGER.info("List of inhabitants by address served by station "
-                + station + " found");
-        return firestationsM
-                .personsAndMedicalRecordsModelToFloodDTO(medicalRecordsMap);
-    }*/
 }

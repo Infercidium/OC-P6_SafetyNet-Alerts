@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -22,6 +22,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
+@RequestMapping(value = "/person")
 public class PersonsRest {
 
     /**
@@ -33,7 +34,7 @@ public class PersonsRest {
     /**
      * Instantiation of PersonsService.
      */
-    private final PersonsI personsS;
+    private final PersonsI personsI;
 
     /**
      * Instantiation of PersonsMapper.
@@ -42,12 +43,12 @@ public class PersonsRest {
 
     /**
      * Class constructor.
-     * @param personsSe this is PersonsService.
+     * @param personsIn this is PersonsService.
      * @param personsMa this is PersonsMapper.
      */
-    public PersonsRest(final PersonsI personsSe,
+    public PersonsRest(final PersonsI personsIn,
                        final PersonsMapper personsMa) {
-        this.personsS = personsSe;
+        this.personsI = personsIn;
         this.personsM = personsMa;
     }
 
@@ -59,11 +60,11 @@ public class PersonsRest {
      * @return 201 Created if successful,
      * 409 conflict if already exist or 400 bad request if bad field.
      */
-    @PostMapping(value = "/person")
+    @PostMapping
     public ResponseEntity<Void> createPerson(
             @Valid @RequestBody final PersonsDTO personsDTO) {
         Persons persons = personsM.dtoToModel(personsDTO);
-        Persons postPerson = personsS.postPerson(persons);
+        Persons postPerson = personsI.postPerson(persons);
 
         URI locate = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -85,13 +86,13 @@ public class PersonsRest {
      * @return 200 Ok if successful,
      * 404 not found if non-existent or 400 bad request if bad field.
      */
-    @PutMapping(value = "/person/{firstName}/{lastName}")
+    @PutMapping(value = "/{firstName}/{lastName}")
     public ResponseEntity<Void> editPerson(
             @PathVariable final String firstName,
             @PathVariable final String lastName,
             @RequestBody final PersonsDTO personsDTO) {
         Persons persons = personsM.dtoToModel(personsDTO);
-        personsS.editPerson(firstName, lastName, persons);
+        personsI.editPerson(firstName, lastName, persons);
         LOGGER.info("Person " + firstName + " " + lastName + " modification");
         return ResponseEntity.ok().build();
     }
@@ -102,11 +103,11 @@ public class PersonsRest {
      * @param lastName : allows you to find the resource in the database.
      * @return 200 Ok if successful, 404 not found if it does not exist.
      */
-    @DeleteMapping(value = "/person/{firstName}/{lastName}")
+    @DeleteMapping(value = "/{firstName}/{lastName}")
     public ResponseEntity<Void> removePerson(
             @PathVariable final String firstName,
             @PathVariable final String lastName) {
-        personsS.removePerson(firstName, lastName);
+        personsI.removePerson(firstName, lastName);
         LOGGER.info("Person " + firstName + " " + lastName + " deletion");
         return ResponseEntity.ok().build();
     }
@@ -120,11 +121,11 @@ public class PersonsRest {
      * @return person and 200 Ok if successful
      * or 404 not found if it does not exist.
      */
-    @GetMapping(value = "/person/{firstName}/{lastName}")
+    @GetMapping(value = "/{firstName}/{lastName}")
     public PersonsDTO getPerson(
             @PathVariable final String firstName,
             @PathVariable final String lastName) {
-        Persons person = personsS.getPersonName(firstName, lastName);
+        Persons person = personsI.getPersonName(firstName, lastName);
         PersonsDTO personDTO = personsM.modelToDto(person);
         LOGGER.info("Person found");
         return personDTO;
@@ -135,29 +136,11 @@ public class PersonsRest {
      * @return List of person and 200 Ok if successful
      * or 404 not found if it does not exist.
      */
-    @GetMapping(value = "/persons")
+    @GetMapping(value = "/")
     public List<PersonsDTO> getPersons() {
-        List<Persons> persons = personsS.getPersons();
+        List<Persons> persons = personsI.getPersons();
         List<PersonsDTO> personDTOS = personsM.modelToDto(persons);
         LOGGER.info("List of Persons displayed");
         return personDTOS;
-    }
-
-    //URL lié à Persons
-
-    /**
-     * This url allows you to have the list of emails
-     * of the inhabitants of a city.
-     * @param city : allows you to find the resource in the database.
-     * @return List of personsDTO and 200 Ok if successful
-     * or 404 not found if it does not exist.
-     */
-    @GetMapping(value = "/communityEmail")
-    public List<PersonsDTO> getCommunityEmail(@RequestParam final String city) {
-        List<Persons> persons = personsS.getPersonsCity(city);
-        List<PersonsDTO> personsDTO
-                = personsS.personsToPersonsdtoEmail(persons);
-        LOGGER.info("List of emails from " + city + " residents found");
-        return personsDTO;
     }
 }

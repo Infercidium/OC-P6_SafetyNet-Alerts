@@ -3,6 +3,8 @@ package com.infercidium.safetynet.repository;
 import com.infercidium.safetynet.model.MedicalRecords;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 public interface MedicalrecordsRepository
         extends JpaRepository<MedicalRecords, Long> {
 
@@ -15,4 +17,6 @@ public interface MedicalrecordsRepository
     MedicalRecords
     findByPersonsFirstNameIgnoreCaseAndPersonsLastNameIgnoreCase(
             String firstName, String lastName);
+
+    List<MedicalRecords> findByPersonsAddressAddressIgnoreCase(String address);
 }

@@ -9,7 +9,7 @@ import java.util.Set;
 public abstract class AddressMapper {
 
     public abstract Address addressFromString(String address);
-    public String stringFromAddress(Address address) {
+    public String stringFromAddress(final Address address) {
         return address.getAddress();
     }
     public abstract Set<Address> addressFromString(Set<String> address);

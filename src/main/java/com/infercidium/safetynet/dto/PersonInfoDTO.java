@@ -1,5 +1,6 @@
 package com.infercidium.safetynet.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.infercidium.safetynet.model.Allergies;
 import com.infercidium.safetynet.model.Medications;
 
@@ -8,6 +9,7 @@ import javax.validation.constraints.NotBlank;
 import java.util.HashSet;
 import java.util.Set;
 
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class PersonInfoDTO {
 
     /**

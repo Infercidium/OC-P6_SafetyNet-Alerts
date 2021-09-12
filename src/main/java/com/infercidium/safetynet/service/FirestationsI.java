@@ -3,6 +3,7 @@ package com.infercidium.safetynet.service;
 import com.infercidium.safetynet.model.Address;
 import com.infercidium.safetynet.model.Firestations;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 
 public interface FirestationsI {
@@ -14,7 +15,9 @@ public interface FirestationsI {
      * @param firestations to save.
      * @return firestations saved.
      */
-    Firestations createMapage(Address address, Firestations firestations);
+    Firestations createMapage(Address address,
+                              Firestations firestations)
+            throws SQLIntegrityConstraintViolationException;
 
     /**
      * Edit Method Service.
@@ -22,9 +25,11 @@ public interface FirestationsI {
      * @param station to check Firestations.
      * @param firestations to edit.
      */
-    void editFirestation(String address, int station, Firestations firestations);
+    void editFirestation(String address, int station,
+                         Firestations firestations)
+            throws SQLIntegrityConstraintViolationException;
 
-    void removeMapage(String address, int station);
+    void removeAddress(String address, int station);
 
     void removeStation(int station);
 

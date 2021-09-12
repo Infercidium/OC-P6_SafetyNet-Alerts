@@ -13,32 +13,31 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 
 @Service
-public class MedicalRecordsService implements MedicalRecordsI {
+public class MedicalRecordsService
+        implements MedicalRecordsI, ChildAlertI, FireAndFloodI {
 
     /**
      * Instantiation of LOGGER in order to inform in console.
      */
     private static final Logger LOGGER
             = LoggerFactory.getLogger(MedicalRecordsService.class);
-    /**
-     * Majorite constant.
-     */
-    private static final int MAJORITE = 18;
 
     /**
      * Instantiation of personsService.
      */
-    private final PersonsI personsS;
+    private final PersonsI personsI;
     /**
      * Instantiation of SecondaryTableService.
      */
-    private final MedicationsI medicationsS;
+    private final MedicationsI medicationsI;
     /**
      * Instantiation of SecondaryTableService.
      */
-    private final AllergiesI allergiesS;
+    private final AllergiesI allergiesI;
     /**
      * Instantiation of MedicalRecordsRepository.
      */
@@ -46,20 +45,20 @@ public class MedicalRecordsService implements MedicalRecordsI {
 
     /**
      * Class constructor.
-     * @param personsSe this is PersonsService.
+     * @param personsIn this is PersonsService.
      * @param medicalrecordsRe this is MedicalRecordsRepository.
-     * @param medicationsSe this is MedicationsService.
-     * @param allergiesSe this is AllergiesService.
+     * @param medicationsIn this is MedicationsService.
+     * @param allergiesIn this is AllergiesService.
      */
     public MedicalRecordsService(
-            final PersonsI personsSe,
+            final PersonsI personsIn,
             final MedicalrecordsRepository medicalrecordsRe,
-            final MedicationsI medicationsSe,
-            final AllergiesI allergiesSe) {
-        this.personsS = personsSe;
+            final MedicationsI medicationsIn,
+            final AllergiesI allergiesIn) {
+        this.personsI = personsIn;
         this.medicalRecordsR = medicalrecordsRe;
-        this.medicationsS = medicationsSe;
-        this.allergiesS = allergiesSe;
+        this.medicationsI = medicationsIn;
+        this.allergiesI = allergiesIn;
     }
 
     //Post, Put, delete
@@ -76,17 +75,17 @@ public class MedicalRecordsService implements MedicalRecordsI {
             final MedicalRecords medicalRecords,
             final String firstName,
             final String lastName) {
-        if (personsS.personCheck(firstName, lastName)) {
+        if (personsI.personCheck(firstName, lastName)) {
             medicalRecords.setPersons(
-                    personsS.getPersonName(firstName, lastName));
+                    personsI.getPersonName(firstName, lastName));
         } else {
             throw new NullArgumentException("Null table binding");
         }
         medicalRecords.setAllergies(
-                allergiesS.checkAllergies(
+                allergiesI.checkAllergies(
                         medicalRecords.getAllergies()));
         medicalRecords.setMedications(
-                medicationsS.checkMedications(
+                medicationsI.checkMedications(
                         medicalRecords.getMedications()));
         return this.medicalRecordsR.save(medicalRecords);
     }
@@ -155,81 +154,6 @@ public class MedicalRecordsService implements MedicalRecordsI {
             throw new NullPointerException();
         }
     }
-    //URL lié à MedicalRecords
-
-    /**
-     * Check the person's age to find out if they are over majorite.
-     * @param firstName to check medicalRecords Age.
-     * @param lastName to check medicalRecords Age.
-     * @return True if major and False if not.
-     */
-    @Override
-    public boolean checkMajority(final String firstName,
-                                 final String lastName) {
-        MedicalRecords medicalRecords
-                = getMedicalRecordName(firstName, lastName);
-        LOGGER.debug("Checking if the person is over " + MAJORITE);
-        return medicalRecords.getAge() > MAJORITE;
-    }
-
-    /**
-     * Relay method.
-     * @param address to check Persons.
-     * @return list of Persons checked.
-     */
-    @Override
-    public List<Persons> getPersonsAddress(final String address) {
-        return personsS.getPersonsAddress(address);
-    }
-
-    /**
-     * Formatting the response for the ChildAlert URL.
-     * @param personsAndMedicalrecordsDTO : list of inhabitants.
-     * @return Map expected in result.
-     */
-    @Override
-    public Map<String, Object> getChildAlertCount(
-          final List<PersonsAndMedicalRecordsDTO> personsAndMedicalrecordsDTO) {
-        Map<String, Object> childAlert = new HashMap<>();
-        List<PersonsAndMedicalRecordsDTO> adultPersonsAndMedicalRecordsDTO
-                = new ArrayList<>();
-        List<PersonsAndMedicalRecordsDTO> childPersonsAndMedicalRecordsDTO
-                = new ArrayList<>();
-        int adult = 0;
-        int child = 0;
-        String adultString;
-        String childString;
-
-        for (PersonsAndMedicalRecordsDTO
-                personsAndMedicalrecordsDto : personsAndMedicalrecordsDTO) {
-            MedicalRecords medicalRecords = getMedicalRecordName(
-                    personsAndMedicalrecordsDto.getFirstName(),
-                    personsAndMedicalrecordsDto.getLastName());
-            personsAndMedicalrecordsDto.setPhone(null);
-            if (checkMajority(medicalRecords.getFirstName(),
-                    medicalRecords.getLastName())) {
-                adult++;
-                adultPersonsAndMedicalRecordsDTO
-                        .add(personsAndMedicalrecordsDto);
-            } else {
-                personsAndMedicalrecordsDto.setAge(medicalRecords.getAge());
-                child++;
-                childPersonsAndMedicalRecordsDTO
-                        .add(personsAndMedicalrecordsDto);
-            }
-        }
-
-        adultString = adult > 1 ? "Adults" : "Adult";
-        childString = child > 1 ? "Children" : "Child";
-        childAlert.put(adultString, adultPersonsAndMedicalRecordsDTO);
-        childAlert.put(childString, childPersonsAndMedicalRecordsDTO);
-        LOGGER.debug("Counting and formatting of the list "
-                + "of inhabitants covered");
-        if (child == 0) {
-            childAlert.clear();
-        }
-        return childAlert;
-    }
 
     //Method Tiers
 
@@ -253,7 +177,7 @@ public class MedicalRecordsService implements MedicalRecordsI {
                     basicMedicalRecords.getAllergies());
         } else {
             medicalRecordsChanged.setAllergies(
-                    allergiesS.checkAllergies(
+                    allergiesI.checkAllergies(
                             medicalRecordsChanged.getAllergies()));
         }
         if (medicalRecordsChanged.getMedications() == null) {
@@ -261,9 +185,102 @@ public class MedicalRecordsService implements MedicalRecordsI {
                     basicMedicalRecords.getMedications());
         } else {
             medicalRecordsChanged.setMedications(
-                    medicationsS.checkMedications(
+                    medicationsI.checkMedications(
                             medicalRecordsChanged.getMedications()));
         }
         return medicalRecordsChanged;
+    }
+
+    @Override
+    public boolean medicalRecordCheck(final String firstName,
+                                      final String lastName) {
+        MedicalRecords medicalRecords = medicalRecordsR
+                .findByPersonsFirstNameIgnoreCaseAndPersonsLastNameIgnoreCase(
+                        firstName, lastName);
+        LOGGER.debug("Verification of the medicalRecord's existence");
+        return medicalRecords != null;
+    }
+
+    //URL ChildAlert
+    @Override
+    public Map<String, List<PersonsAndMedicalRecordsDTO>> childAlert(
+            final String address) {
+        Map<String, List<PersonsAndMedicalRecordsDTO>> result = new HashMap<>();
+        List<MedicalRecords> medicalRecordsList = medicalRecordsR
+                .findByPersonsAddressAddressIgnoreCase(address);
+        if (medicalRecordsList.isEmpty()) {
+            throw  new NullPointerException();
+        }
+
+        //Separation into two lists
+        List<MedicalRecords> medicalRecordsChild
+                = medicalRecordsList.stream()
+                .filter(medicalRecords -> medicalRecords.getAge() <= 18)
+                .collect(Collectors.toList());
+        if (medicalRecordsChild.isEmpty()) {
+            return result;
+        }
+        List<MedicalRecords> medicalRecordsAdult
+                = medicalRecordsList.stream()
+                .filter(medicalRecords -> medicalRecords.getAge() > 18)
+                .collect(Collectors.toList());
+
+        //Formatting
+        List<PersonsAndMedicalRecordsDTO> child
+                = medicalRecordstoChildResult(medicalRecordsChild);
+        List<PersonsAndMedicalRecordsDTO> adult
+                = medicalRecordstoAdultResult(medicalRecordsAdult);
+        String adultString = adult.size() > 1 ? "Adults" : "Adult";
+        String childString = child.size() > 1 ? "Children" : "Child";
+
+        result.put(childString, child);
+        result.put(adultString, adult);
+        return result;
+    }
+
+    private List<PersonsAndMedicalRecordsDTO> medicalRecordstoChildResult(
+            final List<MedicalRecords> medicalRecords) {
+        List<PersonsAndMedicalRecordsDTO> result = new ArrayList<>();
+        for (MedicalRecords medicalRecord : medicalRecords) {
+            PersonsAndMedicalRecordsDTO personsAndMedicalRecordsDto
+                    = new PersonsAndMedicalRecordsDTO();
+            personsAndMedicalRecordsDto
+                    .setFirstName(medicalRecord.getFirstName());
+            personsAndMedicalRecordsDto
+                    .setLastName(medicalRecord.getLastName());
+            personsAndMedicalRecordsDto.setAge(medicalRecord.getAge());
+            result.add(personsAndMedicalRecordsDto);
+        }
+        return result;
+    }
+
+    private List<PersonsAndMedicalRecordsDTO> medicalRecordstoAdultResult(
+            final List<MedicalRecords> medicalRecords) {
+        List<PersonsAndMedicalRecordsDTO> result = new ArrayList<>();
+        for (MedicalRecords medicalRecord : medicalRecords) {
+            PersonsAndMedicalRecordsDTO personsAndMedicalRecordsDto
+                    = new PersonsAndMedicalRecordsDTO();
+            personsAndMedicalRecordsDto
+                    .setFirstName(medicalRecord.getFirstName());
+            personsAndMedicalRecordsDto
+                    .setLastName(medicalRecord.getLastName());
+            result.add(personsAndMedicalRecordsDto);
+        }
+        return result;
+    }
+
+    //URL Fire and Flood
+    @Override
+    public List<MedicalRecords> personsListToMedicalRecordsList(
+            final List<Persons> personsList) {
+        List<MedicalRecords> medicalRecordsList = new ArrayList<>();
+        for (Persons person : personsList) {
+            MedicalRecords medicalRecords
+                    = getMedicalRecordName(
+                            person.getFirstName(),
+                            person.getLastName());
+            medicalRecordsList.add(medicalRecords);
+        }
+        return medicalRecordsList;
     }
 }

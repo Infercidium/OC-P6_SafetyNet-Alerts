@@ -1,5 +1,6 @@
 package com.infercidium.safetynet.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.infercidium.safetynet.model.Allergies;
 import com.infercidium.safetynet.model.Medications;
@@ -42,6 +43,9 @@ public class PersonsAndMedicalRecordsDTO {
      * Allergies Set attribute.
      */
     private Set<Allergies> allergies = new HashSet<>();
+
+    @JsonIgnore
+    private String address;
 
     /**
      * FirstName getter.
@@ -137,5 +141,13 @@ public class PersonsAndMedicalRecordsDTO {
      */
     public void setAllergies(final Set<Allergies> allergiesS) {
         this.allergies = allergiesS;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(final String addressS) {
+        this.address = addressS;
     }
 }

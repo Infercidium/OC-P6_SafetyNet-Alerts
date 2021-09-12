@@ -17,7 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class FirestationsIT {
 
-    @Autowired
+    /*@Autowired
     private MockMvc mvc;
 
     //Delete
@@ -122,5 +122,5 @@ public class FirestationsIT {
     @Test
     public void echecBadParamFlood() throws Exception {
         mvc.perform(get("/flood/stations")).andExpect(status().isBadRequest());
-    }
+    }*/
 }

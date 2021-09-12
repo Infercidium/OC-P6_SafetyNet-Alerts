@@ -16,7 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class MedicalrecordsIT {
 
-    @Autowired
+    /*@Autowired
     private MockMvc mvc;
 
     //Delete
@@ -73,5 +73,5 @@ public class MedicalrecordsIT {
     @Test
     public void echecBadParamPersonInfo() throws Exception {
         mvc.perform(get("/personInfo")).andExpect(status().isBadRequest());
-    }
+    }*/
 }

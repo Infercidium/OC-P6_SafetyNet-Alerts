@@ -186,6 +186,10 @@ public class MedicalRecords {
         this.persons = personsS;
     }
 
+    public String getPhone() {
+        return persons.getPhone();
+    }
+
     /**
      * ToString method allows you to see the content.
      * @return a String containing the name

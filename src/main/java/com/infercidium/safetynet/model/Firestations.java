@@ -2,7 +2,14 @@ package com.infercidium.safetynet.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.validation.constraints.Min;
 import java.util.HashSet;
 import java.util.Set;
@@ -21,7 +28,7 @@ public class Firestations {
     /**
      * Address attribute.
      */
-    @ManyToMany(fetch=FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "Firestations_Address",
             joinColumns = @JoinColumn(name = "Firestations_id"),
             inverseJoinColumns = @JoinColumn(name = "Address_id"))
@@ -106,12 +113,12 @@ public class Firestations {
         this.station = stationS;
     }
 
-    public void addAddress(final Address address) {
-        this.address.add(address);
+    public void addAddress(final Address addressAdded) {
+        this.address.add(addressAdded);
     }
 
-    public void removeAddress(final Address address) {
-        this.address.remove(address);
+    public void removeAddress(final Address addressRemoved) {
+        this.address.remove(addressRemoved);
     }
 
     /**

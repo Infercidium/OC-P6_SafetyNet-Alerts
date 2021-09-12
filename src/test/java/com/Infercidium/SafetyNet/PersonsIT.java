@@ -16,7 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class PersonsIT {
 
-    @Autowired
+   /* @Autowired
     private MockMvc mvc;
 
     //Delete
@@ -67,5 +67,5 @@ public class PersonsIT {
     @Test
     public void echecBadParamCommunityEmail() throws Exception {
         mvc.perform(get("/communityEmail")).andExpect(status().isBadRequest());
-    }
+    }*/
 }

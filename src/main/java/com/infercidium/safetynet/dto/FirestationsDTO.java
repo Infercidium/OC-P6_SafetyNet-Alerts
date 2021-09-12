@@ -19,7 +19,8 @@ public class FirestationsDTO {
     @Min(value = 1, message = "The station cannot be null or empty.")
     private int station;
 
-    public FirestationsDTO(FirestationsAddressDTO firestationsAddressDTO) {
+    public FirestationsDTO(
+            final FirestationsAddressDTO firestationsAddressDTO) {
         address = new HashSet<>();
         this.address.add(firestationsAddressDTO.getAddress());
         this.station = firestationsAddressDTO.getStation();
@@ -59,9 +60,9 @@ public class FirestationsDTO {
         this.station = stationS;
     }
 
-    public void addAddress(final String address) {
-        if (!this.address.contains(address)) {
-            this.address.add(address);
+    public void addAddress(final String addressAdded) {
+        if (!this.address.contains(addressAdded)) {
+            this.address.add(addressAdded);
         }
     }
 }

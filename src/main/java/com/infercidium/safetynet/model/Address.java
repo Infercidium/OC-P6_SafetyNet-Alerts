@@ -88,11 +88,16 @@ public class Address {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Address)) return false;
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Address)) {
+            return false;
+        }
         Address address1 = (Address) o;
-        return getAddress().equals(address1.getAddress()) || getId().equals(address1.getId());
+        return getAddress().equals(address1.getAddress())
+                || getId().equals(address1.getId());
     }
 
     @Override
