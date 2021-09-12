@@ -13,14 +13,32 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Contains URLs linked to Flood.
+ */
 @RestController
 public class FloodRest {
+
+    /**
+     * Instantiation of LOGGER in order to inform in console.
+     */
     private static final Logger LOGGER
             = LoggerFactory.getLogger(FloodRest.class);
 
+    /**
+     * Instantiation of floodInterface.
+     */
     private final FloodI floodI;
+    /**
+     * Instantiation of floodMapper.
+     */
     private final FireAndFloodMapper floodM;
 
+    /**
+     * Class constructor.
+     * @param floodIn this is floodInterface.
+     * @param floodMa this is floodMapper.
+     */
     public FloodRest(final FloodI floodIn, final FireAndFloodMapper floodMa) {
         this.floodI = floodIn;
         this.floodM = floodMa;

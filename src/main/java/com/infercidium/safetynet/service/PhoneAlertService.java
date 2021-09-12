@@ -8,17 +8,39 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * PhoneAlert Service develops public methods of interfaces,
+ * and private methods.
+ */
 @Service
 public class PhoneAlertService implements PhoneAlertI {
+
+    /**
+     *  Instantiation of personsInterface.
+     */
     private final PersonsI personsI;
+
+    /**
+     * Instantiation of firestationsInterface.
+     */
     private final FirestationsI firestationsI;
 
+    /**
+     *  Class constructor.
+     * @param personsIn this is personsInterface.
+     * @param firestationsIn this is firestationsInterface.
+     */
     public PhoneAlertService(final PersonsI personsIn,
                              final FirestationsI firestationsIn) {
         this.personsI = personsIn;
         this.firestationsI = firestationsIn;
     }
 
+    /**
+     * Find the phone people covered by this station.
+     * @param station to retrieve the list of persons.
+     * @return list of phone Persons.
+     */
     @Override
     public List<PersonsDTO> getPersonsPhone(final int station) {
         List<PersonsDTO> personsDTOList = new ArrayList<>();
@@ -38,7 +60,6 @@ public class PhoneAlertService implements PhoneAlertI {
 
     /**
      * Check if phone exists in PersonsDTO list.
-     *
      * @param personsDTO this is a list.
      * @param phone      this is phone to verify.
      * @return True if phone exist in list or False if phone is new.

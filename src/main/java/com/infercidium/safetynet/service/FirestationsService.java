@@ -8,6 +8,10 @@ import org.springframework.stereotype.Service;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 
+/**
+ * Firestations Service develops public methods of interfaces,
+ * and private methods.
+ */
 @Service
 public class FirestationsService implements FirestationsI {
 
@@ -82,6 +86,11 @@ public class FirestationsService implements FirestationsI {
         createMapage(addressComplete, firestations);
     }
 
+    /**
+     * Allows you to delete an address from a specific station.
+     * @param address to delete.
+     * @param station specified.
+     */
     @Override
     public void removeAddress(final String address, final int station) {
         if (!addressCheck(address)) {
@@ -98,6 +107,10 @@ public class FirestationsService implements FirestationsI {
         }
     }
 
+    /**
+     * Allows you to delete an entire station.
+     * @param station to delete.
+     */
     @Override
     public void removeStation(final int station) {
         if (!stationCheck(station)) {
@@ -107,6 +120,10 @@ public class FirestationsService implements FirestationsI {
         firestationsR.delete(firestation);
     }
 
+    /**
+     * Allows you to delete an address from all stations.
+     * @param address to delete.
+     */
     @Override
     public void removeAddress(final String address) {
         List<Firestations> firestationsList = getFirestationsAddress(address);
@@ -137,6 +154,11 @@ public class FirestationsService implements FirestationsI {
         return firestations;
     }
 
+    /**
+     * Find a Firestation.
+     * @param station number sought.
+     * @return a Firestation.
+     */
     @Override
     public Firestations getFirestationsStation(final int station) {
         if (!stationCheck(station)) {
@@ -146,6 +168,13 @@ public class FirestationsService implements FirestationsI {
     }
 
     //Method Tiers
+
+    /**
+     * Check if an address and a station are linked.
+     * @param address to verify.
+     * @param station to verify.
+     * @return True if existing otherwise false.
+     */
     @Override
     public boolean mapageCheck(final String address, final int station) {
         Firestations firestation = firestationsR
@@ -153,6 +182,11 @@ public class FirestationsService implements FirestationsI {
         return firestation != null;
     }
 
+    /**
+     * Check if an address exists.
+     * @param address to verify.
+     * @return True if existing otherwise false.
+     */
     @Override
     public boolean addressCheck(final String address) {
         List<Firestations> firestationsList
@@ -160,6 +194,11 @@ public class FirestationsService implements FirestationsI {
         return !firestationsList.isEmpty();
     }
 
+    /**
+     * Check if a station exists.
+     * @param station to verify.
+     * @return True if existing otherwise false.
+     */
     @Override
     public boolean stationCheck(final int station) {
         Firestations firestation = firestationsR.findByStation(station);

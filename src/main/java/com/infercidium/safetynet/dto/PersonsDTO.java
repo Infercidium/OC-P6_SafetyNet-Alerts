@@ -6,6 +6,10 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 
+/**
+ * DTO used for the exchange between the user
+ * and the server for the data of Persons.
+ */
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class PersonsDTO {
 

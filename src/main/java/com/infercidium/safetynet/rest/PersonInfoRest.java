@@ -10,14 +10,32 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Contains URLs linked to PersonInfo.
+ */
 @RestController
 public class PersonInfoRest {
+
+    /**
+     * Instantiation of LOGGER in order to inform in console.
+     */
     private static final Logger LOGGER
             = LoggerFactory.getLogger(PersonInfoRest.class);
 
+    /**
+     * Instantiation of medicalrecordsInterface.
+     */
     private final MedicalRecordsI medicalRecordsI;
+    /**
+     * Instantiation of personInfoMapper.
+     */
     private final PersonInfoMapper personInfoM;
 
+    /**
+     * Class constructor.
+     * @param medicalRecordsIn this is medicalRecordsInterface.
+     * @param personInfoMa this is personInfoMapper.
+     */
     public PersonInfoRest(final MedicalRecordsI medicalRecordsIn,
                           final PersonInfoMapper personInfoMa) {
         this.medicalRecordsI = medicalRecordsIn;

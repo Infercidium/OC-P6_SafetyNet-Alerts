@@ -6,6 +6,9 @@ import org.mapstruct.Mapper;
 
 import java.util.List;
 
+/**
+ * Converter of Firestations.
+ */
 @Mapper(componentModel = "spring", uses = {AddressMapper.class})
 public interface FirestationsMapper {
 

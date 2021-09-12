@@ -8,6 +8,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * DataBaseInit interface to store public methods
+ * and use them in different services.
+ */
 public interface DataBaseInitI {
 
     /**

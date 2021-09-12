@@ -9,6 +9,10 @@ import javax.validation.constraints.NotBlank;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * DTO used for the exchange between the user and the server
+ * for the data of Persons and MedicalRecords for the URLs.
+ */
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class PersonsAndMedicalRecordsDTO {
 
@@ -44,6 +48,9 @@ public class PersonsAndMedicalRecordsDTO {
      */
     private Set<Allergies> allergies = new HashSet<>();
 
+    /**
+     * Address Set attribute.
+     */
     @JsonIgnore
     private String address;
 
@@ -143,10 +150,18 @@ public class PersonsAndMedicalRecordsDTO {
         this.allergies = allergiesS;
     }
 
+    /**
+     * Address Set getter.
+     * @return address Set attribute.
+     */
     public String getAddress() {
         return address;
     }
 
+    /**
+     * Address Set setter.
+     * @param addressS becomes the new address Set attribute.
+     */
     public void setAddress(final String addressS) {
         this.address = addressS;
     }

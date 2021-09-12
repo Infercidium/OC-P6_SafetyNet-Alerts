@@ -13,6 +13,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Persons Service develops public methods of interfaces, and private methods.
+ */
 @Service
 public class PersonsService implements PersonsI, CommunityEmailI {
 
@@ -167,9 +170,9 @@ public class PersonsService implements PersonsI, CommunityEmailI {
 
     //URL CommunityEmail
     /**
-     * Find the people living in the city.
+     * Find the email people living in the city.
      * @param city to check Persons.
-     * @return list of Persons.
+     * @return list of email Persons.
      */
     @Override
     public List<PersonsDTO> getPersonsEmail(final String city) {
@@ -217,6 +220,12 @@ public class PersonsService implements PersonsI, CommunityEmailI {
     }
 
     //URL
+
+    /**
+     * Create a list of Persons from an Address Set.
+     * @param addressSet contains the addresses of the residents.
+     * @return the list of residents linked to the address.
+     */
     @Override
     public List<Persons> addressSetToPersonsList(
             final Set<Address> addressSet) {

@@ -1,5 +1,6 @@
 package com.infercidium.safetynet.service;
 
+import com.infercidium.safetynet.constants.Majority;
 import com.infercidium.safetynet.dto.PersonsAndMedicalRecordsDTO;
 import com.infercidium.safetynet.model.MedicalRecords;
 import com.infercidium.safetynet.model.Persons;
@@ -15,7 +16,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-
+/**
+ * MedicalRecords Service develops public methods of interfaces,
+ * and private methods.
+ */
 @Service
 public class MedicalRecordsService
         implements MedicalRecordsI, ChildAlertI, FireAndFloodI {
@@ -191,6 +195,12 @@ public class MedicalRecordsService
         return medicalRecordsChanged;
     }
 
+    /**
+     * Check if a station exists.
+     * @param firstName to verify.
+     * @param lastName to verify.
+     * @return True if existing otherwise false.
+     */
     @Override
     public boolean medicalRecordCheck(final String firstName,
                                       final String lastName) {
@@ -202,6 +212,13 @@ public class MedicalRecordsService
     }
 
     //URL ChildAlert
+
+    /**
+     *Method which finds and formats childAlert lists.
+     * @param address of the targeted residence.
+     * @return Children List and Adult List
+     * if Child list not empty.
+     */
     @Override
     public Map<String, List<PersonsAndMedicalRecordsDTO>> childAlert(
             final String address) {
@@ -215,14 +232,16 @@ public class MedicalRecordsService
         //Separation into two lists
         List<MedicalRecords> medicalRecordsChild
                 = medicalRecordsList.stream()
-                .filter(medicalRecords -> medicalRecords.getAge() <= 18)
+                .filter(medicalRecords -> medicalRecords
+                        .getAge() <= Majority.MAJORITY)
                 .collect(Collectors.toList());
         if (medicalRecordsChild.isEmpty()) {
             return result;
         }
         List<MedicalRecords> medicalRecordsAdult
                 = medicalRecordsList.stream()
-                .filter(medicalRecords -> medicalRecords.getAge() > 18)
+                .filter(medicalRecords -> medicalRecords
+                        .getAge() > Majority.MAJORITY)
                 .collect(Collectors.toList());
 
         //Formatting
@@ -238,6 +257,12 @@ public class MedicalRecordsService
         return result;
     }
 
+    /**
+     * Convert a list from MedicalRecords to PersonsAndMedicalRecordsDTO
+     * for Child Alert, Child List.
+     * @param medicalRecords List to convert.
+     * @return List of PersonsAndMedicalRecordsDTO.
+     */
     private List<PersonsAndMedicalRecordsDTO> medicalRecordstoChildResult(
             final List<MedicalRecords> medicalRecords) {
         List<PersonsAndMedicalRecordsDTO> result = new ArrayList<>();
@@ -254,6 +279,12 @@ public class MedicalRecordsService
         return result;
     }
 
+    /**
+     * Converts a list from MedicalRecords to PersonsAndMedicalRecordsDTO
+     * for childAlert, adult list.
+     * @param medicalRecords List to convert.
+     * @return List of PersonsAndMedicalRecordsDTO.
+     */
     private List<PersonsAndMedicalRecordsDTO> medicalRecordstoAdultResult(
             final List<MedicalRecords> medicalRecords) {
         List<PersonsAndMedicalRecordsDTO> result = new ArrayList<>();
@@ -270,6 +301,12 @@ public class MedicalRecordsService
     }
 
     //URL Fire and Flood
+
+    /**
+     * Retrieves a list of MedicalRecords via a list of Persons.
+     * @param personsList to convert.
+     * @return medicalRecordsList.
+     */
     @Override
     public List<MedicalRecords> personsListToMedicalRecordsList(
             final List<Persons> personsList) {

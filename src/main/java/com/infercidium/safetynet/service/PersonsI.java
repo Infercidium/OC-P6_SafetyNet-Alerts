@@ -6,6 +6,9 @@ import com.infercidium.safetynet.model.Persons;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Persons interface to store public methods and use them in different services.
+ */
 public interface PersonsI {
     //Post, Put, Delete
     /**
@@ -55,5 +58,10 @@ public interface PersonsI {
     boolean personCheck(String firstName, String lastName);
 
     //URL
+    /**
+     * Create a list of Persons from an Address Set.
+     * @param addressSet contains the addresses of the residents.
+     * @return the list of residents linked to the address.
+     */
     List<Persons> addressSetToPersonsList(Set<Address> addressSet);
 }

@@ -10,19 +10,29 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+/**
+ * Contains URLs linked to CommunityEmail.
+ */
 @RestController
 public class CommunityEmailRest {
 
+    /**
+     * Instantiation of LOGGER in order to inform in console.
+     */
     private static final Logger LOGGER
             = LoggerFactory.getLogger(CommunityEmailRest.class);
 
     /**
-     * Instantiation of PersonsService.
+     * Instantiation of communityEmailInterface.
      */
     private final CommunityEmailI communityEmailI;
 
-    public CommunityEmailRest(final CommunityEmailI communityEmailIC) {
-        this.communityEmailI = communityEmailIC;
+    /**
+     * Class constructor.
+     * @param communityEmailIn this is communityEmailInterface.
+     */
+    public CommunityEmailRest(final CommunityEmailI communityEmailIn) {
+        this.communityEmailI = communityEmailIn;
     }
 
     /**

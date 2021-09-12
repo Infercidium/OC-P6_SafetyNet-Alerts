@@ -21,6 +21,9 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
 
+/**
+ * Contains URLs linked to Persons.
+ */
 @RestController
 @RequestMapping(value = "/person")
 public class PersonsRest {
@@ -32,7 +35,7 @@ public class PersonsRest {
             = LoggerFactory.getLogger(PersonsRest.class);
 
     /**
-     * Instantiation of PersonsService.
+     * Instantiation of PersonsInterface.
      */
     private final PersonsI personsI;
 
@@ -43,7 +46,7 @@ public class PersonsRest {
 
     /**
      * Class constructor.
-     * @param personsIn this is PersonsService.
+     * @param personsIn this is PersonsInterface.
      * @param personsMa this is PersonsMapper.
      */
     public PersonsRest(final PersonsI personsIn,

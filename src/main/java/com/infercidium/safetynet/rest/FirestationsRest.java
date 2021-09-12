@@ -25,6 +25,9 @@ import java.net.URI;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 
+/**
+ * Contains URLs linked to Firestations.
+ */
 @RestController
 @RequestMapping(value = "/firestation")
 public class FirestationsRest {

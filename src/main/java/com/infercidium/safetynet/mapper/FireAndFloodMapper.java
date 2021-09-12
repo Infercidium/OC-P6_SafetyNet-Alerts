@@ -8,6 +8,9 @@ import org.mapstruct.Mappings;
 
 import java.util.List;
 
+/**
+ * Converter of Fire and Flood.
+ */
 @Mapper(componentModel = "spring")
 public interface FireAndFloodMapper {
     /**

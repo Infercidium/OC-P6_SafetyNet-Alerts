@@ -13,14 +13,32 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Contains URLs linked to Fire.
+ */
 @RestController
 public class FireRest {
+
+    /**
+     * Instantiation of LOGGER in order to inform in console.
+     */
     private static final Logger LOGGER
             = LoggerFactory.getLogger(FireRest.class);
 
+    /**
+     * Instantiation of fireInterface.
+     */
     private final FireI fireI;
+    /**
+     * Instantiation of fireMapper.
+     */
     private final FireAndFloodMapper fireM;
 
+    /**
+     * Class constructor.
+     * @param fireIn this is fireInterface.
+     * @param fireMa this is fireMapper.
+     */
     public FireRest(final FireI fireIn,
                     final FireAndFloodMapper fireMa) {
         this.fireI = fireIn;

@@ -9,7 +9,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotBlank;
 
-
+/**
+ * Allergies model stored in the database.
+ */
 @Entity
 public class Allergies {
 

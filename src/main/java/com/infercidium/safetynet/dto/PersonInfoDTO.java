@@ -9,6 +9,10 @@ import javax.validation.constraints.NotBlank;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * DTO used for the exchange between the user and the server
+ * for the data of Persons and MedicalRecords for the URLs.
+ */
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class PersonInfoDTO {
 

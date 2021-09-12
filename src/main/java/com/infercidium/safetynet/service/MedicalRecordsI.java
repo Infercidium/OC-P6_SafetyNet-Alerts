@@ -4,6 +4,10 @@ import com.infercidium.safetynet.model.MedicalRecords;
 
 import java.util.List;
 
+/**
+ * MedicalRecords interface to store public methods
+ * and use them in different services.
+ */
 public interface MedicalRecordsI {
 
     //Post, Put, delete
@@ -49,6 +53,11 @@ public interface MedicalRecordsI {
     List<MedicalRecords> getMedicalRecords();
 
     //Method Tiers
-
+    /**
+     * Check if a station exists.
+     * @param firstName to verify.
+     * @param lastName to verify.
+     * @return True if existing otherwise false.
+     */
     boolean medicalRecordCheck(String firstName, String lastName);
 }

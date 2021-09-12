@@ -6,6 +6,9 @@ import org.mapstruct.Mapper;
 
 import java.util.List;
 
+/**
+ * Converter of MedicalRecords.
+ */
 @Mapper(componentModel = "spring")
 public interface MedicalRecordsMapper {
 

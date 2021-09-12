@@ -21,6 +21,9 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
 
+/**
+ * Contains URLs linked to MedicalRecords.
+ */
 @RestController
 @RequestMapping(value = "/medicalRecord")
 public class MedicalRecordsRest {

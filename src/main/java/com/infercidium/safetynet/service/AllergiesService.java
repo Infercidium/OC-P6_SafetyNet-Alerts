@@ -9,6 +9,9 @@ import org.springframework.stereotype.Service;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Allergies Service develops public methods of interfaces, and private methods.
+ */
 @Service
 public class AllergiesService implements AllergiesI {
 

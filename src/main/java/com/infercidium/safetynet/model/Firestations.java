@@ -14,6 +14,9 @@ import javax.validation.constraints.Min;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Firestations model stored in the database.
+ */
 @Entity
 public class Firestations {
 
@@ -50,7 +53,6 @@ public class Firestations {
     /**
      * Constructor taking all the attributes not automatically generated,
      * instantiating all the attribute values.
-     *
      * @param addressC this is the address attribute.
      * @param stationC this is the station attribute.
      */
@@ -61,7 +63,6 @@ public class Firestations {
 
     /**
      * Id getter.
-     *
      * @return id attribute.
      */
     public Long getId() {
@@ -70,7 +71,6 @@ public class Firestations {
 
     /**
      * Id setter.
-     *
      * @param idS becomes the new id attribute.
      */
     public void setId(final Long idS) {
@@ -79,7 +79,6 @@ public class Firestations {
 
     /**
      * Address getter.
-     *
      * @return address attribute.
      */
     public Set<Address> getAddress() {
@@ -88,7 +87,6 @@ public class Firestations {
 
     /**
      * Address setter.
-     *
      * @param addressS becomes the new address attribute.
      */
     public void setAddress(final Set<Address> addressS) {
@@ -97,7 +95,6 @@ public class Firestations {
 
     /**
      * Station getter.
-     *
      * @return station attribute.
      */
     public int getStation() {
@@ -106,24 +103,30 @@ public class Firestations {
 
     /**
      * Station setter.
-     *
      * @param stationS becomes the new station attribute.
      */
     public void setStation(final int stationS) {
         this.station = stationS;
     }
 
+    /**
+     * Adds an address to the existing Set.
+     * @param addressAdded : Address to add.
+     */
     public void addAddress(final Address addressAdded) {
         this.address.add(addressAdded);
     }
 
+    /**
+     * Delete an address to the existing Set.
+     * @param addressRemoved : Address to delete.
+     */
     public void removeAddress(final Address addressRemoved) {
         this.address.remove(addressRemoved);
     }
 
     /**
      * ToString method allows you to see the content.
-     *
      * @return a String containing the name
      * of all the attributes and their contents.
      */

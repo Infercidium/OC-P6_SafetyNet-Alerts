@@ -23,6 +23,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -31,6 +32,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * DataBaseInit Service develops public methods of interfaces,
+ * and private methods.
+ */
 @Service
 public class DataBaseInitService implements DataBaseInitI {
 
@@ -99,7 +104,8 @@ public class DataBaseInitService implements DataBaseInitI {
         StringBuilder data = new StringBuilder();
         try (InputStream inputStream = new FileInputStream(path);
              InputStreamReader inputStreamReader
-                     = new InputStreamReader(inputStream, "UTF-8");
+                     = new InputStreamReader(inputStream,
+                     StandardCharsets.UTF_8);
              BufferedReader bufferedReader
                      = new BufferedReader(inputStreamReader)) {
             String line;

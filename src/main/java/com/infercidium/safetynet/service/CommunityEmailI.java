@@ -7,9 +7,9 @@ import java.util.List;
 public interface CommunityEmailI {
 
     /**
-     * Find the people living in the city.
+     * Find the email people living in the city.
      * @param city to check Persons.
-     * @return list of Persons.
+     * @return list of email Persons.
      */
     List<PersonsDTO> getPersonsEmail(String city);
 }

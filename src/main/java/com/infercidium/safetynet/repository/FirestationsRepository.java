@@ -5,7 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-
+/**
+ * Methods of retrieving Firestations data from the database.
+ */
 public interface FirestationsRepository
         extends JpaRepository<Firestations, Long> {
 

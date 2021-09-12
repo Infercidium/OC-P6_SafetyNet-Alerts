@@ -5,6 +5,9 @@ import javax.validation.constraints.NotBlank;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * DTO use for sending server data to the Firestation user.
+ */
 public class FirestationsDTO {
 
     /**
@@ -19,6 +22,11 @@ public class FirestationsDTO {
     @Min(value = 1, message = "The station cannot be null or empty.")
     private int station;
 
+    /**
+     * Adapter manufacturer.
+     * @param firestationsAddressDTO : user-supplied element
+     *                               to adapt to the server format.
+     */
     public FirestationsDTO(
             final FirestationsAddressDTO firestationsAddressDTO) {
         address = new HashSet<>();
@@ -26,6 +34,9 @@ public class FirestationsDTO {
         this.station = firestationsAddressDTO.getStation();
     }
 
+    /**
+     * Basic builder.
+     */
     public FirestationsDTO() { }
 
     /**
@@ -60,9 +71,13 @@ public class FirestationsDTO {
         this.station = stationS;
     }
 
+    /**
+     * Adds an address to the existing Set.
+     * Information: No need for now
+     * but potentially useful for future modification.
+     * @param addressAdded : the address to add.
+     */
     public void addAddress(final String addressAdded) {
-        if (!this.address.contains(addressAdded)) {
-            this.address.add(addressAdded);
-        }
+        this.address.add(addressAdded);
     }
 }

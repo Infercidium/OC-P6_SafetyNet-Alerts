@@ -3,6 +3,9 @@ package com.infercidium.safetynet.dto;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 
+/**
+ * DTO use for receiving user data from Firestation.
+ */
 public class FirestationsAddressDTO {
 
     /**

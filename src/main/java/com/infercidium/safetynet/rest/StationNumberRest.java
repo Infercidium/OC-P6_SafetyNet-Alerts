@@ -9,17 +9,38 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
+/**
+ * Contains URLs linked to StationNumber.
+ */
 @RestController
 public class StationNumberRest {
+
+    /**
+     * Instantiation of LOGGER in order to inform in console.
+     */
     private static final Logger LOGGER
             = LoggerFactory.getLogger(StationNumberRest.class);
 
+    /**
+     * Instantiation of stationNumberInterface.
+     */
     private final StationNumberI stationNumberI;
 
+    /**
+     * Class constructor.
+     * @param stationNumberIn this is stationNumberInterface.
+     */
     public StationNumberRest(final StationNumberI stationNumberIn) {
         this.stationNumberI = stationNumberIn;
     }
 
+    /**
+     * Find the list of residents
+     * whose address is covered by Firestation.
+     * @param stationNumber of the Firestation.
+     * @return residents and 200 Ok if successful
+     * or 404 not found if it does not exist.
+     */
     @GetMapping(value = "/firestation")
     public Map<String, Object> getStationNumber(
             @RequestParam final int stationNumber) {

@@ -1,5 +1,6 @@
 package com.infercidium.safetynet.service;
 
+import com.infercidium.safetynet.constants.Majority;
 import com.infercidium.safetynet.dto.PersonsDTO;
 import com.infercidium.safetynet.model.Firestations;
 import com.infercidium.safetynet.model.MedicalRecords;
@@ -11,13 +12,34 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * StationNumber Service develops public methods of interfaces,
+ * and private methods.
+ */
 @Service
 public class StationNumberService implements StationNumberI {
 
+    /**
+     * Instantiation of medicalRecordsInstance.
+     */
     private final MedicalRecordsI medicalRecordsI;
+
+    /**
+     * Instantiation of personsInterface.
+     */
     private final PersonsI personsI;
+
+    /**
+     * Instantiation of firestationsInterface.
+     */
     private final FirestationsI firestationsI;
 
+    /**
+     *  Class constructor.
+     * @param medicalRecordsIn this is medicalRecordsInterface.
+     * @param personsIn this is personsInterface.
+     * @param firestationsIn this is firestationsInterface.
+     */
     public StationNumberService(final MedicalRecordsI medicalRecordsIn,
                                 final PersonsI personsIn,
                                 final FirestationsI firestationsIn) {
@@ -26,7 +48,12 @@ public class StationNumberService implements StationNumberI {
         this.firestationsI = firestationsIn;
     }
 
-
+    /**
+     * Formats the list of residents covered
+     * by a station as well as the adult and child count.
+     * @param station number.
+     * @return the final Map expected by / firestation.
+     */
     @Override
     public Map<String, Object> stationNumber(final int station) {
         //Found the Firestation
@@ -56,6 +83,11 @@ public class StationNumberService implements StationNumberI {
         return result;
     }
 
+    /**
+     * Convert a persons to personsdto.
+     * @param persons list to be converted.
+     * @return personsDTO list.
+     */
     private List<PersonsDTO> personsToPersonsdto(final List<Persons> persons) {
         List<PersonsDTO> personsDTO = new ArrayList<>();
         for (Persons person : persons) {
@@ -69,6 +101,11 @@ public class StationNumberService implements StationNumberI {
         return personsDTO;
     }
 
+    /**
+     * Counts the number of children in a list of persons.
+     * @param persons list to be counted.
+     * @return the count of the number of children on the list.
+     */
     private long childCount(final List<Persons> persons) {
         List<MedicalRecords> medicalRecordsList = new ArrayList<>();
         for (Persons person : persons) {
@@ -78,7 +115,8 @@ public class StationNumberService implements StationNumberI {
             medicalRecordsList.add(medicalRecords);
         }
         return medicalRecordsList.stream()
-                .filter(medicalRecords -> medicalRecords.getAge() <= 18)
+                .filter(medicalRecords -> medicalRecords
+                        .getAge() <= Majority.MAJORITY)
                 .count();
     }
 }

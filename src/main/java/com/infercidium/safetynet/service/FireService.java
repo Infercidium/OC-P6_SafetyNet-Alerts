@@ -14,28 +14,62 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Fire Service develops public methods of interfaces, and private methods.
+ */
 @Service
 public class FireService implements FireI {
+    /**
+     * Instantiation of personsInterface.
+     */
     private final PersonsI personsI;
-    private final FirestationsI firestationsI;
-    private final FireAndFloodI fireAndFloodI;
 
+    /**
+     * Instantiation of firestationsInterface.
+     */
+    private final FirestationsI firestationsI;
+
+    /**
+     * Instantiation of fireInterface.
+     */
+    private final FireAndFloodI fireI;
+
+    /**
+     * Class constructor.
+     * @param personsIn this is personsInterface.
+     * @param firestationsIn this is firestationsInterface.
+     * @param fireIn this is fireInterface.
+     */
     public FireService(final PersonsI personsIn,
                        final FirestationsI firestationsIn,
-                       final FireAndFloodI fireAndFloodIn) {
+                       final FireAndFloodI fireIn) {
         this.personsI = personsIn;
         this.firestationsI = firestationsIn;
-        this.fireAndFloodI = fireAndFloodIn;
+        this.fireI = fireIn;
     }
+
+    /**
+     * Allows you to obtain the list of Medicalrecords
+     * of Persons living at the address.
+     * @param address : String of address target.
+     * @return list of Medicalrecords.
+     */
     @Override
     public List<MedicalRecords> getFireMedicalRecords(final String address) {
         Set<Address> addressSet = new HashSet<>();
         addressSet.add(new Address(address));
         List<Persons> personsList
                 = personsI.addressSetToPersonsList(addressSet);
-        return fireAndFloodI.personsListToMedicalRecordsList(personsList);
+        return fireI.personsListToMedicalRecordsList(personsList);
     }
 
+    /**
+     * The method of shaping Fire.
+     * @param address : String of address target.
+     * @param personsAndMedicalRecordsDTOList : residents List.
+     * @return A Map containing the stations covering the address
+     * and the residents living there.
+     */
     @Override
     public Map<String, Object> getFireResult(
             final String address,

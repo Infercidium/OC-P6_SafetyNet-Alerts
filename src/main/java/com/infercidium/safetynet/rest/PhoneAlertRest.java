@@ -10,13 +10,27 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+/**
+ * Contains URLs linked to PhoneAlert.
+ */
 @RestController
 public class PhoneAlertRest {
+
+    /**
+     * Instantiation of LOGGER in order to inform in console.
+     */
     private static final Logger LOGGER
             = LoggerFactory.getLogger(PhoneAlertRest.class);
 
+    /**
+     * Instantiation of phoneAlertInterface.
+     */
     private final PhoneAlertI phoneAlertI;
 
+    /**
+     * Class constructor.
+     * @param phoneAlertIn this is phoneAlertInterface.
+     */
     public PhoneAlertRest(final PhoneAlertI phoneAlertIn) {
         this.phoneAlertI = phoneAlertIn;
     }

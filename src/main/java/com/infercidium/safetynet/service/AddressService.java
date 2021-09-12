@@ -22,7 +22,7 @@ public class AddressService implements AddressI {
 
     /**
      * Class constructor.
-     * @param addressRe this is AdressRepository.
+     * @param addressRe this is AddressRepository.
      */
     public AddressService(final AddressRepository addressRe) {
         this.addressR = addressRe;

@@ -10,6 +10,10 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * DTO used for the exchange between the user
+ * and the server for the data of MedicalRecords.
+ */
 public class MedicalRecordsDTO {
 
     /**
