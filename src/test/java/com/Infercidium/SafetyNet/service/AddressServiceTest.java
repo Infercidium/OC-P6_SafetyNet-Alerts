@@ -25,13 +25,13 @@ class AddressServiceTest {
 
     Address address = new Address("test");
 
-   /* @Test
+    @Test
     void succesCheckAddress() {
         when(addressR.findByAddressIgnoreCase(address.getAddress())).thenReturn(null);
-        when(addressR.save(address)).thenReturn(address);
+        when(addressR.saveAndFlush(address)).thenReturn(address);
         Address addressResult = addressS.checkAddress(address);
         assertEquals(address, addressResult);
-        verify(addressR, times(1)).save(address);
+        verify(addressR, times(1)).saveAndFlush(address);
         verify(addressR, times(1)).findByAddressIgnoreCase(address.getAddress());
     }
 
@@ -41,5 +41,5 @@ class AddressServiceTest {
         Address addressResult = addressS.checkAddress(address);
         assertEquals(address, addressResult);
         verify(addressR, times(2)).findByAddressIgnoreCase(address.getAddress());
-    }*/
+    }
 }

@@ -13,7 +13,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -24,12 +26,16 @@ import static org.mockito.Mockito.when;
 @SpringBootTest(classes = {PersonsService.class})
 class PersonsServiceTest {
 
-    /*@MockBean
+    @MockBean
     private PersonsRepository personsR;
     @MockBean
     private AddressI addressS;
     @Autowired
     private PersonsService personsService;
+
+    String addressString = "1 rue du testing";
+    Address address = new Address(addressString);
+    Set<Address> addressSet = Collections.singleton(address);
 
     Persons persons = new Persons("Jean", "Bobine", new Address("1 rue du testing"), "Testy", 12345, "456-789-1011", "jbob@email.com");
     List<Persons> personsList = new ArrayList<>();
@@ -43,10 +49,12 @@ class PersonsServiceTest {
         personsDTO.setEmail(persons.getEmail());
         personsDTOList.add(personsDTO);
 
+        when(personsR.findAll()).thenReturn(personsList);
         when(addressS.checkAddress(persons.getAddress())).thenReturn(persons.getAddress());
         when(personsR.save(persons)).thenReturn(persons);
         when(personsR.findByFirstNameIgnoreCaseAndLastNameIgnoreCase(persons.getFirstName(), persons.getLastName())).thenReturn(persons);
     }
+
 
     @Test
     void postPerson() {
@@ -74,34 +82,26 @@ class PersonsServiceTest {
 
     @Test
     void getPersons() {
-        when(personsR.findAll()).thenReturn(personsList);
         List<Persons> personsGetList = personsService.getPersons();
         assertEquals(personsList.get(0), personsGetList.get(0));
-    }
-
-    @Test
-    void getPersonsAddress() {
-        when(personsR.findByAddressAddressIgnoreCase(persons.getAddress().getAddress())).thenReturn(personsList);
-        List<Persons> personsAddress = personsService.getPersonsAddress(persons.getAddress().getAddress());
-        assertEquals(personsList, personsAddress);
-    }
-
-    @Test
-    void getPersonsCity() {
-        when(personsR.findByCityIgnoreCase(persons.getCity())).thenReturn(personsList);
-        List<Persons> personsCity = personsService.getPersonsCity(persons.getCity());
-        assertEquals(personsList, personsCity);
-    }
-
-    @Test
-    void personsToPersonsdtoEmail() {
-        List<PersonsDTO> personsDtoList = personsService.personsToPersonsdtoEmail(personsList);
-        assertEquals(personsDTOList.get(0).getEmail(), personsDtoList.get(0).getEmail());
     }
 
     @Test
     void personCheck() {
         boolean result = personsService.personCheck(persons.getFirstName(), persons.getLastName());
         assertTrue(result);
-    }*/
+    }
+
+    @Test
+    void getPersonsEmail() {
+        when(personsR.findByCityIgnoreCase(persons.getCity())).thenReturn(personsList);
+        List<PersonsDTO> result = personsService.getPersonsEmail(persons.getCity());
+        assertEquals(personsDTOList.get(0).getPhone(), result.get(0).getPhone());
+    }
+
+    @Test
+    void addressSetToPersonsList() {
+        List<Persons> result = personsService.addressSetToPersonsList(addressSet);
+        assertEquals(personsList, result);
+    }
 }
