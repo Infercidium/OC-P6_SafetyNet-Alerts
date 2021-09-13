@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import javax.validation.ConstraintViolationException;
 import java.sql.SQLIntegrityConstraintViolationException;
 
-
+/**
+ * Exception manager.
+ */
 @ControllerAdvice
 public class ApiExceptionHandler {
 

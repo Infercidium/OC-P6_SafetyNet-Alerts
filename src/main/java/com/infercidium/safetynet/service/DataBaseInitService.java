@@ -7,7 +7,12 @@ import com.infercidium.safetynet.dto.PersonsDTO;
 import com.infercidium.safetynet.mapper.FirestationsMapper;
 import com.infercidium.safetynet.mapper.MedicalRecordsMapper;
 import com.infercidium.safetynet.mapper.PersonsMapper;
-import com.infercidium.safetynet.model.*;
+import com.infercidium.safetynet.model.Address;
+import com.infercidium.safetynet.model.Allergies;
+import com.infercidium.safetynet.model.Firestations;
+import com.infercidium.safetynet.model.MedicalRecords;
+import com.infercidium.safetynet.model.Medications;
+import com.infercidium.safetynet.model.Persons;
 import com.jsoniter.JsonIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,11 +23,19 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+/**
+ * DataBaseInit Service develops public methods of interfaces,
+ * and private methods.
+ */
 @Service
 public class DataBaseInitService implements DataBaseInitI {
 
@@ -52,33 +65,33 @@ public class DataBaseInitService implements DataBaseInitI {
     /**
      * Instantiation of PersonsService.
      */
-    private final PersonsI personsS;
+    private final PersonsI personsI;
     /**
      * Instantiation of MedicalrecordsService.
      */
-    private final MedicalRecordsI medicalRecordsS;
+    private final MedicalRecordsI medicalRecordsI;
 
     /**
      * Class constructor.
      * @param firestationsMa this is FirestationsMapper.
      * @param personsMa this is PersonsMapper.
      * @param medicalRecordsMa this is MedicalRecordsMapper.
-     * @param firestationsSe this is FirestationsService.
-     * @param personsSe this is PersonsService.
-     * @param medicalRecordsSe this is MedicalRecordsService.
+     * @param firestationsIn this is FirestationsService.
+     * @param personsIn this is PersonsService.
+     * @param medicalRecordsIn this is MedicalRecordsService.
      */
     public DataBaseInitService(final FirestationsMapper firestationsMa,
                                final PersonsMapper personsMa,
                                final MedicalRecordsMapper medicalRecordsMa,
-                               final FirestationsI firestationsSe,
-                               final PersonsI personsSe,
-                               final MedicalRecordsI medicalRecordsSe) {
+                               final FirestationsI firestationsIn,
+                               final PersonsI personsIn,
+                               final MedicalRecordsI medicalRecordsIn) {
         this.firestationsM = firestationsMa;
         this.personsM = personsMa;
         this.medicalRecordsM = medicalRecordsMa;
-        this.firestationsS = firestationsSe;
-        this.personsS = personsSe;
-        this.medicalRecordsS = medicalRecordsSe;
+        this.firestationsS = firestationsIn;
+        this.personsI = personsIn;
+        this.medicalRecordsI = medicalRecordsIn;
     }
 
     /**
@@ -91,7 +104,8 @@ public class DataBaseInitService implements DataBaseInitI {
         StringBuilder data = new StringBuilder();
         try (InputStream inputStream = new FileInputStream(path);
              InputStreamReader inputStreamReader
-                     = new InputStreamReader(inputStream, "UTF-8");
+                     = new InputStreamReader(inputStream,
+                     StandardCharsets.UTF_8);
              BufferedReader bufferedReader
                      = new BufferedReader(inputStreamReader)) {
             String line;
@@ -149,18 +163,27 @@ public class DataBaseInitService implements DataBaseInitI {
      * @param firestations : the list to instantiate and save.
      */
     @Override
-    public void instanciateListFirestations(final List<Map<String, String>> firestations) {
+    public void instanciateListFirestations(
+            final List<Map<String, String>> firestations)
+            throws SQLIntegrityConstraintViolationException {
 
         for (Map<String, String> firestation : firestations) {
-            FirestationsAddressDTO firestationsAddressDTO = new FirestationsAddressDTO();
+            FirestationsAddressDTO firestationsAddressDTO
+                    = new FirestationsAddressDTO();
             firestationsAddressDTO.setAddress(firestation.get("address"));
-            firestationsAddressDTO.setStation(Integer.parseInt(firestation.get("station")));
-            FirestationsDTO firestationsDTO = new FirestationsDTO(firestationsAddressDTO);
-            Firestations finalFirestation = firestationsM.dtoToModel(firestationsDTO);
+            firestationsAddressDTO.setStation(
+                    Integer.parseInt(firestation.get("station")));
+            FirestationsDTO firestationsDTO
+                    = new FirestationsDTO(firestationsAddressDTO);
+            Firestations finalFirestation
+                    = firestationsM.dtoToModel(firestationsDTO);
             Address address = new Address(firestation.get("address"));
 
-            if (firestationsS.mapageCheck(address.getAddress(), finalFirestation.getStation())) {
-                LOGGER.debug("Mapping of address: " + address + " and station: " + finalFirestation.getStation() + " already existing detected, deletion of duplicate.");
+            if (firestationsS.mapageCheck(address.getAddress(),
+                    finalFirestation.getStation())) {
+                LOGGER.debug("Mapping of address: " + address
+                        + " and station: " + finalFirestation.getStation()
+                        + " already existing detected, deletion of duplicate.");
             } else {
                 firestationsS.createMapage(address, finalFirestation);
             }
@@ -174,7 +197,6 @@ public class DataBaseInitService implements DataBaseInitI {
     @Override
     public void instanciateListPersons(
             final List<Map<String, String>> persons) {
-        List<Persons> personsList = new ArrayList<>();
         for (Map<String, String> person : persons) {
             PersonsDTO personsDTO = new PersonsDTO();
             personsDTO.setFirstName(person.get("firstName"));
@@ -185,21 +207,14 @@ public class DataBaseInitService implements DataBaseInitI {
             personsDTO.setPhone(person.get("phone"));
             personsDTO.setEmail(person.get("email"));
             Persons finalPerson = personsM.dtoToModel(personsDTO);
-            personsList.add(finalPerson);
-            boolean novel = true;
-            for (int i = 1; i < personsList.size(); i++) {
-                if (personsList.get(i - 1).getFirstName()
-                        .equals(finalPerson.getFirstName())
-                        && personsList.get(i - 1).getLastName()
-                        .equals(finalPerson.getLastName())) {
-                    LOGGER.debug(finalPerson.getFirstName() + " "
-                            + finalPerson.getLastName()
-                            + " detected in duplicate, deletion.");
-                    novel = false;
-                }
-            }
-            if (novel) {
-                personsS.postPerson(finalPerson);
+            if (personsI.personCheck(
+                    finalPerson.getFirstName(),
+                    finalPerson.getLastName())) {
+                LOGGER.debug(finalPerson.getFirstName()
+                        + " " + finalPerson.getLastName()
+                        + " detected in duplicate, deletion.");
+            } else {
+                personsI.postPerson(finalPerson);
             }
         }
     }
@@ -211,20 +226,21 @@ public class DataBaseInitService implements DataBaseInitI {
     @Override
     public void instanciateListMedicalRecords(
             final List<Map<String, Object>> medicalRecords) {
-        List<MedicalRecordsDTO> medicalRecordsDTOList = new ArrayList<>();
         for (Map<String, Object> medicalRecord : medicalRecords) {
             MedicalRecordsDTO medicalRecordsDTO = new MedicalRecordsDTO();
-            medicalRecordsDTO.setFirstName(
-                    String.valueOf(medicalRecord.get("firstName")));
-            medicalRecordsDTO.setLastName(
-                    String.valueOf(medicalRecord.get("lastName")));
+            medicalRecordsDTO.setFirstName(String.valueOf(medicalRecord
+                    .get("firstName")));
+            medicalRecordsDTO.setLastName(String.valueOf(medicalRecord
+                    .get("lastName")));
+
             //Date Management
             DateTimeFormatter formatter
                     = DateTimeFormatter.ofPattern("MM/dd/yyyy");
-            LocalDate localDate = LocalDate
-                    .parse((CharSequence) medicalRecord
-                            .get("birthdate"), formatter);
+            LocalDate localDate
+                    = LocalDate.parse((CharSequence) medicalRecord
+                    .get("birthdate"), formatter);
             medicalRecordsDTO.setBirthdate(localDate);
+
             //Set management
             medicalRecordsDTO.setMedications(
                     instanciateListMedications(
@@ -232,23 +248,25 @@ public class DataBaseInitService implements DataBaseInitI {
             medicalRecordsDTO.setAllergies(
                     instanciateListAllergies(
                             (List<String>) medicalRecord.get("allergies")));
-            medicalRecordsDTOList.add(medicalRecordsDTO);
+
             MedicalRecords finalMedicalRecord
                     = medicalRecordsM.dtoToModel(medicalRecordsDTO);
-            boolean novel = true;
-            for (int i = 1; i < medicalRecordsDTOList.size(); i++) {
-                if (medicalRecordsDTOList.get(i - 1).getFirstName()
-                        .equals(medicalRecordsDTO.getFirstName())
-                        && medicalRecordsDTOList.get(i - 1).getLastName()
-                        .equals(medicalRecordsDTO.getLastName())) {
-                    LOGGER.debug(medicalRecordsDTO.getFirstName() + " "
-                            + medicalRecordsDTO.getLastName()
-                            + " detected in duplicate, deletion.");
-                    novel = false;
-                }
-            }
-            if (novel) {
-                medicalRecordsS.postMedicalRecords(finalMedicalRecord,
+
+            //Possible error management
+            if (medicalRecordsI.medicalRecordCheck(
+                    medicalRecordsDTO.getFirstName(),
+                    medicalRecordsDTO.getLastName())) {
+                LOGGER.debug(medicalRecordsDTO.getFirstName() + " "
+                        + medicalRecordsDTO.getLastName()
+                        + " detected in duplicate, deletion.");
+            } else if (!personsI.personCheck(
+                    medicalRecordsDTO.getFirstName(),
+                    medicalRecordsDTO.getLastName())) {
+                LOGGER.debug("No Person to associate with MedicalRecords "
+                        + medicalRecordsDTO.getFirstName() + " "
+                        + medicalRecordsDTO.getLastName() + ", deletion.");
+            } else {
+                medicalRecordsI.postMedicalRecords(finalMedicalRecord,
                         medicalRecordsDTO.getFirstName(),
                         medicalRecordsDTO.getLastName());
             }

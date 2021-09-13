@@ -23,11 +23,21 @@ public class FirestationsIT {
     //Delete
     @Test
     public void successDeleteFirestationAddress() throws Exception {
-        mvc.perform(delete("/firestation/address/112 Steppes Pl")).andExpect(status().isOk());
+        mvc.perform(delete("/firestation/address/951 LoneTree Rd")).andExpect(status().isOk());
     }
     @Test
     public void echecDeleteFirestationAddress() throws Exception {
         mvc.perform(delete("/firestation/address/Inexistant address"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void successDeleteFirestationMapping() throws Exception {
+        mvc.perform(delete("/firestation/address/112 Steppes Pl?station=3")).andExpect(status().isOk());
+    }
+    @Test
+    public void echecDeleteFirestationMapping() throws Exception {
+        mvc.perform(delete("/firestation/address/Inexistant address?station=1"))
                 .andExpect(status().isNotFound());
     }
 
@@ -42,85 +52,35 @@ public class FirestationsIT {
 
     //Get
     @Test
-    public void succesGetFirestation() throws Exception {
-        mvc.perform(get("/firestation/1509 Culver St")).andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].address", is("1509 Culver St")))
+    public void succesGetFirestationAddress() throws Exception {
+        mvc.perform(get("/firestation/?address=1509 Culver St")).andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].address[1]", is("1509 Culver St")))
                 .andExpect(jsonPath("$[0].station", is(3)));
     }
 
     @Test
-    public void echecGetFirestation() throws Exception {
-        mvc.perform(get("/firestation/1 Impasse rien")).andExpect(status().isNotFound());
+    public void echecGetFirestationAddress() throws Exception {
+        mvc.perform(get("/firestation/?address=1 Impasse rien")).andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void succesGetFirestationStation() throws Exception {
+        mvc.perform(get("/firestation/3")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.address[1]", is("1509 Culver St")))
+                .andExpect(jsonPath("$.station", is(3)));
+    }
+
+    @Test
+    public void echecGetFirestationStation() throws Exception {
+        mvc.perform(get("/firestation/8")).andExpect(status().isNotFound());
     }
 
     @Test
     public void successGetAllFirestations() throws Exception {
 
-        mvc.perform(get("/firestations")).andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].address", is("1509 Culver St")))
-                .andExpect(jsonPath("$[4].address", is("748 Townings Dr")));
-    }
-
-    //URL
-    @Test
-    public void successFirestation() throws Exception {
-        mvc.perform(get("/firestation?stationNumber=1")).andExpect(status().isOk())
-                .andExpect(jsonPath("Adults", is(5)))
-                .andExpect(jsonPath("Child", is(1)))
-                .andExpect(jsonPath("Residents[0].firstName", is("Peter")));
-    }
-    @Test
-    public void echecNotFoundFirestation() throws Exception {
-        mvc.perform(get("/firestation?stationNumber=8")).andExpect(status().isNotFound());
-    }
-    @Test
-    public void echecBadParamFirestation() throws Exception {
-        mvc.perform(get("/firestation")).andExpect(status().isBadRequest());
-    }
-
-    @Test
-    public void successPhoneAlert() throws Exception {
-        mvc.perform(get("/phoneAlert?firestation=1")).andExpect(status().isOk())
-                .andExpect(jsonPath("$[*].phone", contains("841-874-6512", "841-874-8547","841-874-7462", "841-874-7784")));
-    }
-    @Test
-    public void echecNotFoundPhoneAlert() throws Exception {
-        mvc.perform(get("/phoneAlert?firestation=8")).andExpect(status().isNotFound());
-    }
-    @Test
-    public void echecBadParamPhoneAlert() throws Exception {
-        mvc.perform(get("/phoneAlert")).andExpect(status().isBadRequest());
-    }
-
-    @Test
-    public void successFire() throws  Exception {
-        mvc.perform(get("/fire?address=1509 Culver St")).andExpect(status().isOk())
-                .andExpect(jsonPath("Station[0]", is(3)))
-                .andExpect(jsonPath("Residents[0].age", is(37)))
-                .andExpect(jsonPath("Residents[*].firstName", contains("John", "Jacob", "Tenley", "Roger", "Felicia")));
-    }
-    @Test
-    public void echecNotFoundFire() throws Exception {
-        mvc.perform(get("/fire?address=inexistant address")).andExpect(status().isNotFound());
-    }
-    @Test
-    public void echecBadParamFire() throws Exception {
-        mvc.perform(get("/fire")).andExpect(status().isBadRequest());
-    }
-
-    @Test
-    public void successFlood() throws  Exception {
-        mvc.perform(get("/flood/stations?station=1")).andExpect(status().isOk())
-                .andExpect(jsonPath("['908 73rd St'][*].firstName", contains("Reginold", "Jamie")))
-                .andExpect(jsonPath("['947 E. Rose Dr'][*].age", contains(45, 41, 7)))
-                .andExpect(jsonPath("['644 Gershwin Cir'][0].lastName", is("Duncan")));
-    }
-    @Test
-    public void echecNotFoundFlood() throws Exception {
-        mvc.perform(get("/flood/stations?station=8")).andExpect(status().isNotFound());
-    }
-    @Test
-    public void echecBadParamFlood() throws Exception {
-        mvc.perform(get("/flood/stations")).andExpect(status().isBadRequest());
+        mvc.perform(get("/firestation/")).andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].address[0]", is("748 Townings Dr")))
+                .andExpect(jsonPath("$[3].address[0]", is("489 Manchester St")))
+                .andExpect(jsonPath("$[3].station", is(4)));
     }
 }

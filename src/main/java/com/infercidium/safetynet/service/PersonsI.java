@@ -1,10 +1,14 @@
 package com.infercidium.safetynet.service;
 
-import com.infercidium.safetynet.dto.PersonsDTO;
+import com.infercidium.safetynet.model.Address;
 import com.infercidium.safetynet.model.Persons;
 
 import java.util.List;
+import java.util.Set;
 
+/**
+ * Persons interface to store public methods and use them in different services.
+ */
 public interface PersonsI {
     //Post, Put, Delete
     /**
@@ -44,28 +48,6 @@ public interface PersonsI {
      */
     List<Persons> getPersons();
 
-    //URL lié à Persons
-    /**
-     * Finds people living at the address.
-     * @param address to check Persons.
-     * @return list of Persons.
-     */
-    List<Persons> getPersonsAddress(String address);
-
-    /**
-     * Find the people living in the city.
-     * @param city to check Persons.
-     * @return list of Persons.
-     */
-    List<Persons> getPersonsCity(String city);
-
-    /**
-     * Extract the email from the Persons list in PersonsDTO.
-     * @param persons : list of Persons used.
-     * @return list of Email.
-     */
-    List<PersonsDTO> personsToPersonsdtoEmail(List<Persons> persons);
-
     //Methods Tiers
     /**
      * Check if Persons exists in the database.
@@ -74,4 +56,12 @@ public interface PersonsI {
      * @return True if exist or False if not.
      */
     boolean personCheck(String firstName, String lastName);
+
+    //URL
+    /**
+     * Create a list of Persons from an Address Set.
+     * @param addressSet contains the addresses of the residents.
+     * @return the list of residents linked to the address.
+     */
+    List<Persons> addressSetToPersonsList(Set<Address> addressSet);
 }

@@ -1,4 +1,4 @@
 /**
- * Contains the service methods managing the compute part of the API.
+ * Contains the service methods managing to compute part of the API.
  */
 package com.infercidium.safetynet.service;

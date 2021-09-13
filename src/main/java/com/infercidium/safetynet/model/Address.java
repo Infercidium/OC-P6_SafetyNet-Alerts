@@ -10,6 +10,9 @@ import javax.persistence.Id;
 import javax.validation.constraints.NotBlank;
 import java.util.Objects;
 
+/**
+ * Address model stored in the database.
+ */
 @Entity
 public class Address {
 
@@ -87,14 +90,28 @@ public class Address {
                 + '}';
     }
 
+    /**
+     * Equals methods.
+     * @param o to test.
+     * @return true if equals or false if not.
+     */
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Address)) return false;
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Address)) {
+            return false;
+        }
         Address address1 = (Address) o;
-        return getAddress().equals(address1.getAddress()) || getId().equals(address1.getId());
+        return getAddress().equals(address1.getAddress())
+                || getId().equals(address1.getId());
     }
 
+    /**
+     * HashCode methods.
+     * @return hashed objects.
+     */
     @Override
     public int hashCode() {
         return Objects.hash(getAddress());

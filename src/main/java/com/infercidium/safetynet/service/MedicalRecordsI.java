@@ -1,12 +1,13 @@
 package com.infercidium.safetynet.service;
 
-import com.infercidium.safetynet.dto.PersonsAndMedicalRecordsDTO;
 import com.infercidium.safetynet.model.MedicalRecords;
-import com.infercidium.safetynet.model.Persons;
 
 import java.util.List;
-import java.util.Map;
 
+/**
+ * MedicalRecords interface to store public methods
+ * and use them in different services.
+ */
 public interface MedicalRecordsI {
 
     //Post, Put, delete
@@ -51,27 +52,12 @@ public interface MedicalRecordsI {
      */
     List<MedicalRecords> getMedicalRecords();
 
-    //URL lié à MedicalRecords
+    //Method Tiers
     /**
-     * Check the person's age to find out if they are over majorite.
-     * @param firstName to check medicalRecords Age.
-     * @param lastName to check medicalRecords Age.
-     * @return True if major and False if not.
+     * Check if a station exists.
+     * @param firstName to verify.
+     * @param lastName to verify.
+     * @return True if existing otherwise false.
      */
-    boolean checkMajority(String firstName, String lastName);
-
-    /**
-     * Relay method.
-     * @param address to check Persons.
-     * @return list of Persons checked.
-     */
-    List<Persons> getPersonsAddress(String address);
-
-    /**
-     * Formatting the response for the ChildAlert URL.
-     * @param personsAndMedicalrecordsDTO : list of inhabitants.
-     * @return Map expected in result.
-     */
-    Map<String, Object> getChildAlertCount(
-            List<PersonsAndMedicalRecordsDTO> personsAndMedicalrecordsDTO);
+    boolean medicalRecordCheck(String firstName, String lastName);
 }

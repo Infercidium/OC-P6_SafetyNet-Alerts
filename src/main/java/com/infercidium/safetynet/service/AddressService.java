@@ -6,8 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.Set;
-
 @Service
 public class AddressService implements AddressI {
 
@@ -24,7 +22,7 @@ public class AddressService implements AddressI {
 
     /**
      * Class constructor.
-     * @param addressRe this is AdressRepository.
+     * @param addressRe this is AddressRepository.
      */
     public AddressService(final AddressRepository addressRe) {
         this.addressR = addressRe;

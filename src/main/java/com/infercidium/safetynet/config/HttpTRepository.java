@@ -7,13 +7,16 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Operating HttpTrace.
+ */
 @Component
 class HttpTRepository implements HttpTraceRepository {
 
     /**
      * List containing the requests.
      */
-    private List<HttpTrace> traceList = new ArrayList<>();
+    private final List<HttpTrace> traceList = new ArrayList<>();
 
     /**
      * Allows the operation of Actuator httpTrace.

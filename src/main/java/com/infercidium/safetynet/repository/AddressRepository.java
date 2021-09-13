@@ -3,8 +3,9 @@ package com.infercidium.safetynet.repository;
 import com.infercidium.safetynet.model.Address;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.Set;
-
+/**
+ * Methods of retrieving Address data from the database.
+ */
 public interface AddressRepository extends JpaRepository<Address, Long> {
 
     /**

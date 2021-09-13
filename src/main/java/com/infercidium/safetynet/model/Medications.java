@@ -9,6 +9,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotBlank;
 
+/**
+ * Medications model stored in the database.
+ */
 @Entity
 public class Medications {
 

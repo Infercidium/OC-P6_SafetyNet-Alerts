@@ -5,6 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
+/**
+ * Methods of retrieving Persons data from the database.
+ */
 public interface PersonsRepository extends JpaRepository<Persons, Long> {
 
     /**
@@ -15,13 +18,6 @@ public interface PersonsRepository extends JpaRepository<Persons, Long> {
      */
     Persons findByFirstNameIgnoreCaseAndLastNameIgnoreCase(
             String firstName, String lastName);
-
-    /**
-     * Consult the database to search for Persons.
-     * @param address : address in character string.
-     * @return corresponding Persons.
-     */
-    List<Persons> findByAddressAddressIgnoreCase(String address);
 
     /**
      * Consult the database to search for Persons.

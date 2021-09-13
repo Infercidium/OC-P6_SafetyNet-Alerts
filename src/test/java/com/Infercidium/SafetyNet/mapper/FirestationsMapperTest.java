@@ -1,25 +1,7 @@
 package com.Infercidium.SafetyNet.mapper;
 
-import com.infercidium.safetynet.dto.FirestationsDTO;
-import com.infercidium.safetynet.dto.PersonsAndMedicalRecordsDTO;
-import com.infercidium.safetynet.dto.StationNumberDTO;
-import com.infercidium.safetynet.mapper.FirestationsMapper;
 import com.infercidium.safetynet.mapper.FirestationsMapperImpl;
-import com.infercidium.safetynet.model.Address;
-import com.infercidium.safetynet.model.Firestations;
-import com.infercidium.safetynet.model.MedicalRecords;
-import com.infercidium.safetynet.model.Persons;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;

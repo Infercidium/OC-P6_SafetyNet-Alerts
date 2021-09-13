@@ -16,7 +16,9 @@ import java.time.Period;
 import java.util.HashSet;
 import java.util.Set;
 
-
+/**
+ * MedicalRecords model stored in the database.
+ */
 @Entity
 public class MedicalRecords {
 
@@ -184,6 +186,14 @@ public class MedicalRecords {
      */
     public void setPersons(final Persons personsS) {
         this.persons = personsS;
+    }
+
+    /**
+     * Phone getter.
+     * @return phone attribute.
+     */
+    public String getPhone() {
+        return persons.getPhone();
     }
 
     /**

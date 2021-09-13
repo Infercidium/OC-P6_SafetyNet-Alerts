@@ -2,11 +2,21 @@ package com.infercidium.safetynet.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.validation.constraints.Min;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Firestations model stored in the database.
+ */
 @Entity
 public class Firestations {
 
@@ -21,7 +31,7 @@ public class Firestations {
     /**
      * Address attribute.
      */
-    @ManyToMany(fetch=FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "Firestations_Address",
             joinColumns = @JoinColumn(name = "Firestations_id"),
             inverseJoinColumns = @JoinColumn(name = "Address_id"))
@@ -43,7 +53,6 @@ public class Firestations {
     /**
      * Constructor taking all the attributes not automatically generated,
      * instantiating all the attribute values.
-     *
      * @param addressC this is the address attribute.
      * @param stationC this is the station attribute.
      */
@@ -54,7 +63,6 @@ public class Firestations {
 
     /**
      * Id getter.
-     *
      * @return id attribute.
      */
     public Long getId() {
@@ -63,7 +71,6 @@ public class Firestations {
 
     /**
      * Id setter.
-     *
      * @param idS becomes the new id attribute.
      */
     public void setId(final Long idS) {
@@ -72,7 +79,6 @@ public class Firestations {
 
     /**
      * Address getter.
-     *
      * @return address attribute.
      */
     public Set<Address> getAddress() {
@@ -81,7 +87,6 @@ public class Firestations {
 
     /**
      * Address setter.
-     *
      * @param addressS becomes the new address attribute.
      */
     public void setAddress(final Set<Address> addressS) {
@@ -90,7 +95,6 @@ public class Firestations {
 
     /**
      * Station getter.
-     *
      * @return station attribute.
      */
     public int getStation() {
@@ -99,24 +103,30 @@ public class Firestations {
 
     /**
      * Station setter.
-     *
      * @param stationS becomes the new station attribute.
      */
     public void setStation(final int stationS) {
         this.station = stationS;
     }
 
-    public void addAddress(final Address address) {
-        this.address.add(address);
+    /**
+     * Adds an address to the existing Set.
+     * @param addressAdded : Address to add.
+     */
+    public void addAddress(final Address addressAdded) {
+        this.address.add(addressAdded);
     }
 
-    public void removeAddress(final Address address) {
-        this.address.remove(address);
+    /**
+     * Delete an address to the existing Set.
+     * @param addressRemoved : Address to delete.
+     */
+    public void removeAddress(final Address addressRemoved) {
+        this.address.remove(addressRemoved);
     }
 
     /**
      * ToString method allows you to see the content.
-     *
      * @return a String containing the name
      * of all the attributes and their contents.
      */
