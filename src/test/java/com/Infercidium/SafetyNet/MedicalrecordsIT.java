@@ -16,7 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class MedicalrecordsIT {
 
-    /*@Autowired
+    @Autowired
     private MockMvc mvc;
 
     //Delete
@@ -43,35 +43,6 @@ public class MedicalrecordsIT {
     @Test
     public void successGetAllMedicalRecords() throws Exception {
 
-        mvc.perform(get("/medicalRecords")).andExpect(status().isOk());
+        mvc.perform(get("/medicalRecord/")).andExpect(status().isOk());
     }
-
-    //URL
-    @Test
-    public void successChildAlert() throws Exception {
-        mvc.perform(get("/childAlert?address=947 E. Rose Dr")).andExpect(status().isOk())
-                .andExpect(jsonPath("Adults[0].firstName", is("Brian")))
-                .andExpect(jsonPath("Child[0].firstName", is("Kendrik")));
-    }
-    @Test
-    public void echecNotFoundChildAlert() throws Exception {
-        mvc.perform(get("/childAlert?address=Inexistant address")).andExpect(status().isNotFound());
-    }
-    @Test
-    public void echecBadParamChildAlert() throws Exception {
-        mvc.perform(get("/childAlert")).andExpect(status().isBadRequest());
-    }
-
-    @Test
-    public void successPersonInfo() throws Exception {
-        mvc.perform(get("/personInfo?firstName=Jacob&lastName=boyd")).andExpect(status().isOk());
-    }
-    @Test
-    public void echecNotFoundPersonInfo() throws Exception {
-        mvc.perform(get("/personInfo?firstName=Jess&lastName=Xistepas")).andExpect(status().isNotFound());
-    }
-    @Test
-    public void echecBadParamPersonInfo() throws Exception {
-        mvc.perform(get("/personInfo")).andExpect(status().isBadRequest());
-    }*/
 }

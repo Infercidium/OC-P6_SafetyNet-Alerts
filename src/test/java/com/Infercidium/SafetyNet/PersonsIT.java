@@ -16,7 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class PersonsIT {
 
-   /* @Autowired
+    @Autowired
     private MockMvc mvc;
 
     //Delete
@@ -48,24 +48,6 @@ public class PersonsIT {
     @Test
     public void successGetAllPersons() throws Exception {
 
-        mvc.perform(get("/persons")).andExpect(status().isOk());
+        mvc.perform(get("/person/")).andExpect(status().isOk());
     }
-
-    //URL
-    @Test
-    public void successCommunityEmail() throws Exception {
-        mvc.perform(get("/communityEmail?city=Culver")).andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].email", is("jaboyd@email.com")))
-                .andExpect(jsonPath("$[3].email", is("tcoop@ymail.com")))
-                .andExpect(jsonPath("$[7].email", is("zarc@email.com")))
-                .andExpect(jsonPath("$[11].email", is("bstel@email.com")));
-    }
-    @Test
-    public void echecNotFoundCommunityEmail() throws Exception {
-        mvc.perform(get("/communityEmail?city=Inexistant city")).andExpect(status().isNotFound());
-    }
-    @Test
-    public void echecBadParamCommunityEmail() throws Exception {
-        mvc.perform(get("/communityEmail")).andExpect(status().isBadRequest());
-    }*/
 }
