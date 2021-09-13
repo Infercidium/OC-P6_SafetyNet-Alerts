@@ -30,7 +30,7 @@ import static org.mockito.Mockito.*;
 @SpringBootTest(classes = {MedicalRecordsRest.class})
 class MedicalRecordsRestTest {
 
-    /*@MockBean
+    @MockBean
     private MedicalRecordsService medicalRecordsS;
     @MockBean
     private MedicalRecordsMapper medicalRecordsM;
@@ -46,12 +46,6 @@ class MedicalRecordsRestTest {
 
     MedicalRecordsDTO medicalRecordsDTO = new MedicalRecordsDTO();
     List<MedicalRecordsDTO> medicalRecordsDTOList = new ArrayList<>();
-
-    PersonsAndMedicalRecordsDTO personsAndMedicalRecordsDTO = new PersonsAndMedicalRecordsDTO();
-    List<PersonsAndMedicalRecordsDTO> personsAndMedicalRecordsDTOList = new ArrayList<>();
-
-    Map<String, Object> childAlertResult = new HashMap<>();
-    PersonInfoDTO personInfoDTO = new PersonInfoDTO();
 
     @BeforeEach
     private void setUpPerTest() {
@@ -106,38 +100,4 @@ class MedicalRecordsRestTest {
         assertEquals(1, medicalRecordsDtoList.size());
 
     }
-
-    @Test
-    void getChildAlert() {
-        personsAndMedicalRecordsDTO.setFirstName(persons.getFirstName());
-        personsAndMedicalRecordsDTO.setLastName(persons.getLastName());
-        personsAndMedicalRecordsDTO.setMedications(medicalRecords.getMedications());
-        personsAndMedicalRecordsDTO.setAllergies(medicalRecords.getAllergies());
-        personsAndMedicalRecordsDTO.setAge(medicalRecords.getAge());
-        personsAndMedicalRecordsDTO.setPhone(persons.getPhone());
-        personsAndMedicalRecordsDTOList.add(personsAndMedicalRecordsDTO);
-        when(medicalRecordsS.getPersonsAddress(persons.getAddress().getAddress())).thenReturn(personsList);
-        when(medicalRecordsM.personsModelToChildAlertAndFireDTO(personsList)).thenReturn(personsAndMedicalRecordsDTOList);
-        when(medicalRecordsS.getChildAlertCount(personsAndMedicalRecordsDTOList)).thenReturn(childAlertResult);
-        Map<String, Object> result = medicalRecordsRest.getChildAlert(persons.getAddress().getAddress());
-        assertTrue(result.isEmpty());
-    }
-
-    @Test
-    void getPersonInfo() {
-        personInfoDTO.setFirstName(persons.getFirstName());
-        personInfoDTO.setLastName(persons.getLastName());
-        personInfoDTO.setMedications(medicalRecords.getMedications());
-        personInfoDTO.setAllergies(medicalRecords.getAllergies());
-        personInfoDTO.setAge(medicalRecords.getAge());
-        personInfoDTO.setAddress(persons.getAddress().getAddress());
-        personInfoDTO.setEmail(persons.getEmail());
-        when(medicalRecordsM.modelToPersonInfoDTO(medicalRecords)).thenReturn(personInfoDTO);
-        PersonInfoDTO personInfoDto = medicalRecordsRest.getPersonInfo(persons.getFirstName(), persons.getLastName());
-        assertEquals(personInfoDTO.getFirstName(), personInfoDto.getFirstName());
-        assertEquals(personInfoDTO.getLastName(), personInfoDto.getLastName());
-        assertEquals(personInfoDTO.getAge(), personInfoDto.getAge());
-        assertEquals(personInfoDTO.getAddress(), personInfoDto.getAddress());
-        assertEquals(personInfoDTO.getEmail(), personInfoDto.getEmail());
-    }*/
 }

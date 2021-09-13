@@ -1,25 +1,50 @@
 package com.Infercidium.SafetyNet.mapper;
 
+import com.infercidium.safetynet.dto.FirestationsDTO;
+import com.infercidium.safetynet.mapper.AddressMapper;
+import com.infercidium.safetynet.mapper.FirestationsMapper;
 import com.infercidium.safetynet.mapper.FirestationsMapperImpl;
+import com.infercidium.safetynet.model.Address;
+import com.infercidium.safetynet.model.Firestations;
+import com.infercidium.safetynet.model.MedicalRecords;
+import com.infercidium.safetynet.model.Persons;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
-@SpringBootTest(classes = {FirestationsMapperImpl.class}) //todo réactiver
+@SpringBootTest(classes = {FirestationsMapperImpl.class})
 class FirestationsMapperTest {
 
-    /*@Autowired
-    private FirestationsMapper firestationsMapperImpl;
+    @MockBean
+    private AddressMapper addressMapper;
+    @Autowired
+    private FirestationsMapper firestationsMapper;
+
+    String addressString = "1 rue du testing";
+    Address address = new Address(addressString);
+    Set<Address> addressSet = Collections.singleton(address);
+    Set<String> addressStringSet = Collections.singleton(addressString);
 
     FirestationsDTO firestationsDTO = new FirestationsDTO();
     List<FirestationsDTO> firestationsDTOList = new ArrayList<>();
 
-    Firestations firestations = new Firestations(new Address("1 rue du testing"), 1);
+    Firestations firestations = new Firestations(addressSet, 1);
     List<Firestations> firestationsList = new ArrayList<>();
 
-    Persons persons = new Persons("Jean", "Bobine", new Address("1 rue du testing"), "Testy", 12345, "456-789-1011", "jbob@email.com");
+    Persons persons = new Persons("Jean", "Bobine", address, "Testy", 12345, "456-789-1011", "jbob@email.com");
     List<Persons> personsList = new ArrayList<>();
 
     LocalDate localDate = LocalDate.of(1990, 1, 1);
@@ -29,67 +54,37 @@ class FirestationsMapperTest {
     @BeforeEach
     private void setUpPerTest() {
         firestationsDTO.setStation(1);
-        firestationsDTO.setAddress("1 rue du testing");
+        firestationsDTO.setAddress(addressStringSet);
         firestationsDTOList.add(firestationsDTO);
 
         firestationsList.add(firestations);
         personsList.add(persons);
         medicalRecordsList.add(medicalRecords);
+
+        when(addressMapper.addressFromString(addressString)).thenReturn(address);
+        when(addressMapper.stringFromAddress(address)).thenReturn(addressString);
+        when(addressMapper.addressFromString(addressStringSet)).thenReturn(addressSet);
+        when(addressMapper.stringFromAddress(addressSet)).thenReturn(addressStringSet);
     }
+
 
     @Test
     void dtoToModel() {
-        Firestations convertFirestations = firestationsMapperImpl.dtoToModel(firestationsDTO);
+        Firestations convertFirestations = firestationsMapper.dtoToModel(firestationsDTO);
         assertTrue(firestations.toString().equals(convertFirestations.toString()));
     }
 
     @Test
-    void map() {
-        Address result = firestationsMapperImpl.map("1 rue du testing");
-        assertEquals(firestations.getAddress().toString(), result.toString());
-    }
-
-    @Test
     void modelToDto() {
-        FirestationsDTO firestationsDto = firestationsMapperImpl.modelToDto(firestations);
+        FirestationsDTO firestationsDto = firestationsMapper.modelToDto(firestations);
         assertEquals(firestationsDTO.getAddress(), firestationsDto.getAddress());
         assertEquals(firestationsDTO.getStation(), firestationsDto.getStation());
     }
 
     @Test
     void testModelToDto() {
-        List<FirestationsDTO> firestationsDtoList = firestationsMapperImpl.modelToDto(firestationsList);
+        List<FirestationsDTO> firestationsDtoList = firestationsMapper.modelToDto(firestationsList);
         assertEquals(firestationsDTOList.get(0).getAddress(), firestationsDtoList.get(0).getAddress());
         assertEquals(firestationsDtoList.get(0).getStation(), firestationsDtoList.get(0).getStation());
     }
-
-    @Test
-    void testMap() {
-        String result = firestationsMapperImpl.map(firestations.getAddress());
-        assertEquals(firestationsDTO.getAddress(), result);
-    }
-
-    @Test
-    void personsModelToStationNumberDTO() {
-        List<StationNumberDTO> stationNumberDtoList = firestationsMapperImpl.personsModelToStationNumberDTO(personsList);
-        assertEquals(persons.getFirstName(), stationNumberDtoList.get(0).getFirstName());
-        assertEquals(persons.getLastName(), stationNumberDtoList.get(0).getLastName());
-        assertEquals(persons.getAddress().getAddress(), stationNumberDtoList.get(0).getAddress());
-        assertEquals(persons.getPhone(), stationNumberDtoList.get(0).getPhone());
-    }
-
-    @Test
-    void personsAndMedicalRecordsModelToPersonsAndMedicalRecordsDTO() {
-        List<PersonsAndMedicalRecordsDTO> result = firestationsMapperImpl.personsAndMedicalRecordsModelToPersonsAndMedicalRecordsDTO(medicalRecordsList);
-        assertFalse(result.isEmpty());
-        assertEquals(medicalRecords.getAge() ,result.get(0).getAge());
-    }
-
-    @Test
-    void personsAndMedicalRecordsModelToFloodDTO() {
-        Map<String, List<MedicalRecords>> medicalRecordsMap = new HashMap<>();
-        medicalRecordsMap.put(firestationsDTO.getAddress(), medicalRecordsList);
-        Map<String, Object> result = firestationsMapperImpl.personsAndMedicalRecordsModelToFloodDTO(medicalRecordsMap);
-        assertTrue(medicalRecordsMap.containsKey(persons.getAddress().getAddress()));
-    }*/
 }
