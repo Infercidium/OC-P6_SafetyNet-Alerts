@@ -14,14 +14,10 @@ import com.infercidium.safetynet.service.MedicalRecordsI;
 import com.infercidium.safetynet.service.PersonsI;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.mockito.Spy;
-import org.mockito.internal.stubbing.answers.CallsRealMethods;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,7 +27,9 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = {FirestationsService.class})
 class FirestationsServiceTest {
@@ -98,22 +96,6 @@ class FirestationsServiceTest {
         when(firestationsR.findByAddressAddressIgnoreCaseAndStation(addressString,firestationsDTO.getStation())).thenReturn(firestations);
         when(medicalRecordsS.getMedicalRecordName(medicalRecords.getFirstName(), medicalRecords.getLastName())).thenReturn(medicalRecords);
     }
-
-
-    /*@Test //TODO à faire
-    void createMapage() throws SQLIntegrityConstraintViolationException {
-        when(firestationsR.findByAddressAddressIgnoreCaseAndStation(addressString,firestationsDTO.getStation())).thenReturn(null);
-        when(addressS.checkAddress(address)).thenReturn(address);
-        Firestations postFirestations = firestationsService.createMapage(address, firestations);
-        assertEquals(firestations, postFirestations);
-    }
-
-    @Test //TODO impossible
-    void editFirestation() throws SQLIntegrityConstraintViolationException {
-        firestations.setId(1L);
-        firestationsService.editFirestation(addressString, firestationsDTO.getStation(),  firestations);
-        verify(firestationsService, times(2)).mapageCheck(addressString, firestationsDTO.getStation());
-    }*/
 
     @Test
     void removeAddress() {

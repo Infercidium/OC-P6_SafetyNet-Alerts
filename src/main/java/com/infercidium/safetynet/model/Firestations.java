@@ -82,7 +82,7 @@ public class Firestations {
      * @return address attribute.
      */
     public Set<Address> getAddress() {
-        return address;
+        return new HashSet<>(address);
     }
 
     /**
