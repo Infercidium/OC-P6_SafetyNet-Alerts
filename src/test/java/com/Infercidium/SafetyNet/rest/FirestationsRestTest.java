@@ -96,7 +96,7 @@ class FirestationsRestTest {
         personsAndMedicalRecordsDTO.setPhone(persons.getPhone());
         personsAndMedicalRecordsDTOList.add(personsAndMedicalRecordsDTO);
 
-        when(firestationsM.dtoToModel(firestationsDTO)).thenReturn(firestations);
+        when(firestationsM.dtoToModel(any(FirestationsDTO.class))).thenReturn(firestations);
         when(firestationsM.modelToDto(firestations)).thenReturn(firestationsDTO);
         when(firestationsM.modelToDto(firestationsList)).thenReturn(Collections.singletonList(firestationsDTO));
 
@@ -104,13 +104,13 @@ class FirestationsRestTest {
         when(firestationsS.getFirestationsAddress(addressString)).thenReturn(firestationsList);
     }
 
-    /*@Test //TODO Solution inconnue
+    @Test
     void createStationMap() throws SQLIntegrityConstraintViolationException {
         when(firestationsS.createMapage(address, firestations)).thenReturn(firestations);
         ResponseEntity<Void> responseEntity = firestationsRest.createStationMap(firestationsAddressDTO);
         assertEquals("201 CREATED", responseEntity.getStatusCode().toString());
-        assertEquals("[Location:\"http://localhost/Address%7B%20id%20=%20null,%20address%20=%20'1%20rue%20du%20testing'%7D\"]", responseEntity.getHeaders().toString());
-    }*/
+        assertEquals("[Location:\"http://localhost/%5BAddress%7B%20id%20=%20null,%20address%20=%20'1%20rue%20du%20testing'%7D%5D\"]", responseEntity.getHeaders().toString());
+    }
 
     @Test
     void editStationMap() throws SQLIntegrityConstraintViolationException {

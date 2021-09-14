@@ -31,9 +31,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest(classes = {FirestationsService.class})
 class FirestationsServiceTest {
@@ -106,12 +104,11 @@ class FirestationsServiceTest {
     void createMapage() throws SQLIntegrityConstraintViolationException {
         when(firestationsR.findByAddressAddressIgnoreCaseAndStation(addressString,firestationsDTO.getStation())).thenReturn(null);
         when(addressS.checkAddress(address)).thenReturn(address);
-        doAnswer(new CallsRealMethods()).when(firestations).addAddress(address);
         Firestations postFirestations = firestationsService.createMapage(address, firestations);
         assertEquals(firestations, postFirestations);
-    }*/
+    }
 
-    /*@Test //TODO impossible
+    @Test //TODO impossible
     void editFirestation() throws SQLIntegrityConstraintViolationException {
         firestations.setId(1L);
         firestationsService.editFirestation(addressString, firestationsDTO.getStation(),  firestations);

@@ -14,7 +14,6 @@ import com.infercidium.safetynet.model.Medications;
 import com.infercidium.safetynet.model.Persons;
 import com.infercidium.safetynet.service.DataBaseInitService;
 import com.infercidium.safetynet.service.FirestationsI;
-import com.infercidium.safetynet.service.MedicalRecordsI;
 import com.infercidium.safetynet.service.PersonsI;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,8 +45,6 @@ class DataBaseInitServiceTest {
     private FirestationsI firestationsS;
     @MockBean
     private MedicalRecordsMapper medicalRecordsM;
-    @MockBean
-    private MedicalRecordsI medicalRecordsS;
     @Autowired
     private DataBaseInitService dataBaseInitService;
 
@@ -64,7 +61,7 @@ class DataBaseInitServiceTest {
     Set<Allergies> allergiesSet = new HashSet<>();
     Set<Medications> medicationsSet = new HashSet<>();
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
-    MedicalRecords medicalRecords = new MedicalRecords(LocalDate.of(1984, 03, 06), medicationsSet, allergiesSet, persons);
+    MedicalRecords medicalRecords = new MedicalRecords(LocalDate.of(1984, 3, 6), medicationsSet, allergiesSet, persons);
 
     @BeforeEach
     private void setUpPerTest() {
@@ -88,7 +85,7 @@ class DataBaseInitServiceTest {
 
         medicalRecordsDTO.setFirstName("John");
         medicalRecordsDTO.setLastName("Boyd");
-        medicalRecordsDTO.setBirthdate(LocalDate.of(1984, 03, 06));
+        medicalRecordsDTO.setBirthdate(LocalDate.of(1984, 3, 6));
         medicalRecordsDTO.setMedications(medicationsSet);
         medicalRecordsDTO.setAllergies(allergiesSet);
     }
