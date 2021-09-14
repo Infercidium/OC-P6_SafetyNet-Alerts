@@ -119,27 +119,26 @@ class DataBaseInitServiceTest {
         assertEquals(medicalRecordsDTO.getBirthdate().format(formatter), result.get(0).get("birthdate"));
     }
 
-    /*@Test //TODO Solution inconnue
+    @Test
     void instanciateListFirestations() throws SQLIntegrityConstraintViolationException {
         List<Map<String, String>> mapList = new ArrayList<>();
         Map firestationsMap = new HashMap();
         firestationsMap.put("station", "3");
         firestationsMap.put("address", "1509 Culver St");
         mapList.add(firestationsMap);
-        when(firestationsM.dtoToModel(firestationsDTO)).thenReturn(firestations);
+        when(firestationsM.dtoToModel(any(FirestationsDTO.class))).thenReturn(firestations);
         when(firestationsS.mapageCheck("1509 Culver St", 3)).thenReturn(false);
         dataBaseInitService.instanciateListFirestations(mapList);
         verify(firestationsM, times(1)).dtoToModel(any(FirestationsDTO.class));
-    }*/
+    }
 
-    /*@Test //TODO Solution inconnue
+    @Test
     void instanciateListPersons() {
-
-        when(personsM.dtoToModel(personsDTO)).thenReturn(persons);
+        when(personsM.dtoToModel(any(PersonsDTO.class))).thenReturn(persons);
         when(personsS.personCheck(personsDTO.getFirstName(), personsDTO.getLastName())).thenReturn(true);
         dataBaseInitService.instanciateListPersons(dataBaseInitService.convertMaptoList(dataMap, "persons"));
         verify(personsM, times(1)).dtoToModel(any(PersonsDTO.class));
-    }*/
+    }
 
     @Test
     void instanciateListMedicalRecords() {

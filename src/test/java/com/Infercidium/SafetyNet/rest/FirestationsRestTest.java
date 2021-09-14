@@ -104,8 +104,7 @@ class FirestationsRestTest {
         when(firestationsS.getFirestationsAddress(addressString)).thenReturn(firestationsList);
     }
 
-   /* @Test //TODO Solution inconnue
-    @PrepareTestInstance(value = {FirestationsDTO.class, FirestationsRest.class})
+    /*@Test //TODO Solution inconnue
     void createStationMap() throws SQLIntegrityConstraintViolationException {
         when(firestationsS.createMapage(address, firestations)).thenReturn(firestations);
         ResponseEntity<Void> responseEntity = firestationsRest.createStationMap(firestationsAddressDTO);
