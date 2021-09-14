@@ -1,8 +1,6 @@
 package com.Infercidium.SafetyNet.mapper;
 
 import com.infercidium.safetynet.dto.MedicalRecordsDTO;
-import com.infercidium.safetynet.dto.PersonInfoDTO;
-import com.infercidium.safetynet.dto.PersonsAndMedicalRecordsDTO;
 import com.infercidium.safetynet.mapper.MedicalRecordsMapper;
 import com.infercidium.safetynet.mapper.MedicalRecordsMapperImpl;
 import com.infercidium.safetynet.model.Address;
@@ -18,13 +16,14 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @SpringBootTest(classes = {MedicalRecordsMapperImpl.class})
 class MedicalRecordsMapperTest {
 
-    /*@Autowired
-    private MedicalRecordsMapper medicalRecordsMapperImpl;
+    @Autowired
+    private MedicalRecordsMapper medicalRecordsMapper;
 
     Persons persons = new Persons("Jean", "Bobine", new Address("1 rue du testing"), "Testy", 12345, "456-789-1011", "jbob@email.com");
     List<Persons> personsList = new ArrayList<>();
@@ -51,14 +50,14 @@ class MedicalRecordsMapperTest {
 
     @Test
     void dtoToModel() {
-        MedicalRecords medicalRecord = medicalRecordsMapperImpl.dtoToModel(medicalRecordsDTO);
+        MedicalRecords medicalRecord = medicalRecordsMapper.dtoToModel(medicalRecordsDTO);
         medicalRecord.setPersons(persons);
-        assertTrue(medicalRecords.toString().equals(medicalRecord.toString()));
+        assertEquals(medicalRecords.toString(), medicalRecord.toString());
     }
 
     @Test
     void modelToDto() {
-        MedicalRecordsDTO medicalRecordsDto = medicalRecordsMapperImpl.modelToDto(medicalRecords);
+        MedicalRecordsDTO medicalRecordsDto = medicalRecordsMapper.modelToDto(medicalRecords);
         assertEquals(medicalRecords.getFirstName(), medicalRecordsDto.getFirstName());
         assertEquals(medicalRecords.getLastName(), medicalRecordsDto.getLastName());
         assertEquals(medicalRecords.getBirthdate(), medicalRecordsDto.getBirthdate());
@@ -66,26 +65,8 @@ class MedicalRecordsMapperTest {
 
     @Test
     void testModelToDto() {
-        List<MedicalRecordsDTO> medicalRecordsDtoList = medicalRecordsMapperImpl.modelToDto(medicalRecordsList);
+        List<MedicalRecordsDTO> medicalRecordsDtoList = medicalRecordsMapper.modelToDto(medicalRecordsList);
         assertFalse(medicalRecordsDtoList.isEmpty());
         assertEquals(medicalRecords.getBirthdate(), medicalRecordsDtoList.get(0).getBirthdate());
     }
-
-    @Test
-    void personsModelToChildAlertAndFireDTO() {
-        List<PersonsAndMedicalRecordsDTO> personsAndMedicalrecordsDto = medicalRecordsMapperImpl.personsModelToChildAlertAndFireDTO(personsList);
-        assertFalse(personsAndMedicalrecordsDto.isEmpty());
-        assertEquals(persons.getFirstName(), personsAndMedicalrecordsDto.get(0).getFirstName());
-        assertEquals(persons.getLastName(), personsAndMedicalrecordsDto.get(0).getLastName());
-    }
-
-    @Test
-    void modelToPersonInfoDTO() {
-        PersonInfoDTO personInfoDto = medicalRecordsMapperImpl.modelToPersonInfoDTO(medicalRecords);
-        assertEquals(persons.getFirstName(), personInfoDto.getFirstName());
-        assertEquals(persons.getLastName(), personInfoDto.getLastName());
-        assertEquals(persons.getAddress().getAddress() ,personInfoDto.getAddress());
-        assertEquals(persons.getEmail(), personInfoDto.getEmail());
-        assertEquals(medicalRecords.getAge(), personInfoDto.getAge());
-    }*/
 }

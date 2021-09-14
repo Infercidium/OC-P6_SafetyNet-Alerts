@@ -17,12 +17,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -30,7 +31,7 @@ import static org.mockito.Mockito.when;
 @SpringBootTest(classes = {MedicalRecordsService.class})
 class MedicalRecordsServiceTest {
 
-    /*@MockBean
+    @MockBean
     private PersonsI personsS;
     @MockBean
     private MedicalrecordsRepository medicalRecordsR;
@@ -40,6 +41,9 @@ class MedicalRecordsServiceTest {
     private AllergiesI allergiesS;
     @Autowired
     private MedicalRecordsService medicalRecordsService;
+
+    String addressString = "1 rue du testing";
+    Address address = new Address(addressString);
 
     Persons persons = new Persons("Jean", "Bobine", new Address("1 rue du testing"), "Testy", 12345, "456-789-1011", "jbob@email.com");
     List<Persons> personsList = new ArrayList<>();
@@ -106,22 +110,32 @@ class MedicalRecordsServiceTest {
     }
 
     @Test
-    void checkMajority() {
-        Boolean result = medicalRecordsService.checkMajority(persons.getFirstName(), persons.getLastName());
+    void medicalRecordCheck() {
+        when(medicalRecordsR.findByPersonsFirstNameIgnoreCaseAndPersonsLastNameIgnoreCase(persons.getFirstName(), persons.getLastName())).thenReturn(medicalRecords);
+        boolean result = medicalRecordsService.medicalRecordCheck(persons.getFirstName(), persons.getLastName());
         assertTrue(result);
     }
 
     @Test
-    void getPersonsAddress() {
-        when(personsS.getPersonsAddress(persons.getAddress().getAddress())).thenReturn(personsList);
-        List<Persons> personsAddress = medicalRecordsService.getPersonsAddress(persons.getAddress().getAddress());
-        assertEquals(personsList, personsAddress);
+    void childAlert() {
+        when(medicalRecordsR.findByPersonsAddressAddressIgnoreCase(addressString)).thenReturn(medicalRecordsList);
+        Map<String, List<PersonsAndMedicalRecordsDTO>> result = medicalRecordsService.childAlert(addressString);
+        assertTrue(result.isEmpty());
     }
 
     @Test
-    void getChildAlertCount() {
-        Map<String, Object> result = medicalRecordsService.getChildAlertCount(personsAndMedicalRecordsDTOList);
-        System.out.println(result);
-        assertTrue(result.isEmpty());
-    }*/
+    void childAlertchild() {
+        LocalDate localDate = LocalDate.now().minusYears(2);
+        medicalRecords.setBirthdate(localDate);
+        when(medicalRecordsR.findByPersonsAddressAddressIgnoreCase(addressString)).thenReturn(medicalRecordsList);
+        Map<String, List<PersonsAndMedicalRecordsDTO>> result = medicalRecordsService.childAlert(addressString);
+        assertTrue(result.get("Adult").isEmpty());
+        assertFalse(result.get("Child").isEmpty());
+    }
+
+    @Test
+    void personsListToMedicalRecordsList() {
+        List<MedicalRecords> result = medicalRecordsService.personsListToMedicalRecordsList(personsList);
+        assertEquals(medicalRecordsList, result);
+    }
 }

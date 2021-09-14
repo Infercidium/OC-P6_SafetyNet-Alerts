@@ -59,7 +59,7 @@ public class FirestationsService implements FirestationsI {
                     .findByStation(firestations.getStation());
         } else {
             firestation = firestations;
-            firestation.getAddress().clear();
+            firestation.removeAddress(address);
         }
         firestation.addAddress(addressComplete);
         return this.firestationsR.save(firestation);
@@ -76,9 +76,7 @@ public class FirestationsService implements FirestationsI {
                                 final int station,
                                 final Firestations firestations)
             throws SQLIntegrityConstraintViolationException {
-        if (!mapageCheck(address, station)) {
-            throw new NullPointerException();
-        } else if (mapageCheck(address, firestations.getStation())) {
+        if (mapageCheck(address, firestations.getStation())) {
             throw new SQLIntegrityConstraintViolationException();
         }
         Address addressComplete = new Address(address);

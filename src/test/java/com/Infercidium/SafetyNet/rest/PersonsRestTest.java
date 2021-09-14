@@ -24,7 +24,7 @@ import static org.mockito.Mockito.when;
 @SpringBootTest(classes = {PersonsRest.class})
 class PersonsRestTest {
 
-    /*@MockBean
+    @MockBean
     private PersonsService personsS;
     @MockBean
     private PersonsMapper personsM;
@@ -35,7 +35,6 @@ class PersonsRestTest {
     List<Persons> personsList = new ArrayList<>();
 
     PersonsDTO personsDTO = new PersonsDTO();
-    PersonsDTO personsDTOmail = new PersonsDTO();
     List<PersonsDTO> personsDTOList = new ArrayList<>();
 
     @BeforeEach
@@ -49,7 +48,6 @@ class PersonsRestTest {
         personsDTO.setZip(persons.getZip());
         personsDTO.setPhone(persons.getPhone());
         personsDTO.setEmail(persons.getEmail());
-        personsDTOmail.setEmail(persons.getEmail());
         personsDTOList.add(personsDTO);
 
         when(personsM.dtoToModel(personsDTO)).thenReturn(persons);
@@ -98,14 +96,4 @@ class PersonsRestTest {
         List<PersonsDTO> personsDtoList = personsRest.getPersons();
         assertEquals(1, personsDtoList.size());
     }
-
-    @Test
-    void getCommunityEmail() {
-        personsDTOList.clear();
-        personsDTOList.add(personsDTOmail);
-        when(personsS.getPersonsCity(personsDTO.getCity())).thenReturn(personsList);
-        when(personsS.personsToPersonsdtoEmail(personsList)).thenReturn(personsDTOList);
-        List<PersonsDTO> personsDtoList = personsRest.getCommunityEmail(persons.getCity());
-        assertEquals(personsDTOmail.getEmail(), personsDtoList.get(0).getEmail());
-    }*/
 }

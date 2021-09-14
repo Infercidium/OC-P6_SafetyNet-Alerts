@@ -1,6 +1,7 @@
 package com.Infercidium.SafetyNet.mapper;
 
 import com.infercidium.safetynet.dto.PersonsDTO;
+import com.infercidium.safetynet.mapper.AddressMapper;
 import com.infercidium.safetynet.mapper.PersonsMapper;
 import com.infercidium.safetynet.mapper.PersonsMapperImpl;
 import com.infercidium.safetynet.model.Address;
@@ -9,17 +10,28 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
-@SpringBootTest(classes = {PersonsMapperImpl.class}) //todo réactiver
+@SpringBootTest(classes = {PersonsMapperImpl.class})
 class PersonsMapperTest {
 
-    /*@Autowired
+    @MockBean
+    private AddressMapper addressMapper;
+    @Autowired
     private PersonsMapper personsMapperImpl;
+
+    String addressString = "1 rue du testing";
+    Address address = new Address(addressString);
+    Set<Address> addressSet = Collections.singleton(address);
+    Set<String> addressStringSet = Collections.singleton(addressString);
 
     Persons persons = new Persons("Jean", "Bobine", new Address("1 rue du testing"), "Testy", 12345, "456-789-1011", "jbob@email.com");
     List<Persons> personsList = new ArrayList<>();
@@ -39,18 +51,17 @@ class PersonsMapperTest {
         personsDTO.setCity(persons.getCity());
         personsDTO.setAddress(persons.getAddress().getAddress());
         personsDTOList.add(personsDTO);
+
+        when(addressMapper.addressFromString(addressString)).thenReturn(address);
+        when(addressMapper.stringFromAddress(address)).thenReturn(addressString);
+        when(addressMapper.addressFromString(addressStringSet)).thenReturn(addressSet);
+        when(addressMapper.stringFromAddress(addressSet)).thenReturn(addressStringSet);
     }
 
     @Test
     void dtoToModel() {
         Persons person = personsMapperImpl.dtoToModel(personsDTO);
         assertEquals(persons.toString(), person.toString());
-    }
-
-    @Test
-    void map() {
-        Address address = personsMapperImpl.map(persons.getAddress().getAddress());
-        assertEquals(personsDTO.getAddress(), address.getAddress());
     }
 
     @Test
@@ -78,10 +89,4 @@ class PersonsMapperTest {
         assertEquals(persons.getAddress().getAddress(), personsDtoList.get(0).getAddress());
 
     }
-
-    @Test
-    void testMap() {
-        String address = personsMapperImpl.map(persons.getAddress());
-        assertEquals(persons.getAddress().getAddress(), address);
-    }*/
 }
