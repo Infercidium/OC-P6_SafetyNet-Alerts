@@ -14,6 +14,7 @@ import com.infercidium.safetynet.model.Medications;
 import com.infercidium.safetynet.model.Persons;
 import com.infercidium.safetynet.service.DataBaseInitService;
 import com.infercidium.safetynet.service.FirestationsI;
+import com.infercidium.safetynet.service.MedicalRecordsI;
 import com.infercidium.safetynet.service.PersonsI;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,6 +40,8 @@ class DataBaseInitServiceTest {
     private PersonsMapper personsM;
     @MockBean
     private PersonsI personsS;
+    @MockBean
+    private MedicalRecordsI medicalRecordsI;
     @MockBean
     private FirestationsMapper firestationsM;
     @MockBean
