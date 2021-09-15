@@ -98,7 +98,7 @@ public class MedicalRecordsDTO {
      * @return medications Set attribute.
      */
     public Set<Medications> getMedications() {
-        return medications;
+        return new HashSet<>(medications);
     }
 
     /**
@@ -114,7 +114,7 @@ public class MedicalRecordsDTO {
      * @return allergies Set attribute.
      */
     public Set<Allergies> getAllergies() {
-        return allergies;
+        return new HashSet<>(allergies);
     }
 
     /**

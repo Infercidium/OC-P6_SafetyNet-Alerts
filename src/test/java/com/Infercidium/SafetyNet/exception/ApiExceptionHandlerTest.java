@@ -24,7 +24,7 @@ class ApiExceptionHandlerTest {
     @Autowired
     private ApiExceptionHandler apiExceptionHandler;
 
-    String ressourceNotFound = "Ressource not found";
+    String ressourceNotFound = "Resource not found";
     String existingRessource = "Existing resource";
     String linkNull = "Link between tables = null";
     String invalidRessourceField = "Invalid resource field";
@@ -53,7 +53,7 @@ class ApiExceptionHandlerTest {
 
     @Test
     void handleHttpMessageNotReadableException() {
-        ResponseEntity<String> responseEntity = apiExceptionHandler.handleHttpMessageNotReadableException(new HttpMessageNotReadableException("test"));
+        ResponseEntity<String> responseEntity = apiExceptionHandler.handleInvalidRessourceException(new HttpMessageNotReadableException("test"));
         assertEquals(400, responseEntity.getStatusCodeValue());
         assertEquals(invalidRessourceField, responseEntity.getBody());
     }
@@ -68,7 +68,7 @@ class ApiExceptionHandlerTest {
     @Test
     void handleConstraintViolationException() {
         Set<ConstraintViolation<Firestations>> test = new HashSet<>();
-        ResponseEntity<String> responseEntity = apiExceptionHandler.handleConstraintViolationException(new ConstraintViolationException("test", test));
+        ResponseEntity<String> responseEntity = apiExceptionHandler.handleInvalidRessourceException(new ConstraintViolationException("test", test));
         assertEquals(400, responseEntity.getStatusCodeValue());
         assertEquals(invalidRessourceField, responseEntity.getBody());
     }
