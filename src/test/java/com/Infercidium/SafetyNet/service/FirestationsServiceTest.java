@@ -2,7 +2,6 @@ package com.Infercidium.SafetyNet.service;
 
 import com.infercidium.safetynet.dto.FirestationsDTO;
 import com.infercidium.safetynet.dto.PersonsAndMedicalRecordsDTO;
-import com.infercidium.safetynet.dto.PersonsDTO;
 import com.infercidium.safetynet.model.Address;
 import com.infercidium.safetynet.model.Firestations;
 import com.infercidium.safetynet.model.MedicalRecords;
@@ -63,9 +62,6 @@ class FirestationsServiceTest {
 
     FirestationsDTO firestationsDTO = new FirestationsDTO();
     List<FirestationsDTO> firestationsDTOList = new ArrayList<>();
-
-    PersonsDTO personsDTO = new PersonsDTO();
-    List<PersonsDTO> personsDTOList = new ArrayList<>();
 
     PersonsAndMedicalRecordsDTO personsAndMedicalRecordsDTO = new PersonsAndMedicalRecordsDTO();
     List<PersonsAndMedicalRecordsDTO> personsAndMedicalRecordsDTOList = new ArrayList<>();

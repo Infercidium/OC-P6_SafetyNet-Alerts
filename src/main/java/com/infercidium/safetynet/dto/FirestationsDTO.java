@@ -44,7 +44,7 @@ public class FirestationsDTO {
      * @return address attribute.
      */
     public Set<String> getAddress() {
-        return address;
+        return new HashSet<>(address);
     }
 
     /**

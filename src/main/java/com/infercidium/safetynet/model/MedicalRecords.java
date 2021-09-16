@@ -145,7 +145,7 @@ public class MedicalRecords {
      * @return medications Set attribute.
      */
     public Set<Medications> getMedications() {
-        return medications;
+        return new HashSet<>(medications);
     }
 
     /**
@@ -161,7 +161,7 @@ public class MedicalRecords {
      * @return allergies Set attribute.
      */
     public Set<Allergies> getAllergies() {
-        return allergies;
+        return new HashSet<>(allergies);
     }
 
     /**
@@ -177,7 +177,9 @@ public class MedicalRecords {
      * @return persons attribute.
      */
     public Persons getPersons() {
-        return persons;
+        Persons person;
+        person = this.persons;
+        return person;
     }
 
     /**
