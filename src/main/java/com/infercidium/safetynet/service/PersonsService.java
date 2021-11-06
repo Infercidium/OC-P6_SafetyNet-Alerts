@@ -235,7 +235,7 @@ public class PersonsService implements PersonsI, CommunityEmailI {
             List<Persons> filtered
                     = persons.stream()
                     .filter(person -> person.getAddress()
-                            .getAddress().equals(address.getAddress()))
+                            .getAddress().equalsIgnoreCase(address.getAddress()))
                     .collect(Collectors.toList());
             personsList.addAll(filtered);
         }
